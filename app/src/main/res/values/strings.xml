@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Ballet Wiki</string>
+    <string name="composer_label">Compositor</string>
+    <string name="titles_label">Títulos disponibles</string>
+    <string name="wikidata_source">Fuente: %1$s</string>
+    <string name="data_loaded_remote">Datos actualizados desde Wikidata</string>
+    <string name="data_loaded_offline">Mostrando datos verificados guardados localmente</string>
+    <string name="unavailable">No disponible en Wikidata</string>
 </resources>
