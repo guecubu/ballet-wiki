@@ -1,120 +1,81 @@
 # Plan de implementación por fases
 
-Estado: preparación y especificación; no se autoriza todavía la ejecución de fases de
-implementación. La API propia y su contrato están pendientes. No estimar calendario hasta conocer el
-contrato y acordar el alcance.
+Estado: Preparación y especificación de arquitectura y contrato.
 
-## Fase 0 — Preparación y auditoría del proyecto (actual)
+## Fase 0 — Preparación, auditoría y consenso del diseño (fase actual en curso)
 
-**Entregable:** documentación coherente, inventario de configuración actual y lista de decisiones
-pendientes. Sin cambios de producción ni validación de API.
+**Estado:** Fase 0 en curso.
+**Entregable:** Documentación consensuada (`SPECIFICATION.md`, `IMPLEMENTATION_PLAN.md`, `REQUIREMENTS_CHECKLIST.md`).
+- Origen de datos definido: API propia `https://ballet-api.vercel.app/api/ballets` y `/api/ballets/{id}`.
+- Contrato de DTOs: Anotados con `@SerializedName` de Gson para mapeo snake_case a camelCase. Listado extrae: `id`, `title`, `composer`, `premiereYear`, `coverImageUrl`. Detalle extrae la información completa.
+- Estructura de paquetes acordada: `activities`, `adapters`, `data` (`local`, `remote`, `repository`), `utils`.
+- Estrategia de persistencia acordada:
+  - SharedPreferences (`SessionManager` en `utils`): Almacenamiento de IDs favoritos (`Set<String>`).
+  - Room (`local`): Gestión de notas de usuario asociadas a cada obra (`work_id`).
+  - Actividades directas con `lifecycleScope` (sin capa de `ViewModel`).
+  - Traducción ML Kit con extensiones de `TextView` (`TranslationUtils` en `utils`) con diálogo `AlertDialog` de confirmación en datos móviles.
 
-- Revisar la especificación, el plan, el checklist, las instrucciones de agentes y skills.
-- Inspeccionar versiones Gradle/Kotlin/AGP/minSdk y dependencias existentes antes de proponer
-  cambios técnicos.
-- Retirar el prompt inicial y las hipótesis de proveedores terceros de la planificación.
-- Tener en cuenta que existe código de prototipo Wikidata; no considerarlo contrato/validación de la
-  API propia y no modificarlo durante esta fase documental.
-- Conservar objetivos de producto y requisitos académicos como objetivos por verificar, no como
-  implementación ya existente.
+**Puerta de Fase 0:** Aprobación expresa del usuario de esta fase para iniciar la Fase 1.
 
-**Puerta:** completar preparación documental. La integración API no puede empezar sin el contrato de
-la API propia.
+## Fase 1 — Configuración, Modelos de Datos, Retrofit y Room
 
-## Fase 0.5 — Recepción y análisis del contrato (pendiente; bloqueante)
+- Limpiar dependencias y código obsoleto (retirar prototipo Wikidata previo).
+- Crear estructura de paquetes (`activities`, `adapters`, `data.local`, `data.remote`, `data.repository`, `utils`).
+- Configurar dependencias necesarias en Gradle (Retrofit, Gson, Room, ML Kit Translate, Glide/Coil para imágenes) e inspeccionar compatibilidad.
+- Implementar DTOs con `@SerializedName` y `BalletApiService` (Retrofit).
+- Implementar Room: `NoteEntity`, `NoteDao` y `AppDatabase`.
+- Implementar `SessionManager` con SharedPreferences para favoritos.
+- Implementar `BalletRepository` como punto único de acceso para red y base de datos local.
+- Compilar y verificar que no haya errores de construcción.
 
-**Entregable:** contrato revisado, preguntas resueltas, diseño de integración aprobado y pruebas
-contractuales acordadas.
+**Aceptación:** Compilación limpia y modelos/acceso a datos listos para ser consumidos por la UI.
 
-- Recibir especificaciones oficiales: entornos/base URL, recursos/endpoints, métodos, parámetros,
-  modelos/campos, errores, autenticación, límites y reglas operativas.
-- Confirmar catálogo, búsqueda, detalle, identificadores, idioma, procedencia, paginación y
-  operaciones realmente disponibles.
-- Definir gestión de secretos/configuración sin credenciales versionadas, DTO, mapeo a Room, caché y
-  estados recuperables conforme al contrato.
-- Acordar pruebas reproducibles y autorización de llamadas reales; no inventar respuestas ni afirmar
-  validación sin evidencia.
-- Actualizar especificación, checklist y fases; presentar decisiones no resueltas al usuario y
-  detenerse para aprobación.
+## Fase 2 — Catálogo Principal y Navegación (MainActivity & ListAdapter)
 
-**Puerta:** contrato comprendido y aprobado por el usuario. Hasta entonces no implementar ni añadir
-dependencias para la integración.
+- Diseñar layout de `MainActivity` con `RecyclerView` / `ListAdapter` y ViewBinding.
+- Implementar `BalletListAdapter` con `DiffUtil` y callback/lambda para eventos de clic.
+- Cargar listado desde la API y manejar estados de carga, lista vacía y error de red.
+- Implementar filtrado/búsqueda local por título en la TopAppBar.
+- Navegación hacia `DetailActivity` pasando el extra `work_id` en el Intent.
+- Compilar y verificar catálogo.
 
-## Fase 1 — Esqueleto y persistencia
+**Aceptación:** Listado funcional con imágenes, búsqueda por título y navegación con extras.
 
-- Revisar las versiones existentes y dependencias.
-- Definir entidades Room, DAO y base de datos.
-- Implementar precarga idempotente de las obras iniciales.
-- Preservar favoritos y notas durante cualquier actualización.
-- Añadir SharedPreferences para una preferencia útil.
-- Compilar y probar persistencia/reinicio.
+## Fase 3 — Pantalla de Detalle y Favoritos (DetailActivity)
 
-**Aceptación:** catálogo local disponible; datos personales persistentes; compilación correcta.
+- Implementar `DetailActivity` recibiendo y validando el extra `work_id`.
+- Consultar el endpoint de detalle `GET /api/ballets/{id}` mediante `BalletRepository`.
+- Mostrar datos completos de la obra (sinopsis, personajes, variaciones, representaciones, etc.).
+- Integrar botón/icono de Favorito utilizando `SessionManager` (marcar/desmarcar y persistir).
+- Botón de navegación hacia la pantalla de notas de la obra (`NotesActivity`).
+- Compilar y probar.
 
-## Fase 2 — Navegación, catálogo y detalle
+**Aceptación:** Detalle completo y gestión de favoritos persistente en SharedPreferences.
 
-- Implementar MainActivity, DetailActivity y NotesActivity.
-- RecyclerView con callback/lambda por elemento.
-- Pasar `work_id` por Intent y validar el extra.
-- Añadir AppBar/menu.
-- Usar ViewBinding y recursos de strings.
-- Añadir estados vacío/carga/error.
-- Compilar y probar los flujos.
+## Fase 4 — Gestión de Notas y AlertDialog (NotesActivity & Room)
 
-**Aceptación:** navegación completa y requisitos académicos de Activities/Intent/RecyclerView
-satisfechos.
+- Implementar `NotesActivity` y `NotesAdapter` para listar notas de la obra actual.
+- Formulario sencillo para añadir nueva nota en Room (`NoteDao`).
+- Acción de eliminar nota confirmada mediante `AlertDialog`.
+- Validar persistencia de notas asociadas al `work_id` correcto tras reinicio de app.
+- Compilar y probar.
 
-## Fase 3 — Favoritos y notas
+**Aceptación:** CRUD de notas funcional en Room y `AlertDialog` activo.
 
-- Favoritos en Room.
-- CRUD de notas asociadas a `work_id`.
-- AlertDialog al eliminar.
-- Validación de entradas y estados vacíos.
-- Pruebas de persistencia y asociación correcta.
+## Fase 5 — Traducción con ML Kit (TranslationUtils)
 
-**Aceptación:** favoritos/notas persisten y pertenecen a la obra correcta.
+- Integrar `TranslationUtils.kt` adaptado en el paquete `utils`.
+- Añadir traducción dinámica para textos en `DetailActivity` (y opcionalmente títulos en el catálogo).
+- Gestión de descarga de modelos y verificación del `AlertDialog` en conexiones no Wi-Fi.
+- Modo seguro si falla la traducción o no hay conexión.
 
-## Fase 4 — API propia y caché (bloqueada hasta completar Fase 0.5)
+**Aceptación:** Traducción funcional y respetuosa con el texto original.
 
-- Implementar Retrofit conforme al contrato aprobado, sin asumir rutas ni estructura.
-- Mapear DTO a modelos locales utilizando únicamente campos contractuales.
-- Implementar operaciones remotas realmente disponibles y estados/errores definidos.
-- Registrar `lastFetchedAt` solo tras una respuesta válida y según política aprobada.
-- Definir frescura y reintentos basados en evidencia/contrato, sin peticiones redundantes.
-- Probar autenticación, límites, timeout, resultados vacíos, falta de red y errores pertinentes al
-  contrato.
-- Documentar procedencia y atribución solo cuando correspondan.
+## Fase 6 — QA, Caché Offline (Opcional) y Entrega
 
-**Aceptación:** prueba real de red y recuperación desde Room sin conexión.
+- *(Opcional / Si da tiempo)* Implementar caché local de obras en Room para consulta offline.
+- Ejecutar compilación limpia y pruebas de todos los requisitos académicos.
+- Actualizar `README.md` y `REQUIREMENTS_CHECKLIST.md`.
+- Verificación final de recursos XML, strings y entrega.
 
-## Fase 5 — ML Kit y visualización multilingüe
-
-- Integrar el servicio de traducción oficial.
-- Gestionar modelos español/inglés/francés de forma explícita.
-- No asumir que todos están descargados.
-- Implementar Original / Traducido / Ambos en detalle.
-- Mantener el texto original en Room.
-- Cachear traducciones en memoria por contenido e idiomas.
-- No usar ML Kit para construir consultas remotas salvo decisión explícita posterior; preservar su
-  función de presentación.
-- Probar falta de modelo, error de traducción y cambio de idioma.
-
-**Aceptación:** interfaz fluida; el original permanece disponible; la traducción es opcional y
-recuperable.
-
-## Fase 6 — QA y entrega
-
-- Ejecutar compilación limpia.
-- Probar modo sin conexión.
-- Probar los flujos de catálogo, detalle, favoritos, notas y traducción.
-- Revisar todos los requisitos académicos.
-- Completar README y checklist.
-- Revisar dependencias, strings, recursos y credenciales.
-- Presentar lista de cambios y limitaciones.
-
-**Aceptación:** checklist completo y README permite reproducir la ejecución.
-
-## Regla de alcance
-
-No comenzar una fase posterior si la anterior no compila o tiene defectos críticos. Cualquier
-ampliación fuera del MVP requiere aprobación.
+**Aceptación:** Checklist 100% completado y aplicación lista.

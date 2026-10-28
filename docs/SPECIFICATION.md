@@ -10,20 +10,21 @@ Objetivo de planificación: MVP de alcance reducido. La agenda/calendario es fut
 desplazar el catálogo, el detalle, los favoritos y las notas. No se estima duración hasta cerrar el
 contrato de la API y aprobar el alcance.
 
-### Estado de preparación (bloqueante para integración)
+### Estado de preparación (Fase 0 — Documentación y acuerdos de diseño consensuados)
 
-- El prompt inicial y su propuesta de búsqueda/consulta se consideran fuera de alcance; no deben
-  guiar el diseño ni la implementación.
-- Las llamadas remotas se realizarán a una API propia. Su contrato y sus especificaciones se
-  entregarán más adelante; no asumir proveedor tercero, endpoints, autenticación, modelos de
-  respuesta, datos disponibles ni políticas operativas.
-- El repositorio contiene un prototipo previo asociado a Wikidata; no representa la decisión
-  vigente, no valida la API propia y queda fuera del alcance de esta actualización documental.
-- Esta especificación define objetivos de producto y restricciones, no un contrato remoto. La
-  integración Retrofit, el mapeo de DTO, la política de caché y las pruebas de red quedan pendientes
-  hasta revisar la especificación y obtener aprobación.
-- No implementar la API ni simular que se ha validado. La planificación documental puede continuar;
-  el trabajo de integración queda bloqueado por la puerta indicada en `IMPLEMENTATION_PLAN.md`.
+- El proyecto se encuentra en la **Fase 0**. No se inicia la implementación hasta que el usuario dé su aprobación expresa.
+- El origen de datos está unificado en la API propia:
+  - Listado de obras: `GET https://ballet-api.vercel.app/api/ballets`
+  - Detalle de obra: `GET https://ballet-api.vercel.app/api/ballets/{id}`
+- Se descarta la búsqueda remota fuera de catálogo; el listado completo se obtiene de la API y la búsqueda es local en la ActionBar (por título) sobre dicho listado.
+- La persistencia principal se estructura de forma ligera:
+  - **SharedPreferences:** mediante una clase `SessionManager` en el paquete `utils`, guardará el conjunto de IDs favoritos (cumpliendo el requisito de SharedPreferences).
+  - **Room (SQLite):** gestionará la tabla de notas personales asociadas a cada obra (`work_id`).
+  - **Caché offline de obras en Room:** queda pospuesta como tarea opcional al final del proyecto si hay tiempo.
+- **Sin ViewModel:** Para adecuarse al nivel del curso y no sobrecargar la arquitectura, las Activities gestionarán su ciclo de vida y llamarán directamente al repositorio usando corrutinas (`lifecycleScope.launch`).
+- **Traducción con ML Kit:** Se implementará mediante funciones de extensión sobre `TextView` (en `TranslationUtils.kt`), gestionando descargas por Wi-Fi y solicitando confirmación con `AlertDialog` si se usan datos móviles. Permite traducir títulos (mostrando original entre paréntesis) y textos de detalle.
+- **Estructura de paquetes:** `activities`, `adapters`, `data` (`local`, `remote`, `repository`), `utils`.
+- **Serialización:** Los DTOs de Retrofit usarán anotaciones `@SerializedName` de Gson para mapear explícitamente los campos JSON (snake_case) a las propiedades Kotlin (camelCase).
 
 ## 2. Requisitos funcionales
 
@@ -172,22 +173,66 @@ consultas reales lo requieren.
 - No guardar claves API privadas en preferencias compartidas sin protección; preferir configuración
   segura apropiada y no versionada cuando proceda.
 
-## 5. Contrato de API propia y normalización (pendiente)
+## 5. Contrato de API propia y estructura de datos (análisis preliminar)
 
-No se ha proporcionado todavía la especificación de la API propia. Hasta recibirla, las decisiones
-siguientes son preguntas de análisis, no requisitos asumidos ni instrucciones para implementar:
+Se han facilitado y consultado los endpoints base:
+- **Base URL:** `https://ballet-api.vercel.app/`
+- **Listado:** `GET /api/ballets`
+- **Detalle:** `GET /api/ballets/{id}`
 
-- Base URL por entorno, endpoints, métodos, parámetros, paginación y formato de errores.
-- Recursos/operaciones disponibles para catálogo, búsqueda y detalle; campos y nulabilidad reales.
-- Identificadores estables, aliases, idiomas y procedencia incluidos en respuestas.
-- Autenticación, configuración local/entornos, secretos, límites, políticas de reintento y
-  requisitos de cabeceras.
-- Reglas de actualización, compatibilidad/versionado y disponibilidad.
+### Estructura JSON identificada (catálogo de 60 obras)
 
-Tras recibir el contrato: contrastar cada capacidad con el flujo de producto, registrar
-preguntas/respuestas y ejemplos de respuesta aprobados; decidir DTO y normalización sin inferir
-propiedades. Ejecutar una prueba real autorizada o disponer de fixtures contractuales verificables
-antes de declarar funcional la integración.
+Tanto el listado general como el detalle devuelven los mismos campos con tipos consistentes:
+
+```json
+{
+  "id": 1,                                  // Int (identificador numérico)
+  "title": "Swan Lake",                     // String
+  "composer": "Pyotr Ilyich Tchaikovsky",   // String
+  "original_choreographer": "Julius Reisinger", // String
+  "premiere_year": 1877,                    // Int
+  "premiere_location": "Bolshoi Theatre, Moscow", // String
+  "acts": 4,                                // Int
+  "synopsis": "...",                        // String
+  "history_and_evolution": "...",           // String
+  "characters": [                           // List<String>
+    "Odette/Odile",
+    "Prince Siegfried"
+  ],
+  "key_variations": [                       // List<String>
+    "White Swan Pas de Deux"
+  ],
+  "historical_performances": [              // List<Object>
+    {
+      "year": 1895,                         // Int
+      "company": "Imperial Ballet",         // String
+      "theater": "Mariinsky Theatre",       // String
+      "choreographer": "Marius Petipa and Lev Ivanov", // String
+      "relevance": "..."                    // String
+    }
+  ],
+  "prominent_companies": [                  // List<Object>
+    {
+      "name": "Bolshoi Ballet",             // String
+      "country": "Russia",                  // String
+      "official_url": "https://bolshoi.ru"  // String
+    }
+  ],
+  "multimedia": {                           // Object
+    "cover_image_url": "https://commons.wikimedia.org/...", // String
+    "europeana_search_term": "...",         // String
+    "youtube_query": "..."                  // String
+  }
+}
+```
+
+*Nota:* En el elemento 54 ("Afternoon of a Faun"), se detectó un campo adicional redundante `acts1: 1` junto con `acts: 1`.
+
+### Aspectos pendientes de revisión con el usuario
+- Confirmar si se persiste toda la estructura en Room (entidades anidadas, TypeConverters para listas y objetos complejos, o modelo aplanado para el MVP).
+- Revisar si el listado soporta parámetros de búsqueda (`?search=`, `?q=`) o si se trabajará con filtrado local del catálogo obtenido.
+- Revisar si existen requisitos de cabeceras o autenticación.
+- Alinear el nuevo origen de datos con los requerimientos académicos y el plan general del proyecto.
 
 Principios independientes del proveedor:
 
@@ -241,18 +286,19 @@ sin adivinarlo.
 
 ## 7. Arquitectura técnica
 
-Arquitectura MVVM sencilla:
+Arquitectura directa y ligera basada en componentes estándar de Android:
 
-- UI: Activities, layouts XML, RecyclerView adapters.
-- ViewModels: estado de pantalla y coordinación de operaciones.
-- Repositories: acceso unificado a datos locales/remotos.
-- Local data source: Room, entidades y DAO.
-- Remote data source: Retrofit, servicios y DTO solo después de recibir y aprobar el contrato de la
-  API propia.
-- Translation service: envoltorio pequeño para ML Kit y caché de traducciones.
+- **UI / Activities (`com.gf.ballet_wiki.activities`):** `MainActivity`, `DetailActivity`, `NotesActivity`. Gestionan el ciclo de vida y la interacción con vistas mediante ViewBinding.
+- **Adapters (`com.gf.ballet_wiki.adapters`):** `BalletListAdapter` (usando `ListAdapter` de RecyclerView) y `NotesAdapter`.
+- **Data Layer (`com.gf.ballet_wiki.data`):**
+  - **`local`:** Base de datos Room (`AppDatabase`), DAO de notas (`NoteDao`), entidad `NoteEntity`.
+  - **`remote`:** Cliente Retrofit, interfaz `BalletApiService`, DTOs con anotaciones `@SerializedName` (`BalletItemDto`, `BalletDetailDto`, etc.).
+  - **`repository`:** `BalletRepository` que unifica las llamadas a la API remota y el acceso a la base de datos local de notas.
+- **Utils (`com.gf.ballet_wiki.utils`):**
+  - `SessionManager`: Manejo de SharedPreferences para persistencia de favoritos (`Set<String>`).
+  - `TranslationUtils`: Funciones de extensión sobre `TextView` y gestor de traducción ML Kit.
 
-No añadir una capa de dominio independiente ni interfaces para cada clase si no aportan valor.
-Mantener las operaciones asíncronas y cancelar trabajo cuando el ciclo de vida lo requiera.
+Sin capas de ViewModel ni Domain complejas para mantener el código claro y ajustado a los conocimientos del curso. Las operaciones asíncronas se ejecutan con `lifecycleScope.launch` en el hilo de IO.
 
 ## 8. UI y accesibilidad
 
