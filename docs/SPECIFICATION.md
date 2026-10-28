@@ -1,0 +1,307 @@
+# Especificación funcional y técnica — Ballet Reference
+
+## 1. Objetivo y alcance
+
+Aplicación Android nativa de referencia para consultar obras de ballet clásico, encontrar
+información adicional, guardar favoritos y notas personales, y leer los textos en su idioma
+original, traducidos al idioma preferido o en ambos idiomas.
+
+Objetivo de planificación: MVP de alcance reducido. La agenda/calendario es futura y no debe
+desplazar el catálogo, el detalle, los favoritos y las notas. No se estima duración hasta cerrar el
+contrato de la API y aprobar el alcance.
+
+### Estado de preparación (bloqueante para integración)
+
+- El prompt inicial y su propuesta de búsqueda/consulta se consideran fuera de alcance; no deben
+  guiar el diseño ni la implementación.
+- Las llamadas remotas se realizarán a una API propia. Su contrato y sus especificaciones se
+  entregarán más adelante; no asumir proveedor tercero, endpoints, autenticación, modelos de
+  respuesta, datos disponibles ni políticas operativas.
+- El repositorio contiene un prototipo previo asociado a Wikidata; no representa la decisión
+  vigente, no valida la API propia y queda fuera del alcance de esta actualización documental.
+- Esta especificación define objetivos de producto y restricciones, no un contrato remoto. La
+  integración Retrofit, el mapeo de DTO, la política de caché y las pruebas de red quedan pendientes
+  hasta revisar la especificación y obtener aprobación.
+- No implementar la API ni simular que se ha validado. La planificación documental puede continuar;
+  el trabajo de integración queda bloqueado por la puerta indicada en `IMPLEMENTATION_PLAN.md`.
+
+## 2. Requisitos funcionales
+
+### RF-01 — Catálogo inicial
+
+- Incluir unas 20 obras de ballet clásico reconocidas.
+- Poder abrir y consultar el catálogo sin conexión después de la instalación y la precarga local.
+- Mostrar título y los datos que estén realmente disponibles.
+- Mostrar el catálogo mediante RecyclerView y responder al clic de cada celda mediante
+  lambda/callback.
+- Ofrecer búsqueda local por títulos y alias conocidos cuando existan.
+- No inventar datos bibliográficos.
+
+### RF-02 — Búsqueda remota (requisitos pendientes de contrato)
+
+- La API propia será la fuente remota de la aplicación y se consumirá mediante Retrofit, una vez
+  recibidas y aprobadas sus especificaciones.
+- Se desea permitir buscar obras fuera del catálogo local; confirmar en el contrato los recursos y
+  operaciones que lo soportan.
+- Mostrar estados de carga, resultados vacíos y fallos recuperables. Los estados de autenticación,
+  cuotas, rate limiting y errores HTTP se definirán según el contrato.
+- No inventar endpoints, campos, límites, atribución, licencias, autenticación ni comportamiento de
+  servidor.
+- Conservar procedencia e identificadores remotos si el contrato los proporciona.
+
+### RF-03 — Detalle de obra
+
+Mostrar, cuando existan en la fuente:
+
+- Título original y alias/títulos alternativos.
+- Descripción o argumento.
+- Compositor.
+- Coreógrafo.
+- Fecha de estreno.
+- Otros datos pertinentes, fuente y enlace de procedencia.
+
+Los campos ausentes se omiten o se presentan como no disponibles. No completar con suposiciones.
+
+### RF-04 — Favoritos
+
+- Marcar/desmarcar una obra como favorita.
+- Persistir el estado entre sesiones.
+- Ofrecer acceso a la lista de favoritos.
+- Evitar duplicados.
+- Preferentemente almacenar `isFavorite` en la entidad de obra, salvo que la investigación
+  justifique una tabla de relación.
+
+### RF-05 — Notas
+
+- Crear, editar y eliminar notas de texto asociadas a una obra.
+- Mostrar las notas de una obra en una lista.
+- Confirmar la eliminación mediante AlertDialog.
+- Las notas se guardan en Room y no caducan.
+- Se puede facilitar copiar/seleccionar texto del detalle para crear una nota, pero el MVP puede
+  usar un flujo sencillo de copiar/pegar.
+- No implementar aún recortes visuales, OCR, anotaciones sobre imágenes ni edición enriquecida.
+- No traducir las notas automáticamente. Una acción explícita de traducción podría estudiarse en una
+  fase futura.
+
+### RF-06 — Preferencias
+
+- Usar SharedPreferences para guardar al menos un valor persistente requerido por la práctica.
+- Valores adecuados: idioma preferido de visualización, modo Original/Traducido/Ambos o última obra
+  consultada.
+- SharedPreferences no es una base de datos de obras ni una sesión temporal en memoria.
+- Al recuperar una preferencia, comprobar que sus valores siguen siendo válidos.
+
+## 3. Navegación y Activities
+
+Como mínimo:
+
+1. `MainActivity`: catálogo, búsqueda y acceso a favoritos.
+2. `DetailActivity`: datos de la obra, favorito, selector de idioma de texto y acceso a notas.
+3. `NotesActivity`: listado y gestión de notas asociadas a una obra.
+
+Flujo principal: `MainActivity` → `DetailActivity` → `NotesActivity`.
+
+- Pasar `work_id` mediante extra de Intent.
+- Recuperar el extra en la Activity de destino y utilizarlo para cargar la obra/notas.
+- Manejar un identificador ausente o inválido sin cerrar la aplicación inesperadamente.
+- Incluir menú de AppBar.
+- Mantener navegación simple, sin introducir Navigation Component salvo que ya esté en el proyecto y
+  sea útil.
+
+## 4. Datos y persistencia
+
+### Room / SQLite
+
+Room es la capa de persistencia sobre SQLite.
+
+Entidades iniciales sugeridas:
+
+#### `WorkEntity`
+
+- `id`: identificador local estable.
+- `sourceId`: identificador remoto opcional.
+- `source`: identificador de la fuente.
+- `originalTitle`.
+- `originalLanguage`: código BCP-47 o ISO cuando se conozca.
+- `descriptionOriginal`: nullable.
+- `composer`: nullable.
+- `choreographer`: nullable.
+- `premiereDate`: nullable.
+- `sourceUrl`: nullable.
+- `aliases`: formato simple que se pueda consultar o modelado separado si es necesario.
+- `isFavorite`.
+- `lastFetchedAt`: fecha de la última consulta correcta/actualización del recurso.
+- `expiresAt` o política de caducidad equivalente, solo si la estrategia de caché lo necesita.
+- `updatedAt` local, si aporta valor.
+
+No incluir campos vacíos o duplicados sin justificación. Separar una entidad de alias solo si las
+consultas reales lo requieren.
+
+#### `NoteEntity`
+
+- `id`.
+- `workId`, con relación a la obra.
+- `text`.
+- `createdAt` y `updatedAt` si no complican el MVP.
+
+#### Caché
+
+- Primera opción: utilizar los datos y `lastFetchedAt` de `WorkEntity` para controlar la frescura
+  por obra.
+- Crear `CacheEntry` solo si se necesitan metadatos de caché para consultas que no representan una
+  obra, o si la validación técnica demuestra que simplifica la solución.
+- Registrar únicamente consultas exitosas como última consulta correcta.
+- No renovar la fecha de éxito tras un error de red.
+- Definir caducidad por fuente/recurso, no una caducidad universal inventada.
+- Definir manejo de límites, reintentos y errores HTTP después de conocer el contrato de la API
+  propia; no presuponer códigos o cabeceras.
+- Los favoritos, notas y obras iniciales no se eliminan por caducidad.
+
+### Precarga
+
+- Incorporar aproximadamente 20 obras iniciales de forma idempotente.
+- La precarga no debe sobrescribir favoritos ni notas.
+- Documentar el origen y la licencia/procedencia de los datos precargados.
+- El catálogo inicial debe ser utilizable sin conexión; la búsqueda remota requiere conectividad.
+
+### SharedPreferences
+
+- Guardar una preferencia sencilla, por ejemplo `preferred_display_language` o
+  `last_viewed_work_id`.
+- No usar SharedPreferences como caché por artículo ni almacenar listas de obras/notas allí.
+- No guardar claves API privadas en preferencias compartidas sin protección; preferir configuración
+  segura apropiada y no versionada cuando proceda.
+
+## 5. Contrato de API propia y normalización (pendiente)
+
+No se ha proporcionado todavía la especificación de la API propia. Hasta recibirla, las decisiones
+siguientes son preguntas de análisis, no requisitos asumidos ni instrucciones para implementar:
+
+- Base URL por entorno, endpoints, métodos, parámetros, paginación y formato de errores.
+- Recursos/operaciones disponibles para catálogo, búsqueda y detalle; campos y nulabilidad reales.
+- Identificadores estables, aliases, idiomas y procedencia incluidos en respuestas.
+- Autenticación, configuración local/entornos, secretos, límites, políticas de reintento y
+  requisitos de cabeceras.
+- Reglas de actualización, compatibilidad/versionado y disponibilidad.
+
+Tras recibir el contrato: contrastar cada capacidad con el flujo de producto, registrar
+preguntas/respuestas y ejemplos de respuesta aprobados; decidir DTO y normalización sin inferir
+propiedades. Ejecutar una prueba real autorizada o disponer de fixtures contractuales verificables
+antes de declarar funcional la integración.
+
+Principios independientes del proveedor:
+
+1. Preservar el texto introducido por el usuario y el texto original entregado por la fuente.
+2. No convertir una traducción automática en título oficial ni deduplicar únicamente por títulos
+   traducidos.
+3. Guardar identificadores/procedencia solo si la API los define.
+4. ML Kit es una función de presentación propuesta, no un mecanismo de consulta remota; no usar
+   traducción como requisito de búsqueda hasta decisión explícita.
+
+## 6. Traducción con ML Kit
+
+### Idiomas objetivo
+
+Español, inglés y francés. El idioma de la interfaz y el idioma de presentación del contenido son
+conceptos separados.
+
+### Requisitos
+
+- Usar la integración oficial de ML Kit Translation para Android.
+- Revisar dependencias existentes antes de añadir otra.
+- Gestionar explícitamente disponibilidad y descarga de los modelos.
+- No asumir que los tres modelos están instalados por defecto.
+- Descargar bajo demanda o proponer descarga anticipada con Wi-Fi; permitir reintentar.
+- No bloquear la interfaz mientras se descargan modelos o se traduce texto.
+- Cerrar los objetos `Translator` conforme al ciclo de vida recomendado.
+- Si falta el modelo o falla la traducción, mostrar el original y permitir seguir utilizando la
+  aplicación.
+- Traducir los textos al mostrarlos; no sustituir el texto original almacenado en Room.
+
+### Selector en DetailActivity
+
+Ofrecer tres modos:
+
+- `ORIGINAL`: solo texto de la fuente.
+- `TRANSLATED`: texto en el idioma preferido.
+- `BOTH`: original y traducción, con etiquetas claras de idioma.
+
+El modo elegido se puede guardar en SharedPreferences. Si el texto ya está en el idioma destino,
+evitar traducción redundante. El idioma original debe mostrarse como desconocido si no se conoce,
+sin adivinarlo.
+
+### Caché de traducciones
+
+- Evitar traducir de nuevo cada vez que una vista se redibuja o se abre.
+- MVP: caché en memoria indexada por texto/identificador y par de idiomas.
+- No persistir traducciones en la entidad original salvo que una prueba demuestre que es necesario.
+- No traducir nombres propios o títulos oficiales de manera indiscriminada; mantener original
+  visible y usar alias de la fuente para búsqueda.
+- No traducir automáticamente las notas personales.
+
+## 7. Arquitectura técnica
+
+Arquitectura MVVM sencilla:
+
+- UI: Activities, layouts XML, RecyclerView adapters.
+- ViewModels: estado de pantalla y coordinación de operaciones.
+- Repositories: acceso unificado a datos locales/remotos.
+- Local data source: Room, entidades y DAO.
+- Remote data source: Retrofit, servicios y DTO solo después de recibir y aprobar el contrato de la
+  API propia.
+- Translation service: envoltorio pequeño para ML Kit y caché de traducciones.
+
+No añadir una capa de dominio independiente ni interfaces para cada clase si no aportan valor.
+Mantener las operaciones asíncronas y cancelar trabajo cuando el ciclo de vida lo requiera.
+
+## 8. UI y accesibilidad
+
+- Kotlin, XML, Android Views y ViewBinding.
+- RecyclerView/ListAdapter cuando corresponda.
+- Material Components para campos de texto, si son compatibles con las dependencias existentes.
+- Textos visibles en `strings.xml`.
+- Colores, dimensiones y estilos en recursos XML.
+- Español como idioma inicial de la interfaz; estructura preparada para recursos de otros idiomas.
+- Estados de carga, vacío, error y modelo de traducción no disponible.
+- Interfaz simple, centrada en lectura y consulta. No desarrollar todavía identidad visual avanzada.
+
+## 9. Requisitos de la práctica y trazabilidad
+
+| Requisito de la guía       | Solución prevista                                              |
+|----------------------------|----------------------------------------------------------------|
+| 3 Activities o más         | MainActivity, DetailActivity, NotesActivity                    |
+| Pasar y recuperar un extra | `work_id` en Intent hacia DetailActivity y NotesActivity       |
+| AlertDialog                | Confirmación de eliminación de nota                            |
+| SharedPreferences          | Idioma/modo de visualización o última obra                     |
+| SQLite                     | Room sobre SQLite                                              |
+| Retrofit                   | Cliente de API REST propia, tras recibir y aprobar el contrato |
+| RecyclerView + lambda      | Catálogo/lista de notas con callback por celda                 |
+| Menú AppBar                | Opciones básicas                                               |
+| Internacionalización       | Recursos de interfaz en español, preparados para otros idiomas |
+| ViewBinding                | Uso obligatorio                                                |
+| TextField Material         | TextInputLayout/TextInputEditText si compatibles               |
+
+## 10. Fuera de alcance
+
+- Agenda/calendario completo.
+- Diseño o implementación del backend/API propia (se integra como servicio externo a la app);
+  autenticación de usuario no especificada.
+- Sincronización entre dispositivos.
+- OCR, recortes visuales de prensa y anotaciones sobre imágenes.
+- Traducción automática de notas.
+- Relaciones complejas entre compañías, intérpretes y versiones.
+- API de pago o cuenta obligatoria sin aprobación explícita.
+
+## 11. Criterios de aceptación
+
+- La aplicación compila y se ejecuta desde Android Studio.
+- Las tres Activities funcionan y reciben el identificador correcto.
+- Catálogo inicial disponible offline.
+- Favoritos y notas sobreviven al reinicio.
+- Búsqueda remota real funciona contra la API propia según contrato aprobado y gestiona los errores
+  definidos por este.
+- Caché evita llamadas innecesarias y respeta la fecha de última consulta correcta.
+- La pantalla de detalle permite original/traducido/ambos.
+- La traducción no bloquea la UI y falla de forma segura si falta el modelo.
+- Se cumplen todos los requisitos de la práctica y el README los explica.
+- No hay credenciales, datos inventados ni archivos ajenos a la tarea modificados.

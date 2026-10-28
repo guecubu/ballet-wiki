@@ -23,7 +23,6 @@ output-metadata.json
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
-.junie
 
 # Keystore files
 *.jks
