@@ -13,22 +13,22 @@ data class BalletDto(
     val composer: String,
 
     @SerializedName("original_choreographer")
-    val originalChoreographer: String,
+    val originalChoreographer: String = "",
 
     @SerializedName("premiere_year")
     val premiereYear: Int,
 
     @SerializedName("premiere_location")
-    val premiereLocation: String,
+    val premiereLocation: String = "",
 
     @SerializedName("acts")
-    val acts: Int,
+    val acts: Int = 0,
 
     @SerializedName("synopsis")
-    val synopsis: String,
+    val synopsis: String = "",
 
     @SerializedName("history_and_evolution")
-    val historyAndEvolution: String,
+    val historyAndEvolution: String = "",
 
     @SerializedName("characters")
     val characters: List<String> = emptyList(),
@@ -42,9 +42,15 @@ data class BalletDto(
     @SerializedName("prominent_companies")
     val prominentCompanies: List<ProminentCompanyDto> = emptyList(),
 
+    @SerializedName("cover_image")
+    val coverImage: String? = null,
+
     @SerializedName("multimedia")
-    val multimedia: MultimediaDto? = null
-)
+    private val rawMultimedia: MultimediaDto? = null,
+                    ) {
+    val multimedia: MultimediaDto?
+        get() = rawMultimedia ?: coverImage?.let { MultimediaDto(coverImageUrl = it) }
+}
 
 data class HistoricalPerformanceDto(
     @SerializedName("year")
@@ -60,7 +66,7 @@ data class HistoricalPerformanceDto(
     val choreographer: String,
 
     @SerializedName("relevance")
-    val relevance: String
+    val relevance: String,
 )
 
 data class ProminentCompanyDto(
@@ -71,7 +77,7 @@ data class ProminentCompanyDto(
     val country: String,
 
     @SerializedName("official_url")
-    val officialUrl: String
+    val officialUrl: String,
 )
 
 data class MultimediaDto(
@@ -82,5 +88,5 @@ data class MultimediaDto(
     val europeanaSearchTerm: String? = null,
 
     @SerializedName("youtube_query")
-    val youtubeQuery: String? = null
+    val youtubeQuery: String? = null,
 )

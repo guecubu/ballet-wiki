@@ -1,43 +1,66 @@
 # Checklist de requisitos y pruebas
 
-Estado: Implementación completada conforme a los acuerdos del proyecto.
+Estado: Revisión estática del código. Fase 2 — refinamiento y aprobación. Las marcas indican
+presencia observada en el código, no ejecución ni validación funcional; no se revisaron archivos de
+prueba ni se ejecutó QA.
 
 ## Práctica académica
 
-- [x] Al menos tres Activities funcionales (`MainActivity`, `DetailActivity`, `NotesActivity`).
-- [x] Extra de Intent transmitido, recuperado y usado (`work_id`, `work_title`).
-- [x] AlertDialog activado por una acción del usuario (confirmación de eliminación de nota y aviso de descarga ML Kit).
-- [x] Valor persistente mediante SharedPreferences (`SessionManager` para favoritos y última obra consultada).
-- [x] Room sobre SQLite con datos relevantes (`NoteEntity`, `NoteDao`, `AppDatabase` para notas personales).
-- [x] Llamada REST real mediante Retrofit (`BalletApiService` contra `ballet-api.vercel.app`, `EuropeanaApiService` y `OpenOpusApiService`).
-- [x] RecyclerView con evento de clic por celda implementado mediante lambda/callback (`BalletListAdapter` con `ListAdapter` + `DiffUtil`).
-- [x] Menú / Barra superior con logo personalizado (48dp x 48dp) y búsqueda local por título.
-- [x] Textos externalizados y recursos en español en `strings.xml`.
-- [x] ViewBinding; sin `findViewById` en código de UI.
-- [x] Componentes Material Design 3 (CardView, TextInputLayout, TextInputEditText, MaterialButton, Chip, ExtendedFAB).
+- [x] Tres Activities presentes: `MainActivity`, `DetailActivity`, `NotesActivity` (presencia en
+  código; no verificado en ejecución).
+- [x] `work_id` se transmite/recupera en navegación hacia detalle y notas (presencia en código; no
+  verificado en ejecución).
+- [x] AlertDialog para confirmar borrado y solicitar descarga del modelo de traducción (presencia en
+  código).
+- [x] SharedPreferences persiste favoritos y última obra consultada (revisión estática; persistencia
+  tras reinicio no probada).
+- [x] Room/SQLite almacena notas personales. No almacena catálogo ni favoritos.
+- [x] Hay servicios Retrofit para catálogo propio, Open Opus y Europeana; llamadas reales y contrato
+  no validados en esta revisión.
+- [x] `BalletListAdapter` usa `ListAdapter`, `DiffUtil` y callbacks de clic/favorito.
+- [x] Búsqueda local por título y compositor; filtro de favoritos presente.
+- [ ] Localización trilingüe pendiente: hoy solo existe `values/strings.xml` con español. El
+  predeterminado debe ser inglés, con recursos equivalentes en español y francés.
+- [ ] Externalizar todos los textos visibles: se observaron textos literales en Kotlin.
+- [x] ViewBinding observado en las pantallas.
+- [x] Componentes Material están configurados/usados; no se ha validado su comportamiento en
+  ejecución.
 
 ## Funcionalidad
 
-- [x] Catálogo cargado desde la API propia (`GET /api/ballets`).
+- [x] Código consulta catálogo propio (`GET /api/ballets`); ejecución/servicio no verificados.
 - [x] Búsqueda local por título y compositor en la barra superior con filtrado reactivo.
 - [x] Filtro de favoritos mediante Chips (Todos / Favoritos).
-- [x] Detalle completo de la obra cargado desde `GET /api/ballets/{id}`.
+- [x] Código consulta detalle mediante `GET /api/ballets/{id}`; ejecución/servicio no verificados.
 - [x] Consultas complementarias: Open Opus (datos del compositor) y Europeana (archivos digitales adicionales).
 - [x] Estados de carga (`ProgressBar`), vacío y error con botón de reintento.
 - [x] Favoritos persistentes en SharedPreferences (`SessionManager`).
-- [x] CRUD completo de notas personales en Room asociadas a la obra (`work_id`).
-- [ ] (Opcional) Caché offline de obras en Room si da tiempo al final.
+- [x] Crear, listar y eliminar notas asociadas a `work_id` en Room; no se observó edición.
+- [ ] Caché offline/catálogo local en Room pendiente; ante fallo de red no hay catálogo persistido.
 
 ## ML Kit
 
-- [x] Integración con `TranslationUtils` (extensiones `TextView.setTranslatedText`).
-- [x] Modelos descargables y comprobación de Wi-Fi vs. datos móviles con `AlertDialog`.
-- [x] Precarga silenciosa en segundo plano en `MainActivity` cuando hay Wi-Fi.
-- [x] Texto original preservado y mostrado entre paréntesis en el catálogo.
-- [x] Fallback si falta modelo o falla la traducción.
+- [x] Integración ML Kit vía `TranslationUtils`; traducción parcial de títulos y algunos textos de
+  detalle.
+- [x] Código contempla descarga del modelo y diálogo ante uso de datos móviles; no probado en
+  dispositivo.
+- [x] Código inicia precarga en MainActivity con Wi-Fi.
+- [x] El código mantiene texto original cuando falla; no se ha validado visualmente cada flujo.
+- [ ] Selector Original/Traducido/Ambos e idioma preferido pendiente; origen inglés está codificado.
+- [ ] Pruebas con modelos descargados/no descargados y cambio de idioma no realizadas.
 
 ## Entrega
 
-- [x] Estructura de paquetes limpia (`activities`, `adapters`, `data.local`, `data.remote`, `data.repository`, `utils`).
-- [x] Clave de Europeana protegida en `local.properties` y `BuildConfig`.
-- [x] Sin credenciales ni secretos en Git.
+- [x] Estructura por Activities, adapters, data local/remota/repositorio y utils.
+- [ ] Revisar gestión de credencial Europeana: el archivo Gradle incluye un valor fallback literal;
+  no afirmar que el secreto está protegido sin corregir y validar esa configuración.
+- [ ] Ausencia de secretos en Git no verificada en esta revisión.
+
+## Pendiente de validación
+
+- No se ejecutó compilación, aplicación ni pruebas; esta actualización es una revisión estática del
+  código y la documentación.
+- La integración remota no se declara funcional ni validada contra un contrato aprobado o evidencia
+  de ejecución.
+- Confirmar en una tarea posterior la aprobación del alcance y completar las lagunas anteriores
+  antes de marcar entrega.

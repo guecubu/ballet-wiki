@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.gf.ballet_wiki.adapters.BalletListAdapter
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        binding.rvBallets.layoutManager = LinearLayoutManager(this)
+        binding.rvBallets.layoutManager = GridLayoutManager(this, 2)
         binding.rvBallets.adapter = adapter
     }
 
