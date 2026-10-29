@@ -1,5 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base Surfaces (Light: Porcelaine Éditoriale) -->
+    <color name="ballet_window_background">#FBF7F4</color>
+    <color name="ballet_surface_container">#F3ECE7</color>
+    <color name="ballet_surface_variant">#E8DED7</color>
+    <color name="ballet_surface_container_lowest">#FFFFFF</color>
+
+    <!-- Typography Hierarchy -->
+    <color name="ballet_text_high_emphasis">#201A1E</color>
+    <color name="ballet_text_medium_emphasis">#6D6469</color>
+    <color name="ballet_text_disabled">#9E949A</color>
+
+    <!-- Brand Accent 1: Antique Gold -->
+    <color name="ballet_gold_primary">#A6763D</color>
+    <color name="ballet_gold_light">#FDE5D4</color>
+    <color name="ballet_gold_container">#F9EEDF</color>
+
+    <!-- Brand Accent 2: Classical Ballet Rose -->
+    <color name="ballet_rose_accent">#C05C72</color>
+    <color name="ballet_rose_highlight">#F7AAB9</color>
+    <color name="ballet_rose_container">#FCEBED</color>
+
+    <!-- Contours & Dividers -->
+    <color name="ballet_stroke_outline">#E0D3CB</color>
+
+    <!-- Logo Specific Layers -->
+    <color name="ballet_page_layer_top">#73F7AAB9</color>
+    <color name="ballet_page_layer_mid">#99C58B58</color>
+    <color name="ballet_page_layer_base">#3B2332</color>
+
+    <!-- Logo Tokens (Modo Claro) -->
+    <!-- Contenedor -->
+    <color name="ballet_logo_bg">#F5EFEA</color>
+    <color name="ballet_logo_stroke">#D8C8BD</color>
+
+    <!-- Silueta (Mulberry de alto contraste) -->
+    <color name="ballet_logo_silhouette">#241722</color>
+
+    <!-- Tutú -->
+    <color name="ballet_logo_tutu_start">#F7AAB9</color>
+    <color name="ballet_logo_tutu_mid">#DB667F</color>
+    <color name="ballet_logo_tutu_end">#AD3752</color>
+
+    <!-- Páginas del Libro (con canal alfa integrado en el hex #AARRGGBB) -->
+    <!-- 45% alfa de #F7AAB9 = #73F7AAB9 -->
+    <color name="ballet_logo_page_top">#73F7AAB9</color>
+    <!-- 60% alfa de #C58B58 = #99C58B58 -->
+    <color name="ballet_logo_page_mid">#99C58B58</color>
+    <!-- Base sólida: Mulberry bronce -->
+    <color name="ballet_logo_page_base_start">#8C5C2E</color>
+    <color name="ballet_logo_page_base_end">#3B2332</color>
+
+    <!-- Cintas de zapatillas y detalles -->
+    <color name="ballet_logo_highlights">#FDE5D4</color>
+    app/src/main/res/values-night/colors.xml (Modo Oscuro)
+
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

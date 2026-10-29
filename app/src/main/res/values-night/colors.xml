@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Surfaces (Dark: Obsidian Théâtrale) -->
+    <color name="ballet_window_background">#121113</color>
+    <color name="ballet_surface_container">#1C1A1E</color>
+    <color name="ballet_surface_variant">#2A262D</color>
+    <color name="ballet_surface_container_lowest">#121114</color>
+
+    <!-- Typography Hierarchy -->
+    <color name="ballet_text_high_emphasis">#F8F3ED</color>
+    <color name="ballet_text_medium_emphasis">#B8B0B5</color>
+    <color name="ballet_text_disabled">#686066</color>
+
+    <!-- Brand Accent 1: Antique Leaf Gold -->
+    <color name="ballet_gold_primary">#E2A96B</color>
+    <color name="ballet_gold_light">#FCE1BE</color>
+    <color name="ballet_gold_container">#3D2D1B</color>
+
+    <!-- Brand Accent 2: Classical Ballet Rose -->
+    <color name="ballet_rose_accent">#E88096</color>
+    <color name="ballet_rose_highlight">#FFCAD4</color>
+    <color name="ballet_rose_container">#421D26</color>
+
+    <!-- Contours & Dividers -->
+    <color name="ballet_stroke_outline">#38323C</color>
+
+    <!-- Logo Specific Layers -->
+    <color name="ballet_page_layer_top">#4DE88096</color>
+    <color name="ballet_page_layer_mid">#8CE2A96B</color>
+    <color name="ballet_page_layer_base">#6E481D</color>
+
+
+    <!-- Logo Tokens (Modo Oscuro) -->
+    <!-- Contenedor (con 35% de alfa en el borde dorado: #59E2A96B) -->
+    <color name="ballet_logo_bg">#121114</color>
+    <color name="ballet_logo_stroke">#59E2A96B</color>
+
+    <!-- Silueta (Oro de marca sobre obsidiana) -->
+    <color name="ballet_logo_silhouette">#E2A96B</color>
+
+    <!-- Tutú -->
+    <color name="ballet_logo_tutu_start">#FFCAD4</color>
+    <color name="ballet_logo_tutu_mid">#E88096</color>
+    <color name="ballet_logo_tutu_end">#421D26</color>
+
+    <!-- Páginas del Libro (con canal alfa integrado en el hex #AARRGGBB) -->
+    <!-- 35% alfa de #E88096 = #59E88096 -->
+    <color name="ballet_logo_page_top">#59E88096</color>
+    <!-- 55% alfa de #E2A96B = #8CE2A96B -->
+    <color name="ballet_logo_page_mid">#8CE2A96B</color>
+    <!-- Base sólida: Bronce a negro cálido -->
+    <color name="ballet_logo_page_base_start">#E2A96B</color>
+    <color name="ballet_logo_page_base_end">#6E481D</color>
+
+    <!-- Cintas de zapatillas y detalles -->
+    <color name="ballet_logo_highlights">#FCE1BE</color>
+</resources>

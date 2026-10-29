@@ -33,7 +33,9 @@ el código contiene avances adicionales aún en refinamiento y aprobación.
 
 **Aceptación:** Compilación limpia y modelos/acceso a datos listos para ser consumidos por la UI.
 
-## Fase 2 — Catálogo Principal y Navegación (MainActivity & ListAdapter) — fase actual, en refinamiento/aprobación
+## Fase 2 — Catálogo Principal y Navegación (MainActivity & ListAdapter) — fase actual, en refinamiento/approbación
+
+**Documentación de diseño detallada:** Consultar [`docs/DESIGN_WORK_PLAN.md`](file:///D:/Development/StudioProjects/ballet-wiki/docs/DESIGN_WORK_PLAN.md) para el análisis comparativo completo con Figma (`Nodo 1:347`), propuesta de menú de navegación inferior persistente y protocolo de verificación visual.
 
 - Diseñar layout de `MainActivity` con `RecyclerView` en cuadrícula de 2 columnas
   (`GridLayoutManager`), `ListAdapter` y ViewBinding.
