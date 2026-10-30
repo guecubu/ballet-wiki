@@ -49,5 +49,6 @@
     <string name="about_message">Ballet Reference - Catálogo de obras de ballet clásico, favoritos, notas personales y soporte de traducción.\nVersión 1.0</string>
     <string name="close">Cerrar</string>
     <string name="nav_repertoire">Repertorio</string>
+    <string name="nav_selection">Selección</string>
     <string name="nav_notes">Notas</string>
 </resources>

@@ -47,6 +47,8 @@ class CatalogFragment : Fragment() {
 
         TranslationManager.preloadActiveLanguageModel(requireContext())
 
+        filterOnlyFavorites = arguments?.getBoolean("filter_favorites", false) ?: false
+
         setupRecyclerView()
         setupSearchAndFilters()
         setupHeaderActions()
@@ -66,6 +68,12 @@ class CatalogFragment : Fragment() {
                 applyFilterAndSearch()
             }
         }
+    }
+
+    fun setFilterFavorites(enabled: Boolean) {
+        filterOnlyFavorites = enabled
+        updateFilterUI()
+        applyFilterAndSearch()
     }
 
     private fun setupRecyclerView() {

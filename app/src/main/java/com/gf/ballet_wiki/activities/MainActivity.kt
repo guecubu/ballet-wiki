@@ -38,15 +38,43 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNavigationView.selectedItemId = R.id.nav_repertoire
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
-            val fragment = when (item.itemId) {
-                R.id.nav_repertoire -> CatalogFragment()
-                R.id.nav_notes -> NotesFragment()
-                else -> CatalogFragment()
+            when (item.itemId) {
+                R.id.nav_repertoire -> {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                    if (currentFragment !is CatalogFragment) {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, CatalogFragment())
+                            .commit()
+                    } else {
+                        currentFragment.setFilterFavorites(false)
+                    }
+                    true
+                }
+                R.id.nav_selection -> {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                    if (currentFragment !is CatalogFragment) {
+                        val fragment = CatalogFragment().apply {
+                            arguments = Bundle().apply { putBoolean("filter_favorites", true) }
+                        }
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, fragment)
+                            .commit()
+                    } else {
+                        currentFragment.setFilterFavorites(true)
+                    }
+                    true
+                }
+                R.id.nav_notes -> {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                    if (currentFragment !is NotesFragment) {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentContainer, NotesFragment())
+                            .commit()
+                    }
+                    true
+                }
+                else -> false
             }
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, fragment)
-                .commit()
-            true
         }
     }
 }

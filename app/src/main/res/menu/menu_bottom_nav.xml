@@ -5,6 +5,10 @@
         android:icon="@drawable/ic_nav_repertoire"
         android:title="@string/nav_repertoire" />
     <item
+        android:id="@+id/nav_selection"
+        android:icon="@drawable/ic_filter_heart"
+        android:title="@string/nav_selection" />
+    <item
         android:id="@+id/nav_notes"
         android:icon="@drawable/ic_nav_notes"
         android:title="@string/nav_notes" />

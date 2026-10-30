@@ -4,10 +4,10 @@
     android:height="108dp"
     android:viewportWidth="1254"
     android:viewportHeight="1254">
-  <group android:scaleX="0.6288679"
-      android:scaleY="0.6288679"
-      android:translateX="232.69981"
-      android:translateY="232.69981">
+  <group android:scaleX="0.67"
+      android:scaleY="0.67"
+      android:translateX="206.91"
+      android:translateY="206.91">
 
       <!-- 1. Contenedor Squircle -->
       <path

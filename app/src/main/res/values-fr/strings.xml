@@ -32,7 +32,7 @@
     <string name="notes_title">Notes de l\'œuvre</string>
     <string name="add_note">Ajouter une note</string>
     <string name="note_title_hint">Titre de la note</string>
-    <string name="note_content_hint">Écrivez votre note ici…</string>
+    <string name="note_content_hint">Écrivez votre note hier…</string>
     <string name="save">Enregistrer</string>
     <string name="cancel">Annuler</string>
     <string name="delete_note_confirm_title">Supprimer la note ?</string>
@@ -49,5 +49,6 @@
     <string name="about_message">Ballet Reference - Catalogue d\'œuvres de ballet classique, favoris, notes personnelles et support de traduction.\nVersion 1.0</string>
     <string name="close">Fermer</string>
     <string name="nav_repertoire">Répertoire</string>
+    <string name="nav_selection">Sélection</string>
     <string name="nav_notes">Notes</string>
 </resources>

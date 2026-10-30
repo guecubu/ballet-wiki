@@ -5,6 +5,10 @@
     <color name="ballet_surface_container">#F3ECE7</color>
     <color name="ballet_surface_variant">#E8DED7</color>
     <color name="ballet_surface_container_lowest">#FFFFFF</color>
+    <!-- Fondo semitransparente claro para el badge (80% blanco porcelana) -->
+    <color name="ballet_badge_background">#D9FFFFFF</color>
+    <color name="ballet_badge_text">@color/ballet_text_high_emphasis</color> <!-- #201A1E -->
+
 
     <!-- Typography Hierarchy -->
     <color name="ballet_text_high_emphasis">#201A1E</color>
