@@ -22,7 +22,12 @@
 
         <!-- Outlines & Dividers -->
         <item name="colorOutline">@color/ballet_stroke_outline</item>
+    </style>
 
+    <!-- Overlay exclusivo para la barra inferior en modo claro -->
+    <style name="ThemeOverlay.BottomNav.Clear" parent="">
+        <!-- Reemplazamos únicamente el contenedor de la pastilla por ballet_rose_highlight con contraste frente a ballet_surface_container (#F3ECE7) -->
+        <item name="colorSecondaryContainer">@color/ballet_rose_highlight</item>
     </style>
 
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />

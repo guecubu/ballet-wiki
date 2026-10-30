@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.mlkit.translate)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.swiperefreshlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

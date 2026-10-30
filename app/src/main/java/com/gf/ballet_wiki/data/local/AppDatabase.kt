@@ -5,10 +5,22 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [NoteEntity::class], version = 1, exportSchema = false)
+@Database(
+        entities = [
+            NoteEntity::class,
+            EuropeanaEntity::class,
+            ComposerEntity::class,
+            MultimediaEntity::class
+        ],
+        version = 2,
+        exportSchema = false
+         )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun noteDao(): NoteDao
+    abstract fun europeanaDao(): EuropeanaDao
+    abstract fun composerDao(): ComposerDao
+    abstract fun multimediaDao(): MultimediaDao
 
     companion object {
         private const val DATABASE_NAME = "ballet_wiki.db"
@@ -22,7 +34,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     DATABASE_NAME
-                ).build().also { instance = it }
+                                                )
+                        .fallbackToDestructiveMigration()
+                        .build().also { instance = it }
             }
         }
     }

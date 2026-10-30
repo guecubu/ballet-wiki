@@ -51,6 +51,7 @@ class CatalogFragment : Fragment() {
 
         setupRecyclerView()
         setupSearchAndFilters()
+        setupSwipeRefresh()
         setupHeaderActions()
 
         binding.btnRetry.setOnClickListener {
@@ -123,6 +124,12 @@ class CatalogFragment : Fragment() {
         updateFilterUI()
     }
 
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            loadBallets()
+        }
+    }
+
     private fun updateFilterUI() {
         if (filterOnlyFavorites) {
             binding.btnFilterFavorites.setBackgroundResource(R.drawable.bg_segment_active)
@@ -153,6 +160,7 @@ class CatalogFragment : Fragment() {
         showLoading()
         viewLifecycleOwner.lifecycleScope.launch {
             val result = repository.getBallets()
+            binding.swipeRefreshLayout.isRefreshing = false
             result.onSuccess { ballets ->
                 fullBalletList = ballets
                 showContent()
@@ -185,7 +193,9 @@ class CatalogFragment : Fragment() {
     }
 
     private fun showLoading() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         binding.rvBallets.visibility = View.GONE
         binding.layoutError.visibility = View.GONE
         binding.tvEmpty.visibility = View.GONE

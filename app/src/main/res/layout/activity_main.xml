@@ -23,6 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="80dp"
         android:background="@color/ballet_surface_container"
+        android:theme="@style/ThemeOverlay.BottomNav.Clear"
         app:itemIconTint="@color/ballet_gold_primary"
         app:itemTextColor="@color/ballet_text_medium_emphasis"
         app:layout_constraintBottom_toBottomOf="parent"

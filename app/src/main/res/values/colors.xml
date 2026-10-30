@@ -24,6 +24,7 @@
     <color name="ballet_rose_accent">#C05C72</color>
     <color name="ballet_rose_highlight">#F7AAB9</color>
     <color name="ballet_rose_container">#FCEBED</color>
+    <!--    <color name="ballet_rose_container">#FDE5D4</color>-->
 
     <!-- Contours & Dividers -->
     <color name="ballet_stroke_outline">#E0D3CB</color>
@@ -57,8 +58,6 @@
 
     <!-- Cintas de zapatillas y detalles -->
     <color name="ballet_logo_highlights">#FDE5D4</color>
-    app/src/main/res/values-night/colors.xml (Modo Oscuro)
-
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

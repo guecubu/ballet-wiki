@@ -146,6 +146,7 @@
                     android:includeFontPadding="false"
                     android:textColor="@color/ballet_gold_primary"
                     android:textSize="11sp"
+                    android:textStyle="bold"
                     app:fontFamily="@font/plus_jakarta_sans"
                     tools:text="3 Acts" />
 

@@ -19,7 +19,7 @@ clásico, búsqueda, detalle, favoritos, notas personales y visualización de te
   procedimiento de configuración y usar configuración local no versionada cuando corresponda.
 - Los textos visibles deben residir en recursos `strings.xml`; colores, dimensiones y estilos deben
   usar recursos XML.
-- Mantener los textos originales recibidos de la fuente. La traducción de ML Kit es una
+- Mantener los textos originales recibidos de la traducción o fuente. La traducción de ML Kit es una
   representación de presentación, no una sustitución del dato original.
 - Mantener notas del usuario sin traducir automáticamente ni alterar su contenido.
 - Toda operación de red o persistencia debe evitar bloquear el hilo principal.
@@ -65,8 +65,24 @@ campos, límites ni errores antes de recibir las especificaciones.
   pendientes y riesgos.
 - No afirmar que una API funciona sin haber ejecutado una prueba real o aportado evidencia
   verificable.
-- La integración remota está bloqueada mientras no se faciliten y aprueben las especificaciones de
+- La integración remota está guardia mientras no se faciliten y aprueben las especificaciones de
   la API propia; no sustituirlas por investigación de proveedores externos ni por endpoints
   imaginados.
-- No borrar ni sobrescribir datos de usuario durante precarga o actualización de catálogo.
+- Não borrar ni sobrescribir datos de usuario durante precarga o actualización de catálogo.
 - Mantener `docs/REQUIREMENTS_CHECKLIST.md` actualizado cuando se valide un requisito.
+
+## Protocolo estricto de conducta, análisis profundo y prohibiciones críticas
+
+- **Análisis riguroso basado en el contexto real**: Ante cualquier solicitud de análisis,
+  explicación o evaluación ("analiza y explica", "cómo sería"), es **obligatorio** examinar
+  previamente la estructura real del proyecto (Fragments, Activities, componentes de navegación,
+  etc.) para entender exactamente de qué va la aplicación y cómo está construida, evitando dar
+  respuestas genéricas, abstractas o desconectadas de la realidad del código.
+- **Prohibición absoluta de tocar código sin permiso explícito**: No se modificarán archivos de
+  código o recursos de la aplicación sin una orden directa y aprobada por el usuario para ese
+  archivo específico.
+- **PROHIBICIÓN ABSOLUTA Y TERMINANTE DE USAR GIT PARA REVERTIR (`git restore`, `git checkout`,
+  etc.)**: Nunca ejecutar comandos de Git para deshacer o revertir cambios. Esto puede destruir
+  trabajo local o cambios sin commit del usuario de forma catastrófica. Para inspeccionar historial
+  o retroceder en la sesión de desarrollo, se debe confiar exclusivamente en el **Historial Local
+  del IDE (`Local History`)**, nunca en operaciones destructivas de Git.
