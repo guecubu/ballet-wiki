@@ -13,6 +13,9 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE workId = :workId ORDER BY updatedAt DESC")
     suspend fun getNotesForWork(workId: Int): List<NoteEntity>
 
+    @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
+    suspend fun getAllNotes(): List<NoteEntity>
+
     @Query("SELECT * FROM notes WHERE id = :noteId LIMIT 1")
     suspend fun getNoteById(noteId: Long): NoteEntity?
 

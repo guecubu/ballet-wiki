@@ -50,8 +50,10 @@ class NotesActivity : AppCompatActivity() {
         workTitle = intent.getStringExtra(EXTRA_WORK_TITLE).orEmpty()
 
         if (workId == -1) {
-            finish()
-            return
+            workId = 1 // Default to work 1 if opened from global nav
+            if (workTitle.isBlank()) {
+                workTitle = "Notas Generales"
+            }
         }
 
         setupToolbar()
@@ -63,6 +65,8 @@ class NotesActivity : AppCompatActivity() {
     private fun setupToolbar() {
         if (workTitle.isNotBlank()) {
             binding.toolbarNotes.subtitle = workTitle
+        } else {
+            binding.toolbarNotes.subtitle = "Notas Generales"
         }
         binding.toolbarNotes.setNavigationOnClickListener {
             finish()

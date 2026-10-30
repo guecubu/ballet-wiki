@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Ballet Reference</string>
     <string name="composer_label">Compositor</string>
@@ -13,7 +14,8 @@
     <string name="retry">Reintentar</string>
     <string name="empty_list">No hay obras disponibles.</string>
     <string name="premiere_year_format">Estreno: %1$d</string>
-    <string name="search_hint">Buscar por título…</string>
+    <string name="acts_format">%1$d Actos</string>
+    <string name="search_hint">Buscar por título o compositor…</string>
     <string name="filter_all">Todos</string>
     <string name="filter_favorites">Favoritos</string>
     <string name="logo_content_description">Logo de la aplicación</string>
@@ -46,4 +48,6 @@
     <string name="about_title">Acerca de Ballet Reference</string>
     <string name="about_message">Ballet Reference - Catálogo de obras de ballet clásico, favoritos, notas personales y soporte de traducción.\nVersión 1.0</string>
     <string name="close">Cerrar</string>
+    <string name="nav_repertoire">Repertorio</string>
+    <string name="nav_notes">Notas</string>
 </resources>

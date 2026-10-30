@@ -1,84 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:cardBackgroundColor="@color/ballet_surface_container"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/ballet_stroke_outline"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <!-- Cover Image -->
+        <ImageView
             android:id="@+id/ivCover"
             android:layout_width="0dp"
-            android:layout_height="140dp"
+            android:layout_height="0dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="3:4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Small"
             tools:src="@drawable/ic_launcher_background" />
-
-        <TextView
-            android:id="@+id/tvTitle"
+        <View
+            android:id="@+id/view_scrim_overlay"
             android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/scrim_card_bottom"
+            app:layout_constraintTop_toTopOf="@id/ivCover"
+            app:layout_constraintBottom_toBottomOf="@id/ivCover"
+            app:layout_constraintStart_toStartOf="@id/ivCover"
+            app:layout_constraintEnd_toEndOf="@id/ivCover" />
+        <!-- Floating Era Badge (Top Left) -->
+        <TextView
+            android:id="@+id/tvEraBadge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/btnFavorite"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivCover"
-            tools:text="El lago de los cisnes" />
+            android:layout_margin="10dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:background="@drawable/bg_era_badge"
+            android:textColor="@color/ballet_text_high_emphasis"
+            android:textSize="12sp"
+            android:letterSpacing="0.04"
+            app:fontFamily="@font/plus_jakarta_sans"
+            app:layout_constraintStart_toStartOf="@+id/ivCover"
+            app:layout_constraintTop_toTopOf="@+id/ivCover"
+            tools:text="1877 • Petipa" />
 
-        <ImageButton
+        <!-- Floating Favorite Button (Top Right) -->
+        <FrameLayout
             android:id="@+id/btnFavorite"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_favorite_border"
-            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvTitle" />
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_filter_container"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/tvComposer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-            tools:text="Piotr Ilich Chaikovski" />
+            <ImageView
+                android:id="@+id/ivFavorite"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/logo_content_description"
+                android:src="@drawable/ic_filter_heart"
+                app:tint="@color/ballet_gold_primary" />
+        </FrameLayout>
 
-        <TextView
-            android:id="@+id/tvPremiereYear"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="4dp"
-            android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvComposer"
-            tools:text="Estreno: 1877" />
+        <!-- Card Content Container -->
+            <!-- Title (Bodoni Moda Serif) -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="-20dp"
+                android:fontFamily="@font/bodoni_moda"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/ballet_text_high_emphasis"
+                android:maxLines="2"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toTopOf="@id/tvComposer"
+                app:layout_constraintTop_toBottomOf="@id/ivCover"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Le Lac des cygnes" />
+
+            <!-- Composer (Plus Jakarta Sans) -->
+            <TextView
+                android:id="@+id/tvComposer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="11sp"
+                android:textColor="@color/ballet_text_medium_emphasis"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toTopOf="@id/dividerCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="P.I. Tchaïkovski" />
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/dividerCard"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/ballet_stroke_outline"
+                app:layout_constraintBottom_toTopOf="@id/layoutFooter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Footer: Premiere Year / Acts + Arrow -->
+            <LinearLayout
+                android:id="@+id/layoutFooter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvActs"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/ballet_gold_primary"
+                    android:textSize="11sp"
+                    app:fontFamily="@font/plus_jakarta_sans"
+                    tools:text="3 Acts" />
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_arrow_right"
+                    app:tint="@color/ballet_gold_primary" />
+
+            </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

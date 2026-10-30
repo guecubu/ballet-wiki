@@ -107,7 +107,7 @@ class BalletRepository(
     // --- Local: Room (Notes CRUD) ---
 
     suspend fun getNotesForWork(workId: Int): List<NoteEntity> = withContext(Dispatchers.IO) {
-        noteDao.getNotesForWork(workId)
+        if (workId == -1) noteDao.getAllNotes() else noteDao.getNotesForWork(workId)
     }
 
     suspend fun getNoteById(noteId: Long): NoteEntity? = withContext(Dispatchers.IO) {

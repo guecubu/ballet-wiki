@@ -1,7 +1,26 @@
 <resources>
-    <!-- Base application theme. -->
+    <!-- Base application theme (Dark Mode). -->
     <style name="Base.Theme.BalletWiki" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Window & Surface Backgrounds -->
+        <item name="android:windowBackground">@color/ballet_window_background</item>
+        <item name="colorSurface">@color/ballet_surface_container</item>
+        <item name="colorSurfaceVariant">@color/ballet_surface_variant</item>
+
+        <!-- Primary Accent: Gold -->
+        <item name="colorPrimary">@color/ballet_gold_primary</item>
+        <item name="colorOnPrimary">@color/ballet_window_background</item>
+        <item name="colorPrimaryContainer">@color/ballet_gold_container</item>
+        <item name="colorOnPrimaryContainer">@color/ballet_gold_primary</item>
+
+        <!-- Secondary Accent: Ballet Rose -->
+        <item name="colorSecondary">@color/ballet_rose_accent</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">@color/ballet_rose_container</item>
+        <item name="colorOnSecondaryContainer">@color/ballet_rose_accent</item>
+
+        <!-- Outlines & Dividers -->
+        <item name="colorOutline">@color/ballet_stroke_outline</item>
     </style>
+
+    <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />
 </resources>

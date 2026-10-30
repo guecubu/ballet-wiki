@@ -1,6 +1,7 @@
 package com.gf.ballet_wiki.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -44,7 +45,12 @@ class BalletListAdapter(
             )
 
             binding.tvComposer.text = ballet.composer
-            binding.tvPremiereYear.text = context.getString(R.string.premiere_year_format, ballet.premiereYear)
+            binding.tvActs.text = context.getString(R.string.acts_format, ballet
+                    .acts)
+
+            // Era badge (e.g. 1877 • Petipa)
+            val choreographer = ballet.originalChoreographer?.takeIf { it.isNotBlank() }?.split(" ")?.last() ?: "Ballet"
+            binding.tvEraBadge.text = "${ballet.premiereYear} • $choreographer"
 
             // Cover Image with Coil
             binding.ivCover.loadUrl(ballet.multimedia?.coverImageUrl)
@@ -65,9 +71,8 @@ class BalletListAdapter(
 
         private fun updateFavoriteIcon(balletId: Int) {
             val isFav = isFavoriteChecker(balletId)
-            binding.btnFavorite.setImageResource(
-                if (isFav) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
-            )
+            binding.btnFavorite.visibility = if (isFav) {
+                View.VISIBLE } else { View.GONE }
         }
     }
 

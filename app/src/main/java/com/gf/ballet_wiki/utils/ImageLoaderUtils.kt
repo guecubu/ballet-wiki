@@ -33,7 +33,7 @@ object CoilImageLoader {
     }
 }
 
-fun ImageView.loadUrl(url: String?, placeholderResId: Int = R.drawable.ic_launcher_background) {
+fun ImageView.loadUrl(url: String?, placeholderResId: Int = R.drawable.bg_image_placeholder) {
     if (url.isNullOrBlank()) {
         setImageResource(placeholderResId)
         return
