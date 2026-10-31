@@ -11,6 +11,6 @@ interface EuropeanaApiService {
         @Query("wskey") apiKey: String,
         @Query("query") query: String,
         @Query("profile") profile: String = "rich",
-        @Query("rows") rows: Int = 10
+        @Query("rows") rows: Int = 100
     ): EuropeanaSearchResponse
 }

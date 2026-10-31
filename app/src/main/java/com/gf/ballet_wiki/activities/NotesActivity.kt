@@ -2,7 +2,6 @@ package com.gf.ballet_wiki.activities
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -29,7 +28,6 @@ class NotesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNotesBinding
     private lateinit var repository: BalletRepository
     private lateinit var adapter: NotesAdapter
-
     private var workId: Int = -1
     private var workTitle: String = ""
 
@@ -52,7 +50,7 @@ class NotesActivity : AppCompatActivity() {
         if (workId == -1) {
             workId = 1 // Default to work 1 if opened from global nav
             if (workTitle.isBlank()) {
-                workTitle = "Notas Generales"
+                workTitle = getString(R.string.general_notes)
             }
         }
 
@@ -66,7 +64,7 @@ class NotesActivity : AppCompatActivity() {
         if (workTitle.isNotBlank()) {
             binding.toolbarNotes.subtitle = workTitle
         } else {
-            binding.toolbarNotes.subtitle = "Notas Generales"
+            binding.toolbarNotes.subtitle = getString(R.string.general_notes)
         }
         binding.toolbarNotes.setNavigationOnClickListener {
             finish()
@@ -93,7 +91,8 @@ class NotesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val notes = repository.getNotesForWork(workId)
             adapter.submitList(notes)
-            binding.tvNoNotes.visibility = if (notes.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvNoNotes.visibility =
+                    if (notes.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
         }
     }
 
@@ -108,13 +107,14 @@ class NotesActivity : AppCompatActivity() {
                 val content = dialogBinding.etNoteContent.text?.toString()?.trim().orEmpty()
 
                 if (title.isBlank() && content.isBlank()) {
-                    Toast.makeText(this, "La nota no puede estar vacía", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.note_empty_warning), Toast.LENGTH_SHORT)
+                            .show()
                     return@setPositiveButton
                 }
 
-                val finalTitle = if (title.isBlank()) "Nota sin título" else title
+                val finalTitle = if (title.isBlank()) getString(R.string.untitled_note) else title
                 val note = NoteEntity(
-                    workId = workId,
+                        workId = if (workId == -1) 1 else workId,
                     title = finalTitle,
                     content = content
                 )

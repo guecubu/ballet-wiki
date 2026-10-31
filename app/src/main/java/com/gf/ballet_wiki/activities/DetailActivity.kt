@@ -2,6 +2,7 @@ package com.gf.ballet_wiki.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.gf.ballet_wiki.R
+import com.gf.ballet_wiki.adapters.MediaGalleryAdapter
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.ActivityDetailBinding
@@ -150,30 +152,100 @@ class DetailActivity : AppCompatActivity() {
 
     private fun loadOpenOpusInfo(composerName: String) {
         lifecycleScope.launch {
-            val result = repository.searchComposer(composerName)
-            result.onSuccess { composers ->
-                if (composers.isNotEmpty()) {
-                    val comp = composers.first()
-                    binding.tvOpenOpusHeader.visibility = View.VISIBLE
-                    binding.tvOpenOpusInfo.visibility = View.VISIBLE
-                    binding.tvOpenOpusInfo.text = buildString {
-                        append("${comp.completeName} (${comp.birth ?: "?"} - ${comp.death ?: "?"})\n")
-                        if (!comp.epoch.isNullOrBlank()) append("Época: ${comp.epoch}")
-                    }
-                }
+            binding.tvOpenOpusHeader.visibility = View.VISIBLE
+            binding.tvOpenOpusInfo.visibility = View.VISIBLE
+
+            // Fetch from API and save to Room
+            repository.searchComposer(composerName)
+
+            // Read and display exclusively the LOCAL ROOM ENTITY
+            val cachedComposer = repository.getCachedComposer(composerName)
+            if (cachedComposer != null) {
+                Log.i("BALLET_API_RAW", "DISPLAYING LOCAL ROOM COMPOSER ENTITY: $cachedComposer")
+                binding.tvOpenOpusInfo.text =
+                        "ENTIDAD LOCAL ROOM (ComposerEntity):\n\n$cachedComposer"
+            }
+            else {
+                binding.tvOpenOpusInfo.text = "No se encontraron datos de compositor en Room."
             }
         }
     }
 
     private fun loadEuropeanaInfo(searchTerm: String) {
         lifecycleScope.launch {
-            val result = repository.getEuropeanaImages(searchTerm)
-            result.onSuccess { items ->
-                if (items.isNotEmpty()) {
-                    binding.tvEuropeanaHeader.visibility = View.VISIBLE
-                    binding.tvEuropeanaInfo.visibility = View.VISIBLE
-                    binding.tvEuropeanaInfo.text = "Archivos digitales relacionados encontrados: ${items.size}"
+            binding.tvEuropeanaHeader.visibility = View.VISIBLE
+
+            // Fetch from API and save to Room
+            repository.getEuropeanaImages(searchTerm, workId)
+
+            // Read from Room cache and populate 3 modules
+            val cachedRecords = repository.getCachedEuropeanaRecords(workId)
+            if (cachedRecords.isNotEmpty()) {
+                Log.i(
+                        "BALLET_API_RAW",
+                        "EUROPEANA MODULES LOADED FROM ROOM (${cachedRecords.size} records)"
+                     )
+
+                val images =
+                        cachedRecords.filter { it.mediaType.equals("IMAGE", ignoreCase = true) }
+                val sounds = cachedRecords.filter {
+                    it.mediaType.equals(
+                            "SOUND", ignoreCase = true
+                                       ) || it.mediaType.equals("AUDIO", ignoreCase = true)
                 }
+                val videos =
+                        cachedRecords.filter { it.mediaType.equals("VIDEO", ignoreCase = true) }
+
+                // Module 1: Image Gallery RecyclerView
+                if (images.isNotEmpty()) {
+                    binding.tvImageGalleryHeader.visibility = View.VISIBLE
+                    binding.rvMediaGallery.visibility = View.VISIBLE
+                    val adapter = MediaGalleryAdapter { item ->
+                        // Optional item click
+                    }
+                    binding.rvMediaGallery.adapter = adapter
+                    adapter.submitList(images)
+                }
+                else {
+                    binding.tvImageGalleryHeader.visibility = View.GONE
+                    binding.rvMediaGallery.visibility = View.GONE
+                }
+
+                // Module 2: Audio Records
+                if (sounds.isNotEmpty()) {
+                    binding.layoutAudioSection.visibility = View.VISIBLE
+                    binding.tvAudioList.text = buildString {
+                        sounds.forEachIndexed { idx, s ->
+                            append("${idx + 1}. ${s.title}")
+                            if (!s.dataProvider.isNullOrBlank()) append(" — [${s.dataProvider}]")
+                            append("\n")
+                        }
+                    }
+                }
+                else {
+                    binding.layoutAudioSection.visibility = View.GONE
+                }
+
+                // Module 3: Video Records
+                if (videos.isNotEmpty()) {
+                    binding.layoutVideoSection.visibility = View.VISIBLE
+                    binding.tvVideoList.text = buildString {
+                        videos.forEachIndexed { idx, v ->
+                            append("${idx + 1}. ${v.title}")
+                            if (!v.dataProvider.isNullOrBlank()) append(" — [${v.dataProvider}]")
+                            append("\n")
+                        }
+                    }
+                }
+                else {
+                    binding.layoutVideoSection.visibility = View.GONE
+                }
+            }
+            else {
+                binding.tvImageGalleryHeader.visibility = View.GONE
+                binding.rvMediaGallery.visibility = View.GONE
+                binding.layoutAudioSection.visibility = View.GONE
+                binding.layoutVideoSection.visibility = View.GONE
             }
         }
     }

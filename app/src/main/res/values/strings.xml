@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ballet Reference</string>
+    <string name="app_name" translatable="false">En Pointe</string>
+    <string name="app_slogan">Stories Behind the Steps</string>
     <string name="composer_label">Composer</string>
     <string name="titles_label">Available titles</string>
     <string name="unavailable">Not available</string>
@@ -26,6 +27,16 @@
     <string name="section_characters">Main characters</string>
     <string name="section_open_opus">Composer information (Open Opus)</string>
     <string name="section_europeana">Digital collection (Europeana)</string>
+    <string name="section_image_gallery">Image Gallery</string>
+    <string name="section_audio_recordings">Audio Recordings (SOUND)</string>
+    <string name="section_video_recordings">Video Files (VIDEO)</string>
+    <string name="general_notes">General Notes</string>
+    <string name="note_empty_warning">Note cannot be empty</string>
+    <string name="untitled_note">Untitled Note</string>
+    <string name="no_composer_info">No composer information found in Room.</string>
+    <string name="audio_recordings_count">Total recordings: %1$d</string>
+    <string name="video_files_count">Total videos: %1$d</string>
+    <string name="no_multimedia_records">No multimedia records found in Room.</string>
     <string name="composer_format">Composer: %1$s</string>
     <string name="choreographer_format">Original choreographer: %1$s</string>
     <string name="premiere_detail_format">Premiere: %1$d (%2$s) · %3$d Acts</string>

@@ -7,7 +7,7 @@
     <color name="ballet_surface_container_lowest">#121114</color>
     <!-- Fondo semitransparente oscuro para el badge (75% obsidiana) -->
     <color name="ballet_badge_background">#BF121113</color>
-    <color name="ballet_badge_text">@color/ballet_text_high_emphasis</color> <!-- #F8F3ED -->
+    <color name="ballet_badge_text">@color/ballet_gold_primary</color> <!-- #F8F3ED -->
 
     <!-- Typography Hierarchy -->
     <color name="ballet_text_high_emphasis">#F8F3ED</color>

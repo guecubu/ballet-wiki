@@ -1,8 +1,14 @@
 package com.gf.ballet_wiki.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.gf.ballet_wiki.BuildConfig
 import com.gf.ballet_wiki.data.local.AppDatabase
+import com.gf.ballet_wiki.data.local.ComposerDao
+import com.gf.ballet_wiki.data.local.ComposerEntity
+import com.gf.ballet_wiki.data.local.EuropeanaDao
+import com.gf.ballet_wiki.data.local.EuropeanaEntity
+import com.gf.ballet_wiki.data.local.MultimediaDao
 import com.gf.ballet_wiki.data.local.NoteDao
 import com.gf.ballet_wiki.data.local.NoteEntity
 import com.gf.ballet_wiki.data.remote.api.BalletApiService
@@ -21,20 +27,29 @@ class BalletRepository(
     private val europeanaApi: EuropeanaApiService = RetrofitClient.europeanaApiService,
     private val openOpusApi: OpenOpusApiService = RetrofitClient.openOpusApiService,
     private val noteDao: NoteDao,
+    private val composerDao: ComposerDao,
+    private val europeanaDao: EuropeanaDao,
+    private val multimediaDao: MultimediaDao,
     private val sessionManager: SessionManager
 ) {
 
     companion object {
+        private const val RAW_TAG = "BALLET_API_RAW"
+
         @Volatile
         private var instance: BalletRepository? = null
 
         fun getInstance(context: Context): BalletRepository {
             return instance ?: synchronized(this) {
+                val db = AppDatabase.getInstance(context)
                 instance ?: BalletRepository(
                     balletApi = RetrofitClient.balletApiService,
                     europeanaApi = RetrofitClient.europeanaApiService,
                     openOpusApi = RetrofitClient.openOpusApiService,
-                    noteDao = AppDatabase.getInstance(context).noteDao(),
+                    noteDao = db.noteDao(),
+                    composerDao = db.composerDao(),
+                    europeanaDao = db.europeanaDao(),
+                    multimediaDao = db.multimediaDao(),
                     sessionManager = SessionManager.getInstance(context)
                 ).also { instance = it }
             }
@@ -61,33 +76,100 @@ class BalletRepository(
         }
     }
 
-    // --- Remote: Europeana API (Extra Images) ---
+    // --- Remote + Local Room: Europeana API ---
 
-    suspend fun getEuropeanaImages(searchTerm: String): Result<List<EuropeanaItemDto>> = withContext(Dispatchers.IO) {
+    suspend fun getEuropeanaImages(
+            searchTerm: String, workId: Int = -1
+                                  ): Result<List<EuropeanaItemDto>> = withContext(Dispatchers.IO) {
         if (searchTerm.isBlank()) return@withContext Result.success(emptyList())
         try {
             val apiKey = BuildConfig.EUROPEANA_API_KEY
-            val response = europeanaApi.searchEuropeana(apiKey = apiKey, query = searchTerm)
+            val filteredQuery = "$searchTerm AND (TYPE:IMAGE OR TYPE:VIDEO OR TYPE:SOUND)"
+            val response = europeanaApi.searchEuropeana(apiKey = apiKey, query = filteredQuery)
             if (response.success) {
-                Result.success(response.items)
+                val items = response.items
+                Log.i(RAW_TAG, "EUROPEANA REMOTE RESPONSE (${items.size} items): $items")
+
+                // Map and save to Room
+                if (workId != -1 && items.isNotEmpty()) {
+                    val entities = items.mapIndexed { idx, item ->
+                        EuropeanaEntity(
+                                europeanaId = item.id.ifBlank { "eur_${workId}_$idx" },
+                                workId = workId,
+                                title = item.title?.firstOrNull().orEmpty(),
+                                creator = item.dcCreator?.firstOrNull(),
+                                dataProvider = item.dataProvider?.firstOrNull()
+                                               ?: item.provider?.firstOrNull(),
+                                license = item.rights?.firstOrNull(),
+                                sourceUrl = item.isShownAt?.firstOrNull(),
+                                highResUrl = item.isShownBy?.firstOrNull(),
+                                previewUrl = item.edmPreview?.firstOrNull(),
+                                mediaType = item.type ?: "IMAGE",
+                                year = item.year?.firstOrNull(),
+                                country = item.country?.firstOrNull(),
+                                europeanaPageUrl = item.guid
+                                       )
+                    }
+                    europeanaDao.insertRecords(entities)
+                    Log.i(RAW_TAG, "EUROPEANA SAVED TO ROOM (${entities.size} entities): $entities")
+                }
+
+                Result.success(items)
             } else {
                 Result.success(emptyList())
             }
         } catch (e: Exception) {
+            Log.e(RAW_TAG, "EUROPEANA FETCH ERROR: ${e.message}", e)
             Result.failure(e)
         }
     }
 
-    // --- Remote: Open Opus API (Composer Info) ---
+    suspend fun getCachedEuropeanaRecords(workId: Int): List<EuropeanaEntity> = withContext(
+            Dispatchers.IO
+                                                                                           ) {
+        val records = europeanaDao.getRecordsForWork(workId)
+        Log.i(RAW_TAG, "EUROPEANA READ FROM ROOM CACHE (workId=$workId): $records")
+        records
+    }
+
+    // --- Remote + Local Room: Open Opus API ---
 
     suspend fun searchComposer(composerName: String): Result<List<OpenOpusComposerDto>> = withContext(Dispatchers.IO) {
         if (composerName.isBlank()) return@withContext Result.success(emptyList())
         try {
             val response = openOpusApi.searchComposer(composerName)
-            Result.success(response.composers)
+            val composers = response.composers
+            Log.i(RAW_TAG, "OPEN OPUS REMOTE RESPONSE (${composers.size} composers): $composers")
+
+            // Map and save first composer to Room
+            if (composers.isNotEmpty()) {
+                val comp = composers.first()
+                val entity = ComposerEntity(
+                        composerId = comp.id,
+                        name = comp.name,
+                        completeName = comp.completeName,
+                        birth = comp.birth,
+                        death = comp.death,
+                        epoch = comp.epoch,
+                        portrait = comp.portrait
+                                           )
+                composerDao.insertComposer(entity)
+                Log.i(RAW_TAG, "OPEN OPUS SAVED TO ROOM: $entity")
+            }
+
+            Result.success(composers)
         } catch (e: Exception) {
+            Log.e(RAW_TAG, "OPEN OPUS FETCH ERROR: ${e.message}", e)
             Result.failure(e)
         }
+    }
+
+    suspend fun getCachedComposer(composerName: String): ComposerEntity? = withContext(
+            Dispatchers.IO
+                                                                                      ) {
+        val cached = composerDao.getComposerByName(composerName)
+        Log.i(RAW_TAG, "OPEN OPUS READ FROM ROOM CACHE (query=$composerName): $cached")
+        cached
     }
 
     // --- Local: SessionManager (Favorites & Preferences) ---

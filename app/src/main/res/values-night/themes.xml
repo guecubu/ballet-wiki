@@ -22,5 +22,10 @@
         <item name="colorOutline">@color/ballet_stroke_outline</item>
     </style>
 
+    <!-- Contraparte para Modo Oscuro: preserva el contenedor oscuro original intacto -->
+    <style name="ThemeOverlay.BottomNav.Clear" parent="">
+        <item name="colorSecondaryContainer">@color/ballet_rose_container</item>
+    </style>
+
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />
 </resources>

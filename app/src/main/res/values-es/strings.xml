@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ballet Reference</string>
+
+    <string name="app_slogan">Historias detrás de los pasos</string>
     <string name="composer_label">Compositor</string>
     <string name="titles_label">Títulos disponibles</string>
     <string name="unavailable">No disponible</string>
@@ -26,6 +27,16 @@
     <string name="section_characters">Personajes principales</string>
     <string name="section_open_opus">Información del compositor (Open Opus)</string>
     <string name="section_europeana">Colección digital (Europeana)</string>
+    <string name="section_image_gallery">Galería de Imágenes</string>
+    <string name="section_audio_recordings">Grabaciones de Audio (SOUND)</string>
+    <string name="section_video_recordings">Archivos de Vídeo (VIDEO)</string>
+    <string name="general_notes">Notas Generales</string>
+    <string name="note_empty_warning">La nota no puede estar vacía</string>
+    <string name="untitled_note">Nota sin título</string>
+    <string name="no_composer_info">No se encontraron datos de compositor en Room.</string>
+    <string name="audio_recordings_count">Total grabaciones: %1$d</string>
+    <string name="video_files_count">Total vídeos: %1$d</string>
+    <string name="no_multimedia_records">No se encontraron registros multimedia en Room.</string>
     <string name="composer_format">Compositor: %1$s</string>
     <string name="choreographer_format">Coreógrafo original: %1$s</string>
     <string name="premiere_detail_format">Estreno: %1$d (%2$s) · %3$d Actos</string>
@@ -46,7 +57,7 @@
     <string name="sort_composer">Compositor</string>
     <string name="sort_year">Año de estreno</string>
     <string name="about_title">Acerca de Ballet Reference</string>
-    <string name="about_message">Ballet Reference - Catálogo de obras de ballet clásico, favoritos, notas personales y soporte de traducción.\nVersión 1.0</string>
+    <string name="about_message">Ballet Reference - Catálogo de obras de ballet clásico, favoritos, notas personales y soporte de traducción.\nVersion 1.0</string>
     <string name="close">Cerrar</string>
     <string name="nav_repertoire">Repertorio</string>
     <string name="nav_selection">Selección</string>

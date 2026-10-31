@@ -13,8 +13,8 @@ import com.gf.ballet_wiki.R
 import com.gf.ballet_wiki.adapters.NotesAdapter
 import com.gf.ballet_wiki.data.local.NoteEntity
 import com.gf.ballet_wiki.data.repository.BalletRepository
-import com.gf.ballet_wiki.databinding.FragmentNotesBinding
 import com.gf.ballet_wiki.databinding.DialogAddNoteBinding
+import com.gf.ballet_wiki.databinding.FragmentNotesBinding
 import kotlinx.coroutines.launch
 
 class NotesFragment : Fragment() {
@@ -78,11 +78,14 @@ class NotesFragment : Fragment() {
                 val content = dialogBinding.etNoteContent.text?.toString()?.trim().orEmpty()
 
                 if (title.isBlank() && content.isBlank()) {
-                    Toast.makeText(requireContext(), "La nota no puede estar vacía", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                            requireContext(), getString(R.string.note_empty_warning),
+                            Toast.LENGTH_SHORT
+                                  ).show()
                     return@setPositiveButton
                 }
 
-                val finalTitle = if (title.isBlank()) "Nota sin título" else title
+                val finalTitle = if (title.isBlank()) getString(R.string.untitled_note) else title
                 val note = NoteEntity(
                     workId = 1,
                     title = finalTitle,

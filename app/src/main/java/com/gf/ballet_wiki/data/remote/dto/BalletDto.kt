@@ -24,6 +24,12 @@ data class BalletDto(
     @SerializedName("acts")
     val acts: Int = 0,
 
+    @SerializedName("style")
+    val style: String? = null,
+
+    @SerializedName("epoch_period")
+    val epochPeriod: String? = null,
+
     @SerializedName("synopsis")
     val synopsis: String = "",
 

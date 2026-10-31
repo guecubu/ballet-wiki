@@ -22,18 +22,27 @@ data class EuropeanaEntity(
         @ColumnInfo(name = "data_provider")
         val dataProvider: String? = null,
 
-        @ColumnInfo(name = "rights_statement")
-        val rightsStatement: String? = null,
+        @ColumnInfo(name = "license")
+        val license: String? = null,
 
-        @ColumnInfo(name = "is_shown_at_url")
-        val isShownAtUrl: String? = null,
+        @ColumnInfo(name = "source_url")
+        val sourceUrl: String? = null,
 
-        @ColumnInfo(name = "is_shown_by_url")
-        val isShownByUrl: String? = null,
+        @ColumnInfo(name = "high_res_url")
+        val highResUrl: String? = null,
 
         @ColumnInfo(name = "preview_url")
         val previewUrl: String? = null,
 
         @ColumnInfo(name = "media_type")
-        val mediaType: String = "IMAGE"
+        val mediaType: String = "IMAGE",
+
+        @ColumnInfo(name = "year")
+        val year: String? = null,
+
+        @ColumnInfo(name = "country")
+        val country: String? = null,
+
+        @ColumnInfo(name = "europeana_page_url")
+        val europeanaPageUrl: String? = null
                           )

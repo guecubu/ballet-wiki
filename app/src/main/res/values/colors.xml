@@ -7,7 +7,8 @@
     <color name="ballet_surface_container_lowest">#FFFFFF</color>
     <!-- Fondo semitransparente claro para el badge (80% blanco porcelana) -->
     <color name="ballet_badge_background">#D9FFFFFF</color>
-    <color name="ballet_badge_text">@color/ballet_text_high_emphasis</color> <!-- #201A1E -->
+    <color name="ballet_badge_text">@color/ballet_logo_tutu_end</color> <!-- #201A1E -->
+    <!--    <color name="ballet_badge_text">@color/ballet_gold_primary</color> &lt;!&ndash; #201A1E &ndash;&gt;-->
 
 
     <!-- Typography Hierarchy -->

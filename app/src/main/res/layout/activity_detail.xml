@@ -53,7 +53,8 @@
                         <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/ivDetailCover"
                             android:layout_width="match_parent"
-                            android:layout_height="220dp"
+                            android:layout_height="350dp"
+
                             android:contentDescription="@string/app_name"
                             android:scaleType="centerCrop"
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
@@ -197,7 +198,7 @@
                     android:visibility="gone"
                     tools:text="Info de Open Opus..." />
 
-                <!-- Extra: Europeana Images -->
+                <!-- Extra: Europeana Multimedia Modules -->
                 <TextView
                     android:id="@+id/tvEuropeanaHeader"
                     android:layout_width="match_parent"
@@ -208,14 +209,81 @@
                     android:textStyle="bold"
                     android:visibility="gone" />
 
+                <!-- Module 1: Image Gallery (Large cards RecyclerView) -->
                 <TextView
-                    android:id="@+id/tvEuropeanaInfo"
+                    android:id="@+id/tvImageGalleryHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/section_image_gallery"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMediaGallery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:visibility="gone"
-                    tools:text="Imágenes encontradas en Europeana..." />
+                    tools:listitem="@layout/item_media_gallery" />
+
+                <!-- Module 2: Audio Records -->
+                <LinearLayout
+                    android:id="@+id/layoutAudioSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvAudioHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/section_audio_recordings"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvAudioList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        tools:text="• Título de audio 1\n• Título de audio 2" />
+
+                </LinearLayout>
+
+                <!-- Module 3: Video Records -->
+                <LinearLayout
+                    android:id="@+id/layoutVideoSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tvVideoHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/section_video_recordings"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvVideoList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        tools:text="• Vídeo 1\n• Vídeo 2" />
+
+                </LinearLayout>
 
             </LinearLayout>
 

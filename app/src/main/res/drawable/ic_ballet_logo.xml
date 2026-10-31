@@ -10,7 +10,7 @@
         android:pathData="M264,24 L990,24 C1122,24 1230,132 1230,264 L1230,990 C1230,1122 1122,1230 990,1230 L264,1230 C132,1230 24,1122 24,990 L24,264 C24,132 132,24 264,24 Z"
         android:fillColor="@color/ballet_logo_bg"
         android:strokeColor="@color/ballet_logo_stroke"
-        android:strokeWidth="4"/>
+        android:strokeWidth="10" />
 
     <!-- 2. Libro Abierto: Página Superior -->
     <path

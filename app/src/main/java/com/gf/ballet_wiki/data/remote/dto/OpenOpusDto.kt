@@ -8,6 +8,17 @@ data class OpenOpusComposerSearchResponse(
 
     @SerializedName("composers")
     val composers: List<OpenOpusComposerDto> = emptyList()
+                                         )
+
+data class OpenOpusComposerWorksResponse(
+        @SerializedName("status")
+        val status: OpenOpusStatusDto? = null,
+
+        @SerializedName("composer")
+        val composer: OpenOpusComposerDto? = null,
+
+        @SerializedName("works")
+        val works: List<OpenOpusWorkDto> = emptyList()
 )
 
 data class OpenOpusStatusDto(
@@ -38,5 +49,31 @@ data class OpenOpusComposerDto(
     val epoch: String? = null,
 
     @SerializedName("portrait")
-    val portrait: String? = null
+    val portrait: String? = null,
+
+    @SerializedName("works")
+    val works: List<OpenOpusWorkDto>? = null
+                              )
+
+data class OpenOpusWorkDto(
+        @SerializedName("id")
+        val id: String,
+
+        @SerializedName("title")
+        val title: String,
+
+        @SerializedName("subtitle")
+        val subtitle: String? = null,
+
+        @SerializedName("searchterms")
+        val searchterms: String? = null,
+
+        @SerializedName("popular")
+        val popular: String? = null,
+
+        @SerializedName("recommended")
+        val recommended: String? = null,
+
+        @SerializedName("genre")
+        val genre: String? = null
 )
