@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2121113">
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/photoViewZoom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitCenter" />
+
+    <ImageButton
+        android:id="@+id/btnCloseZoom"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_era_badge"
+        android:contentDescription="@string/close"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_close"
+        app:tint="@color/ballet_text_high_emphasis" />
+
+</FrameLayout>

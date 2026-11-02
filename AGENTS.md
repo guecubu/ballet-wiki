@@ -86,3 +86,10 @@ campos, límites ni errores antes de recibir las especificaciones.
   trabajo local o cambios sin commit del usuario de forma catastrófica. Para inspeccionar historial
   o retroceder en la sesión de desarrollo, se debe confiar exclusivamente en el **Historial Local
   del IDE (`Local History`)**, nunca en operaciones destructivas de Git.
+- **Protocolo de Comunicación Estricta ante "Aprobado"**:
+    - Al recibir la palabra `"aprobado"`, se ejecutan **todos** los puntos de la propuesta analizada
+      de inmediato, sin omisiones ni desviaciones a otras tareas.
+    - Cero ensayos o explicaciones largas: respuestas directas, concisas y orientadas a la
+      ejecución.
+    - Si algún punto queda pendiente o no se implementa, se debe avisar explícitamente en el
+      reporte.

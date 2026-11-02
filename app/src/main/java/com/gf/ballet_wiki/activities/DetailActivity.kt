@@ -3,9 +3,11 @@ package com.gf.ballet_wiki.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +16,7 @@ import com.gf.ballet_wiki.adapters.MediaGalleryAdapter
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.ActivityDetailBinding
+import com.gf.ballet_wiki.databinding.DialogImageZoomBinding
 import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.setTranslatedText
 import kotlinx.coroutines.launch
@@ -122,29 +125,50 @@ class DetailActivity : AppCompatActivity() {
             ballet.acts
         )
 
-        // Cover image
-        binding.ivDetailCover.loadUrl(ballet.multimedia?.coverImageUrl)
+        // Cover image & zoom click with Room fallback
+        val primaryCover = ballet.multimedia?.coverImageUrl
+        if (!primaryCover.isNullOrBlank()) {
+            binding.ivDetailCover.loadUrl(primaryCover)
+            binding.ivDetailCover.tag = primaryCover
+            binding.ivDetailCover.setOnClickListener {
+                showImageZoomDialog(primaryCover)
+            }
+        }
+        else {
+            lifecycleScope.launch {
+                val cachedRecords = repository.getCachedEuropeanaRecords(workId)
+                val fallbackImg =
+                        cachedRecords.firstOrNull { !it.highResUrl.isNullOrBlank() }?.highResUrl
+                        ?: cachedRecords.firstOrNull { !it.previewUrl.isNullOrBlank() }?.previewUrl
+                binding.ivDetailCover.loadUrl(fallbackImg)
+                binding.ivDetailCover.tag = fallbackImg
+                binding.ivDetailCover.setOnClickListener {
+                    showImageZoomDialog(fallbackImg)
+                }
+            }
+        }
 
         // Favorite icon
         updateFavoriteIcon(repository.isFavorite(workId))
 
         // Translated Synopsis
         binding.tvDetailSynopsis.setTranslatedText(
-            originalText = ballet.synopsis,
+                originalText = ballet.synopsis.orEmpty(),
             sourceLanguage = "en",
             showOriginalInParentheses = false
         )
 
         // Translated History
         binding.tvDetailHistory.setTranslatedText(
-            originalText = ballet.historyAndEvolution,
+                originalText = ballet.historyAndEvolution.orEmpty(),
             sourceLanguage = "en",
             showOriginalInParentheses = false
         )
 
         // Characters
-        if (ballet.characters.isNotEmpty()) {
-            binding.tvDetailCharacters.text = ballet.characters.joinToString("\n") { "• $it" }
+        val chars = ballet.characters.orEmpty()
+        if (chars.isNotEmpty()) {
+            binding.tvDetailCharacters.text = chars.joinToString("\n") { "• $it" }
         } else {
             binding.tvDetailCharacters.text = getString(R.string.unavailable)
         }
@@ -189,9 +213,9 @@ class DetailActivity : AppCompatActivity() {
                 val images =
                         cachedRecords.filter { it.mediaType.equals("IMAGE", ignoreCase = true) }
                 val sounds = cachedRecords.filter {
-                    it.mediaType.equals(
-                            "SOUND", ignoreCase = true
-                                       ) || it.mediaType.equals("AUDIO", ignoreCase = true)
+                    it.mediaType.equals("SOUND", ignoreCase = true) || it.mediaType.equals(
+                            "AUDIO", ignoreCase = true
+                                                                                          )
                 }
                 val videos =
                         cachedRecords.filter { it.mediaType.equals("VIDEO", ignoreCase = true) }
@@ -201,7 +225,8 @@ class DetailActivity : AppCompatActivity() {
                     binding.tvImageGalleryHeader.visibility = View.VISIBLE
                     binding.rvMediaGallery.visibility = View.VISIBLE
                     val adapter = MediaGalleryAdapter { item ->
-                        // Optional item click
+                        val zoomUrl = item.highResUrl ?: item.previewUrl
+                        showImageZoomDialog(zoomUrl)
                     }
                     binding.rvMediaGallery.adapter = adapter
                     adapter.submitList(images)
@@ -248,6 +273,34 @@ class DetailActivity : AppCompatActivity() {
                 binding.layoutVideoSection.visibility = View.GONE
             }
         }
+    }
+
+    private fun showImageZoomDialog(imageUrl: String?) {
+        if (imageUrl.isNullOrBlank()) return
+        val dialogBinding = DialogImageZoomBinding.inflate(LayoutInflater.from(this))
+        val dialog = android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setLayout(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                                )
+        dialog.window?.setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
+        dialog.window?.attributes?.windowAnimations = R.style.Animation_Ballet_ZoomDialog
+
+        dialogBinding.photoViewZoom.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+        try {
+            dialogBinding.photoViewZoom.setScaleLevels(1.0f, 3.0f, 8.0f)
+        }
+        catch (e: Exception) {
+            Log.e("BALLET_API_RAW", "PhotoView scale error: ${e.message}", e)
+        }
+        dialogBinding.photoViewZoom.loadUrl(imageUrl)
+
+        dialogBinding.btnCloseZoom.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) {

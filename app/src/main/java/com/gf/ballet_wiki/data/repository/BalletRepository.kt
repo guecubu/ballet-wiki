@@ -56,13 +56,39 @@ class BalletRepository(
         }
     }
 
-    // --- Remote: Ballet API ---
+    // --- Remote: Ballet API with Room Fallback ---
 
     suspend fun getBallets(): Result<List<BalletDto>> = withContext(Dispatchers.IO) {
         try {
             val list = balletApi.getBallets()
-            Result.success(list)
+            Log.i(RAW_TAG, "BALLET API SUCCESS: fetched ${list.size} ballets")
+            val cacheMap = try {
+                val allCached = europeanaDao.getAllRecords()
+                allCached.groupBy { it.workId }
+            }
+            catch (e: Exception) {
+                Log.e(RAW_TAG, "ROOM CACHE READ ERROR IN getBallets: ${e.message}", e)
+                emptyMap()
+            }
+
+            val enrichedList = list.map { ballet ->
+                if (ballet.coverImage.isNullOrBlank()) {
+                    val records = cacheMap[ballet.id] ?: emptyList()
+                    val fallbackImg =
+                            records.firstOrNull { !it.highResUrl.isNullOrBlank() }?.highResUrl
+                            ?: records.firstOrNull { !it.previewUrl.isNullOrBlank() }?.previewUrl
+                    if (!fallbackImg.isNullOrBlank()) {
+                        ballet.copy(coverImage = fallbackImg)
+                    }
+                    else ballet
+                }
+                else {
+                    ballet
+                }
+            }
+            Result.success(enrichedList)
         } catch (e: Exception) {
+            Log.e(RAW_TAG, "GET BALLETS ERROR: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -70,7 +96,25 @@ class BalletRepository(
     suspend fun getBalletById(id: Int): Result<BalletDto> = withContext(Dispatchers.IO) {
         try {
             val item = balletApi.getBalletById(id)
-            Result.success(item)
+            val enrichedItem = try {
+                if (item.coverImage.isNullOrBlank()) {
+                    val cachedRecords = europeanaDao.getRecordsForWork(id)
+                    val fallbackImg =
+                            cachedRecords.firstOrNull { !it.highResUrl.isNullOrBlank() }?.highResUrl
+                            ?: cachedRecords.firstOrNull { !it.previewUrl.isNullOrBlank() }?.previewUrl
+                    if (!fallbackImg.isNullOrBlank()) {
+                        item.copy(coverImage = fallbackImg)
+                    }
+                    else item
+                }
+                else {
+                    item
+                }
+            }
+            catch (e: Exception) {
+                item
+            }
+            Result.success(enrichedItem)
         } catch (e: Exception) {
             Result.failure(e)
         }

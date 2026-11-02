@@ -44,5 +44,10 @@
         <item name="checkedIconVisible">false</item>
     </style>
 
+    <style name="Animation.Ballet.ZoomDialog" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />
 </resources>

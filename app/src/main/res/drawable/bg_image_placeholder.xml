@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/ballet_logo_bg" />
+    <solid android:color="@color/ballet_rose_accent" />
+    <stroke
+        android:width="4dp"
+        android:color="@color/ballet_gold_primary" />
 </shape>

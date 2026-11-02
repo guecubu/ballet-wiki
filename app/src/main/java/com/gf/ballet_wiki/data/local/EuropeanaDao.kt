@@ -11,6 +11,9 @@ interface EuropeanaDao {
     @Query("SELECT * FROM europeana_records WHERE work_id = :workId")
     suspend fun getRecordsForWork(workId: Int): List<EuropeanaEntity>
 
+    @Query("SELECT * FROM europeana_records")
+    suspend fun getAllRecords(): List<EuropeanaEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecords(records: List<EuropeanaEntity>)
 

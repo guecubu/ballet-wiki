@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import coil.ImageLoader
 import coil.disk.DiskCache
+import coil.dispose
 import coil.load
 import coil.memory.MemoryCache
 import com.gf.ballet_wiki.R
@@ -54,6 +55,7 @@ object CoilImageLoader {
 }
 
 fun ImageView.loadUrl(url: String?, placeholderResId: Int = R.drawable.bg_image_placeholder) {
+    this.dispose()
     if (url.isNullOrBlank()) {
         setImageResource(placeholderResId)
         return
@@ -71,6 +73,7 @@ fun ImageView.loadUrlWithThumbnail(
         thumbnailUrl: String?,
         placeholderResId: Int = R.drawable.bg_image_placeholder
                                   ) {
+    this.dispose()
     val targetUrl = highResUrl?.takeIf { it.isNotBlank() } ?: thumbnailUrl
     if (targetUrl.isNullOrBlank()) {
         setImageResource(placeholderResId)

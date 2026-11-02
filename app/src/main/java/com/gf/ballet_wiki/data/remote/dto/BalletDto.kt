@@ -13,13 +13,13 @@ data class BalletDto(
     val composer: String,
 
     @SerializedName("original_choreographer")
-    val originalChoreographer: String = "",
+    val originalChoreographer: String? = null,
 
     @SerializedName("premiere_year")
     val premiereYear: Int,
 
     @SerializedName("premiere_location")
-    val premiereLocation: String = "",
+    val premiereLocation: String? = null,
 
     @SerializedName("acts")
     val acts: Int = 0,
@@ -31,22 +31,22 @@ data class BalletDto(
     val epochPeriod: String? = null,
 
     @SerializedName("synopsis")
-    val synopsis: String = "",
+    val synopsis: String? = null,
 
     @SerializedName("history_and_evolution")
-    val historyAndEvolution: String = "",
+    val historyAndEvolution: String? = null,
 
     @SerializedName("characters")
-    val characters: List<String> = emptyList(),
+    val characters: List<String>? = null,
 
     @SerializedName("key_variations")
-    val keyVariations: List<String> = emptyList(),
+    val keyVariations: List<String>? = null,
 
     @SerializedName("historical_performances")
-    val historicalPerformances: List<HistoricalPerformanceDto> = emptyList(),
+    val historicalPerformances: List<HistoricalPerformanceDto>? = null,
 
     @SerializedName("prominent_companies")
-    val prominentCompanies: List<ProminentCompanyDto> = emptyList(),
+    val prominentCompanies: List<ProminentCompanyDto>? = null,
 
     @SerializedName("cover_image")
     val coverImage: String? = null,
