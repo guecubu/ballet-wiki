@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -278,14 +277,12 @@ class DetailActivity : AppCompatActivity() {
     private fun showImageZoomDialog(imageUrl: String?) {
         if (imageUrl.isNullOrBlank()) return
         val dialogBinding = DialogImageZoomBinding.inflate(LayoutInflater.from(this))
-        val dialog = android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        val dialog = android.app.Dialog(this, R.style.Theme_Ballet_ZoomDialog)
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setLayout(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT
                                 )
-        dialog.window?.setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
-        dialog.window?.attributes?.windowAnimations = R.style.Animation_Ballet_ZoomDialog
 
         dialogBinding.photoViewZoom.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
         try {

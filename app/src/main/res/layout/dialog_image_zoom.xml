@@ -17,12 +17,13 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="top|end"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="64dp"
         android:background="@drawable/bg_era_badge"
         android:contentDescription="@string/close"
         android:padding="8dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_close"
-        app:tint="@color/ballet_text_high_emphasis" />
+        app:tint="@color/ballet_badge_text" />
 
 </FrameLayout>

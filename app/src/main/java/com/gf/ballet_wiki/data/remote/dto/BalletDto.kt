@@ -30,6 +30,18 @@ data class BalletDto(
     @SerializedName("epoch_period")
     val epochPeriod: String? = null,
 
+    @SerializedName("difficulty_level")
+    val difficultyLevel: String? = null,
+
+    @SerializedName("schools")
+    val schools: List<String>? = null,
+
+    @SerializedName("traditions")
+    val traditions: List<String>? = null,
+
+    @SerializedName("genre")
+    val genre: List<String>? = null,
+
     @SerializedName("synopsis")
     val synopsis: String? = null,
 
@@ -95,4 +107,10 @@ data class MultimediaDto(
 
     @SerializedName("youtube_query")
     val youtubeQuery: String? = null,
+
+    @SerializedName("youtube_url")
+    val youtubeUrl: String? = null,
+
+    @SerializedName("attribution_cover")
+    val attributionCover: String? = null,
 )

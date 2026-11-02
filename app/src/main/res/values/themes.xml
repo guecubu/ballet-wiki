@@ -49,5 +49,12 @@
         <item name="android:windowExitAnimation">@anim/fade_out</item>
     </style>
 
+    <style name="Theme.Ballet.ZoomDialog" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Ballet.ZoomDialog</item>
+    </style>
+
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />
 </resources>
