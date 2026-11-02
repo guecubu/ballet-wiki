@@ -58,7 +58,7 @@
                             android:contentDescription="@string/app_name"
                             android:scaleType="centerCrop"
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
-                            tools:src="@drawable/ic_launcher_background" />
+                            tools:src="@drawable/bg_image_placeholder" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -179,30 +179,61 @@
                     tools:text="• Odette/Odile\n• Prince Siegfried" />
 
                 <!-- Extra: Open Opus Composer Info -->
-                <TextView
-                    android:id="@+id/tvOpenOpusHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/section_open_opus"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="6dp" />
 
-                <TextView
-                    android:id="@+id/tvOpenOpusInfo"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/groupComposer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:visibility="gone"
-                    tools:text="Info de Open Opus..." />
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/ivComposer"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:contentDescription="@string/logo_content_description"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/tvOpenOpusHeader"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:src="@drawable/bg_image_placeholder" />
+
+                    <TextView
+                        android:id="@+id/tvOpenOpusHeader"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/section_open_opus"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toTopOf="@+id/tvOpenOpusInfo"
+                        app:layout_constraintStart_toEndOf="@+id/ivComposer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Chaicosqui" />
+
+                    <TextView
+                        android:id="@+id/tvOpenOpusInfo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/ivComposer"
+                        app:layout_constraintTop_toBottomOf="@+id/tvOpenOpusHeader"
+                        tools:text="Info de Open Opus..." />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
 
                 <!-- Extra: Europeana Multimedia Modules -->
                 <TextView
                     android:id="@+id/tvEuropeanaHeader"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginTop="20dp"
                     android:text="@string/section_europeana"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
@@ -218,7 +249,7 @@
                     android:text="@string/section_image_gallery"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textStyle="bold"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvMediaGallery"
@@ -227,8 +258,8 @@
                     android:layout_marginTop="8dp"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
+                    android:visibility="visible"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    android:visibility="gone"
                     tools:listitem="@layout/item_media_gallery" />
 
                 <!-- Module 2: Audio Records -->

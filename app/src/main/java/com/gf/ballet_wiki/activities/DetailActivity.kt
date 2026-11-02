@@ -16,15 +16,23 @@ import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.ActivityDetailBinding
 import com.gf.ballet_wiki.databinding.DialogImageZoomBinding
+import com.gf.ballet_wiki.utils.DateStyle
 import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.setTranslatedText
+import com.gf.ballet_wiki.utils.toLocalizedDate
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_WORK_ID = "extra_work_id"
     }
+
+    //    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val dateFormat =
+            SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
 
     private lateinit var binding: ActivityDetailBinding
     private lateinit var repository: BalletRepository
@@ -110,19 +118,20 @@ class DetailActivity : AppCompatActivity() {
     private fun bindBalletData(ballet: BalletDto) {
         // Translated title
         binding.tvDetailTitle.setTranslatedText(
-            originalText = ballet.title,
-            sourceLanguage = "en",
-            showOriginalInParentheses = true
-        )
+                originalText = ballet.title,
+                sourceLanguage = "en",
+                showOriginalInParentheses = true
+                                               )
 
         binding.tvDetailComposer.text = getString(R.string.composer_format, ballet.composer)
-        binding.tvDetailChoreographer.text = getString(R.string.choreographer_format, ballet.originalChoreographer)
+        binding.tvDetailChoreographer.text =
+                getString(R.string.choreographer_format, ballet.originalChoreographer)
         binding.tvDetailPremiere.text = getString(
-            R.string.premiere_detail_format,
-            ballet.premiereYear,
-            ballet.premiereLocation,
-            ballet.acts
-        )
+                R.string.premiere_detail_format,
+                ballet.premiereYear,
+                ballet.premiereLocation,
+                ballet.acts
+                                                 )
 
         // Cover image & zoom click with Room fallback
         val primaryCover = ballet.multimedia?.coverImageUrl
@@ -153,30 +162,33 @@ class DetailActivity : AppCompatActivity() {
         // Translated Synopsis
         binding.tvDetailSynopsis.setTranslatedText(
                 originalText = ballet.synopsis.orEmpty(),
-            sourceLanguage = "en",
-            showOriginalInParentheses = false
-        )
+                sourceLanguage = "en",
+                showOriginalInParentheses = false
+                                                  )
 
         // Translated History
         binding.tvDetailHistory.setTranslatedText(
                 originalText = ballet.historyAndEvolution.orEmpty(),
-            sourceLanguage = "en",
-            showOriginalInParentheses = false
-        )
+                sourceLanguage = "en",
+                showOriginalInParentheses = false
+                                                 )
 
         // Characters
         val chars = ballet.characters.orEmpty()
         if (chars.isNotEmpty()) {
             binding.tvDetailCharacters.text = chars.joinToString("\n") { "• $it" }
-        } else {
+        }
+        else {
             binding.tvDetailCharacters.text = getString(R.string.unavailable)
         }
     }
 
     private fun loadOpenOpusInfo(composerName: String) {
         lifecycleScope.launch {
-            binding.tvOpenOpusHeader.visibility = View.VISIBLE
-            binding.tvOpenOpusInfo.visibility = View.VISIBLE
+
+            //            binding.tvOpenOpusHeader.visibility = View.VISIBLE
+            //            binding.tvOpenOpusInfo.visibility = View.VISIBLE
+            //            binding.ivComposer.visibility = View.VISIBLE
 
             // Fetch from API and save to Room
             repository.searchComposer(composerName)
@@ -184,9 +196,20 @@ class DetailActivity : AppCompatActivity() {
             // Read and display exclusively the LOCAL ROOM ENTITY
             val cachedComposer = repository.getCachedComposer(composerName)
             if (cachedComposer != null) {
-                Log.i("BALLET_API_RAW", "DISPLAYING LOCAL ROOM COMPOSER ENTITY: $cachedComposer")
-                binding.tvOpenOpusInfo.text =
-                        "ENTIDAD LOCAL ROOM (ComposerEntity):\n\n$cachedComposer"
+                //                Log.i("BALLET_API_RAW", "DISPLAYING LOCAL ROOM COMPOSER ENTITY: $cachedComposer")
+                binding.groupComposer.visibility = View.VISIBLE
+                val dates = cachedComposer.birth.toLocalizedDate(
+                        DateStyle.YEAR_ONLY
+                                                                ) + " - " + cachedComposer.death.toLocalizedDate(
+                        DateStyle.YEAR_ONLY
+                                                                                                                )
+                Log.i("BALLET_API_RAW", dates)
+                binding.tvOpenOpusHeader.text = cachedComposer.completeName
+                binding.tvOpenOpusInfo.text = dates
+                binding.ivComposer.loadUrl(cachedComposer.portrait)
+
+                //                        "ENTIDAD LOCAL ROOM (ComposerEntity):\n\n$cachedComposer"
+
             }
             else {
                 binding.tvOpenOpusInfo.text = "No se encontraron datos de compositor en Room."
@@ -302,8 +325,8 @@ class DetailActivity : AppCompatActivity() {
 
     private fun updateFavoriteIcon(isFavorite: Boolean) {
         binding.btnDetailFavorite.setImageResource(
-            if (isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
-        )
+                if (isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite_border
+                                                  )
     }
 
     private fun showLoading() {
