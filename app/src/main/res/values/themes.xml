@@ -30,5 +30,19 @@
         <item name="colorSecondaryContainer">@color/ballet_rose_highlight</item>
     </style>
 
+    <!-- Estilo sutil y estilizado para los Chips de Estilo Coreográfico -->
+    <style name="Widget.Ballet.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+        <item name="chipCornerRadius">16dp</item>
+        <item name="chipMinHeight">32dp</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/ballet_chip_stroke_selector</item>
+        <item name="chipBackgroundColor">@color/ballet_chip_background_selector</item>
+        <item name="android:textColor">@color/ballet_chip_text_selector</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="checkedIconEnabled">false</item>
+        <item name="checkedIconVisible">false</item>
+    </style>
+
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />
 </resources>

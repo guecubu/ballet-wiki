@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Seleccionado: texto dorado luminoso -->
+    <item android:color="@color/ballet_gold_primary" android:state_checked="true" />
+    <!-- No seleccionado: texto secundario sutil -->
+    <item android:color="@color/ballet_text_medium_emphasis" />
+</selector>

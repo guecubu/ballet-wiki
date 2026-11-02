@@ -12,6 +12,7 @@ class SessionManager(context: Context) {
         private const val PREFS_NAME = "ballet_session_prefs"
         private const val KEY_FAVORITES = "key_favorite_ids"
         private const val KEY_LAST_VIEWED_ID = "key_last_viewed_work_id"
+        private const val KEY_SAVED_STYLES = "key_saved_styles"
 
         @Volatile
         private var instance: SessionManager? = null
@@ -62,5 +63,13 @@ class SessionManager(context: Context) {
 
     fun setLastViewedWorkId(workId: Int) {
         prefs.edit().putInt(KEY_LAST_VIEWED_ID, workId).apply()
+    }
+
+    fun getSavedStyles(): Set<String> {
+        return prefs.getStringSet(KEY_SAVED_STYLES, emptySet()) ?: emptySet()
+    }
+
+    fun saveStyles(styles: Set<String>) {
+        prefs.edit().putStringSet(KEY_SAVED_STYLES, styles).apply()
     }
 }

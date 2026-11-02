@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Seleccionado: borde dorado primario -->
+    <item android:color="@color/ballet_gold_primary" android:state_checked="true" />
+    <!-- No seleccionado: borde sutil de contorno -->
+    <item android:color="@color/ballet_stroke_outline" />
+</selector>

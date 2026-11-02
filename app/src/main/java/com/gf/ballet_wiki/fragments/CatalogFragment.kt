@@ -18,6 +18,7 @@ import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.FragmentCatalogBinding
 import com.gf.ballet_wiki.utils.TranslationManager
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
 class CatalogFragment : Fragment() {
@@ -53,6 +54,12 @@ class CatalogFragment : Fragment() {
         setupSearchAndFilters()
         setupSwipeRefresh()
         setupHeaderActions()
+
+        // Restore cached styles from SharedPreferences at 0 ms launch
+        val cachedStyles = repository.getSavedStyles()
+        if (cachedStyles.isNotEmpty()) {
+            setupStyleChips(cachedStyles)
+        }
 
         binding.btnRetry.setOnClickListener {
             loadBallets()
@@ -110,18 +117,72 @@ class CatalogFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        binding.btnFilterAll.setOnClickListener {
-            filterOnlyFavorites = false
-            updateFilterUI()
-            applyFilterAndSearch()
+        binding.chipAll.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Uncheck all other style chips when "Todos" is checked
+                val chipGroup = binding.chipGroupStyles
+                for (i in 0 until chipGroup.childCount) {
+                    val child = chipGroup.getChildAt(i) as? Chip
+                    if (child != null && child.id != binding.chipAll.id) {
+                        child.isChecked = false
+                    }
+                }
+                applyFilterAndSearch()
+            }
         }
+    }
 
-        binding.btnFilterFavorites.setOnClickListener {
-            filterOnlyFavorites = true
-            updateFilterUI()
-            applyFilterAndSearch()
+    private fun setupStyleChips(styles: Set<String>) {
+        val chipGroup = binding.chipGroupStyles
+        // Keep chipAll, remove previous dynamic chips
+        val toRemove = mutableListOf<View>()
+        for (i in 0 until chipGroup.childCount) {
+            val child = chipGroup.getChildAt(i)
+            if (child.id != binding.chipAll.id) {
+                toRemove.add(child)
+            }
         }
-        updateFilterUI()
+        toRemove.forEach { chipGroup.removeView(it) }
+
+        // Populate dynamic style chips using item_filter_chip.xml inflation
+        styles.sorted().forEach { rawStyle ->
+            val chip = LayoutInflater.from(requireContext())
+                    .inflate(R.layout.item_filter_chip, chipGroup, false) as Chip
+            chip.apply {
+                tag = rawStyle // Keep raw English string for filtering
+                text = getTranslatedStyleLabel(rawStyle)
+                isCheckable = true
+                isChecked = false
+                setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        binding.chipAll.isChecked = false
+                    }
+                    else {
+                        // If no style chips remain checked, auto-check "Todos"
+                        val hasAnyChecked = (0 until chipGroup.childCount).any { idx ->
+                            val c = chipGroup.getChildAt(idx) as? Chip
+                            c != null && c.id != binding.chipAll.id && c.isChecked
+                        }
+                        if (!hasAnyChecked) {
+                            binding.chipAll.isChecked = true
+                        }
+                    }
+                    applyFilterAndSearch()
+                }
+            }
+            chipGroup.addView(chip)
+        }
+    }
+
+    private fun getTranslatedStyleLabel(rawStyle: String): String {
+        return when (rawStyle.lowercase().trim()) {
+            "classical" -> "Clásico"
+            "romantic" -> "Romántico"
+            "neoclassical" -> "Neoclásico"
+            "contemporary" -> "Contemporáneo"
+            "modern / avant-garde" -> "Vanguardia"
+            else -> rawStyle
+        }
     }
 
     private fun setupSwipeRefresh() {
@@ -131,23 +192,7 @@ class CatalogFragment : Fragment() {
     }
 
     private fun updateFilterUI() {
-        if (filterOnlyFavorites) {
-            binding.btnFilterFavorites.setBackgroundResource(R.drawable.bg_segment_active)
-            binding.btnFilterFavorites.setTextColor(requireContext().getColor(R.color.ballet_rose_accent))
-            binding.btnFilterFavorites.iconTint = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.ballet_rose_accent))
-
-            binding.btnFilterAll.background = null
-            binding.btnFilterAll.setTextColor(requireContext().getColor(R.color.ballet_text_medium_emphasis))
-            binding.btnFilterAll.iconTint = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.ballet_text_medium_emphasis))
-        } else {
-            binding.btnFilterAll.setBackgroundResource(R.drawable.bg_segment_active)
-            binding.btnFilterAll.setTextColor(requireContext().getColor(R.color.ballet_gold_primary))
-            binding.btnFilterAll.iconTint = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.ballet_gold_primary))
-
-            binding.btnFilterFavorites.background = null
-            binding.btnFilterFavorites.setTextColor(requireContext().getColor(R.color.ballet_text_medium_emphasis))
-            binding.btnFilterFavorites.iconTint = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.ballet_text_medium_emphasis))
-        }
+        // Handled dynamically by chipGroupStyles and bottom nav selection
     }
 
     private fun setupHeaderActions() {
@@ -164,6 +209,15 @@ class CatalogFragment : Fragment() {
             result.onSuccess { ballets ->
                 fullBalletList = ballets
                 showContent()
+
+                // Extract unique styles and save to SharedPreferences + update chips
+                val extractedStyles =
+                        ballets.mapNotNull { it.style?.trim() }.filter { it.isNotBlank() }.toSet()
+                if (extractedStyles.isNotEmpty()) {
+                    repository.saveStyles(extractedStyles)
+                    setupStyleChips(extractedStyles)
+                }
+
                 applyFilterAndSearch()
             }.onFailure {
                 showError()
@@ -172,6 +226,15 @@ class CatalogFragment : Fragment() {
     }
 
     private fun applyFilterAndSearch() {
+        val selectedStyleTags = mutableListOf<String>()
+        val chipGroup = binding.chipGroupStyles
+        for (i in 0 until chipGroup.childCount) {
+            val c = chipGroup.getChildAt(i) as? Chip
+            if (c != null && c.id != binding.chipAll.id && c.isChecked) {
+                (c.tag as? String)?.let { selectedStyleTags.add(it) }
+            }
+        }
+
         val filtered = fullBalletList.filter { ballet ->
             val matchesFavorite = if (filterOnlyFavorites) {
                 repository.isFavorite(ballet.id)
@@ -184,7 +247,15 @@ class CatalogFragment : Fragment() {
                 ballet.title.contains(currentSearchQuery, ignoreCase = true) ||
                         ballet.composer.contains(currentSearchQuery, ignoreCase = true)
             }
-            matchesFavorite && matchesQuery
+            val matchesStyle = if (selectedStyleTags.isEmpty() || binding.chipAll.isChecked) {
+                true
+            }
+            else {
+                ballet.style != null && selectedStyleTags.any { tag ->
+                    ballet.style.equals(tag, ignoreCase = true)
+                }
+            }
+            matchesFavorite && matchesQuery && matchesStyle
         }
 
         adapter.submitList(filtered) {

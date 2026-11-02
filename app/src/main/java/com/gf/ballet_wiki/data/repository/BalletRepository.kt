@@ -186,6 +186,10 @@ class BalletRepository(
 
     fun setLastViewedWorkId(workId: Int) = sessionManager.setLastViewedWorkId(workId)
 
+    fun getSavedStyles(): Set<String> = sessionManager.getSavedStyles()
+
+    fun saveStyles(styles: Set<String>) = sessionManager.saveStyles(styles)
+
     // --- Local: Room (Notes CRUD) ---
 
     suspend fun getNotesForWork(workId: Int): List<NoteEntity> = withContext(Dispatchers.IO) {

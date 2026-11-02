@@ -24,6 +24,10 @@
     <color name="ballet_rose_highlight">#FFCAD4</color>
     <color name="ballet_rose_container">#421D26</color>
 
+    <!-- Color del scrim al centro y al final para Modo Oscuro -->
+    <color name="ballet_scrim_gradient_center">#CC121113</color>
+    <color name="ballet_scrim_gradient_end">#1C1A1E</color>
+
     <!-- Contours & Dividers -->
     <color name="ballet_stroke_outline">#38323C</color>
 
@@ -31,7 +35,6 @@
     <color name="ballet_page_layer_top">#4DE88096</color>
     <color name="ballet_page_layer_mid">#8CE2A96B</color>
     <color name="ballet_page_layer_base">#6E481D</color>
-
 
     <!-- Logo Tokens (Modo Oscuro) -->
     <!-- Contenedor (con 35% de alfa en el borde dorado: #59E2A96B) -->

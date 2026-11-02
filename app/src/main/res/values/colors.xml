@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base Surfaces (Light: Porcelaine Éditoriale) -->
-    <color name="ballet_window_background">#FBF7F4</color>
+    <!-- Superficies con separación real de planos -->
+    <color name="ballet_window_background">#FAF5F2</color>
     <color name="ballet_surface_container">#F3ECE7</color>
-    <color name="ballet_surface_variant">#E8DED7</color>
+    <!-- El variant cobra vida: rosa satinado suave en vez de beige sucio -->
+    <color name="ballet_surface_variant">#FCEBED</color>
     <color name="ballet_surface_container_lowest">#FFFFFF</color>
     <!-- Fondo semitransparente claro para el badge (80% blanco porcelana) -->
-    <color name="ballet_badge_background">#D9FFFFFF</color>
+    <color name="ballet_badge_background">#FCEBED</color>
     <color name="ballet_badge_text">@color/ballet_logo_tutu_end</color> <!-- #201A1E -->
-    <!--    <color name="ballet_badge_text">@color/ballet_gold_primary</color> &lt;!&ndash; #201A1E &ndash;&gt;-->
-
 
     <!-- Typography Hierarchy -->
     <color name="ballet_text_high_emphasis">#201A1E</color>
@@ -17,23 +17,21 @@
     <color name="ballet_text_disabled">#9E949A</color>
 
     <!-- Brand Accent 1: Antique Gold -->
-    <color name="ballet_gold_primary">#A6763D</color>
-    <color name="ballet_gold_light">#FDE5D4</color>
+    <color name="ballet_gold_primary">#9E6B30</color>
+    <color name="ballet_gold_light">#F9EEDF</color>
     <color name="ballet_gold_container">#F9EEDF</color>
 
     <!-- Brand Accent 2: Classical Ballet Rose -->
     <color name="ballet_rose_accent">#C05C72</color>
     <color name="ballet_rose_highlight">#F7AAB9</color>
     <color name="ballet_rose_container">#FCEBED</color>
-    <!--    <color name="ballet_rose_container">#FDE5D4</color>-->
+
+    <!-- Color del scrim al centro y al final para Modo Claro -->
+    <color name="ballet_scrim_gradient_center">#33FCEBED</color>
+    <color name="ballet_scrim_gradient_end">#F3ECE7</color>
 
     <!-- Contours & Dividers -->
     <color name="ballet_stroke_outline">#E0D3CB</color>
-
-    <!-- Logo Specific Layers -->
-    <color name="ballet_page_layer_top">#73F7AAB9</color>
-    <color name="ballet_page_layer_mid">#99C58B58</color>
-    <color name="ballet_page_layer_base">#3B2332</color>
 
     <!-- Logo Tokens (Modo Claro) -->
     <!-- Contenedor -->

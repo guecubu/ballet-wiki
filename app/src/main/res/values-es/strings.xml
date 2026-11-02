@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_slogan">Historias detrás de los pasos</string>
+    <string name="app_slogan">Historias Detrás de Cada Paso</string>
     <string name="composer_label">Compositor</string>
     <string name="titles_label">Títulos disponibles</string>
     <string name="unavailable">No disponible</string>

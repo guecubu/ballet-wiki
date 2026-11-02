@@ -3,7 +3,9 @@ package com.gf.ballet_wiki.utils
 import android.content.Context
 import android.widget.ImageView
 import coil.ImageLoader
+import coil.disk.DiskCache
 import coil.load
+import coil.memory.MemoryCache
 import com.gf.ballet_wiki.R
 import okhttp3.OkHttpClient
 
@@ -18,7 +20,10 @@ object CoilImageLoader {
                 val okHttpClient = OkHttpClient.Builder()
                         .addInterceptor { chain ->
                             val request = chain.request().newBuilder()
-                                    .header("User-Agent", "BalletWiki/1.0 (Android App)")
+                                    .header(
+                                            "User-Agent",
+                                            "BalletReference/1.0 (Android App; contact@ballet-wiki.com)"
+                                           )
                                     .build()
                             chain.proceed(request)
                         }
@@ -26,7 +31,22 @@ object CoilImageLoader {
 
                 ImageLoader.Builder(context.applicationContext)
                         .okHttpClient(okHttpClient)
-                        .crossfade(enable = true)
+                        .memoryCache {
+                            MemoryCache.Builder(context.applicationContext)
+                                    .maxSizePercent(0.25)
+                                    .build()
+                        }
+                        .diskCache {
+                            DiskCache.Builder()
+                                    .directory(
+                                            context.applicationContext.cacheDir.resolve(
+                                                    "image_cache"
+                                                                                       )
+                                              )
+                                    .maxSizeBytes(1024L * 1024L * 250L)
+                                    .build()
+                        }
+                        .crossfade(true)
                         .build().also { imageLoader = it }
             }
         }
@@ -39,8 +59,29 @@ fun ImageView.loadUrl(url: String?, placeholderResId: Int = R.drawable.bg_image_
         return
     }
     this.load(url, CoilImageLoader.get(context)) {
-        crossfade(enable = true)
+        crossfade(300)
         placeholder(placeholderResId)
         error(placeholderResId)
+        placeholderMemoryCacheKey(url)
+    }
+}
+
+fun ImageView.loadUrlWithThumbnail(
+        highResUrl: String?,
+        thumbnailUrl: String?,
+        placeholderResId: Int = R.drawable.bg_image_placeholder
+                                  ) {
+    val targetUrl = highResUrl?.takeIf { it.isNotBlank() } ?: thumbnailUrl
+    if (targetUrl.isNullOrBlank()) {
+        setImageResource(placeholderResId)
+        return
+    }
+    this.load(targetUrl, CoilImageLoader.get(context)) {
+        crossfade(300)
+        placeholder(placeholderResId)
+        error(placeholderResId)
+        thumbnailUrl?.takeIf { it.isNotBlank() }?.let { thumb ->
+            placeholderMemoryCacheKey(thumb)
+        }
     }
 }

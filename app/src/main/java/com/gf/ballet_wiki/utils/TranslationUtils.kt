@@ -3,7 +3,6 @@ package com.gf.ballet_wiki.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.view.Gravity
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
@@ -103,15 +102,63 @@ fun TextView.setTranslatedText(originalText: String, sourceLanguage: String = "e
 }
 
 private fun Translator.translateAndDisplay(originalText: String, textView: TextView, showOriginalInParentheses: Boolean) {
-    translate(originalText)
-        .addOnSuccessListener { translatedText ->
-            if (showOriginalInParentheses && !translatedText.equals(originalText, ignoreCase = true)) {
-                textView.setOriginal("$translatedText ($originalText)")
-            } else {
-                textView.setOriginal(translatedText)
+    if (originalText.isBlank()) {
+        textView.setOriginal(originalText)
+        return
+    }
+
+    val paragraphs = originalText.split("\n\n")
+    if (paragraphs.size <= 1) {
+        translate(originalText)
+                .addOnSuccessListener { translatedText ->
+                    if (showOriginalInParentheses && !translatedText.equals(
+                                    originalText, ignoreCase = true
+                                                                           )
+                    ) {
+                        textView.setOriginal("$translatedText ($originalText)")
+                    }
+                    else {
+                        textView.setOriginal(translatedText)
+                    }
+                }
+                .addOnFailureListener { textView.setOriginal(originalText) }
+    }
+    else {
+        val translatedParagraphs = arrayOfNulls<String>(paragraphs.size)
+        var completedCount = 0
+
+        paragraphs.forEachIndexed { index, paragraph ->
+            if (paragraph.isBlank()) {
+                translatedParagraphs[index] = paragraph
+                completedCount++
+                if (completedCount == paragraphs.size) {
+                    val fullTranslation = translatedParagraphs.filterNotNull().joinToString("\n\n")
+                    textView.setOriginal(fullTranslation)
+                }
+            }
+            else {
+                translate(paragraph)
+                        .addOnSuccessListener { transPara ->
+                            translatedParagraphs[index] = transPara
+                            completedCount++
+                            if (completedCount == paragraphs.size) {
+                                val fullTranslation =
+                                        translatedParagraphs.filterNotNull().joinToString("\n\n")
+                                textView.setOriginal(fullTranslation)
+                            }
+                        }
+                        .addOnFailureListener {
+                            translatedParagraphs[index] = paragraph
+                            completedCount++
+                            if (completedCount == paragraphs.size) {
+                                val fullTranslation =
+                                        translatedParagraphs.filterNotNull().joinToString("\n\n")
+                                textView.setOriginal(fullTranslation)
+                            }
+                        }
             }
         }
-        .addOnFailureListener { textView.setOriginal(originalText) }
+    }
 }
 
 private fun TextView.setOriginal(textToShow: String) {
