@@ -61,13 +61,11 @@ class BalletRepository(
     suspend fun getBallets(): Result<List<BalletDto>> = withContext(Dispatchers.IO) {
         try {
             val list = balletApi.getBallets()
-            Log.i(RAW_TAG, "BALLET API SUCCESS: fetched ${list.size} ballets")
             val cacheMap = try {
                 val allCached = europeanaDao.getAllRecords()
                 allCached.groupBy { it.workId }
             }
             catch (e: Exception) {
-                Log.e(RAW_TAG, "ROOM CACHE READ ERROR IN getBallets: ${e.message}", e)
                 emptyMap()
             }
 
@@ -111,7 +109,7 @@ class BalletRepository(
                     item
                 }
             }
-            catch (e: Exception) {
+            catch (_: Exception) {
                 item
             }
             Result.success(enrichedItem)
@@ -132,12 +130,17 @@ class BalletRepository(
             val response = europeanaApi.searchEuropeana(apiKey = apiKey, query = filteredQuery)
             if (response.success) {
                 val items = response.items
-                Log.i(RAW_TAG, "EUROPEANA REMOTE RESPONSE (${items.size} items): $items")
 
-                // Map and save to Room
-                if (workId != -1 && items.isNotEmpty()) {
-                    val entities = items.mapIndexed { idx, item ->
-                        EuropeanaEntity(
+                // Filter for useful items only and replace Room records for this workId
+                if (workId != -1) {
+                    val usefulItems = items.filter { item ->
+                        !item.isShownBy?.firstOrNull().isNullOrBlank() ||
+                        !item.edmPreview?.firstOrNull().isNullOrBlank()
+                    }
+
+                    if (usefulItems.isNotEmpty()) {
+                        val entities = usefulItems.mapIndexed { idx, item ->
+                            EuropeanaEntity(
                                 europeanaId = item.id.ifBlank { "eur_${workId}_$idx" },
                                 workId = workId,
                                 title = item.title?.firstOrNull().orEmpty(),
@@ -152,10 +155,11 @@ class BalletRepository(
                                 year = item.year?.firstOrNull(),
                                 country = item.country?.firstOrNull(),
                                 europeanaPageUrl = item.guid
-                                       )
+                                           )
+                        }
+                        europeanaDao.deleteRecordsForWork(workId)
+                        europeanaDao.insertRecords(entities)
                     }
-                    europeanaDao.insertRecords(entities)
-                    Log.i(RAW_TAG, "EUROPEANA SAVED TO ROOM (${entities.size} entities): $entities")
                 }
 
                 Result.success(items)
@@ -171,9 +175,7 @@ class BalletRepository(
     suspend fun getCachedEuropeanaRecords(workId: Int): List<EuropeanaEntity> = withContext(
             Dispatchers.IO
                                                                                            ) {
-        val records = europeanaDao.getRecordsForWork(workId)
-        Log.i(RAW_TAG, "EUROPEANA READ FROM ROOM CACHE (workId=$workId): $records")
-        records
+        europeanaDao.getRecordsForWork(workId)
     }
 
     // --- Remote + Local Room: Open Opus API ---
@@ -183,7 +185,6 @@ class BalletRepository(
         try {
             val response = openOpusApi.searchComposer(composerName)
             val composers = response.composers
-            Log.i(RAW_TAG, "OPEN OPUS REMOTE RESPONSE (${composers.size} composers): $composers")
 
             // Map and save first composer to Room
             if (composers.isNotEmpty()) {
@@ -198,7 +199,6 @@ class BalletRepository(
                         portrait = comp.portrait
                                            )
                 composerDao.insertComposer(entity)
-                Log.i(RAW_TAG, "OPEN OPUS SAVED TO ROOM: $entity")
             }
 
             Result.success(composers)
@@ -211,9 +211,7 @@ class BalletRepository(
     suspend fun getCachedComposer(composerName: String): ComposerEntity? = withContext(
             Dispatchers.IO
                                                                                       ) {
-        val cached = composerDao.getComposerByName(composerName)
-        Log.i(RAW_TAG, "OPEN OPUS READ FROM ROOM CACHE (query=$composerName): $cached")
-        cached
+        composerDao.getComposerByName(composerName)
     }
 
     // --- Local: SessionManager (Favorites & Preferences) ---

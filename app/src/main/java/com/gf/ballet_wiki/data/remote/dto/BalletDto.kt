@@ -9,6 +9,9 @@ data class BalletDto(
     @SerializedName("title")
     val title: String,
 
+    @SerializedName("original_title")
+    val originalTitle: String? = null,
+
     @SerializedName("composer")
     val composer: String,
 

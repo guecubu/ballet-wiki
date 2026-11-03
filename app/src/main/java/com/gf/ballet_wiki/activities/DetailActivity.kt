@@ -10,8 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.gf.ballet_wiki.R
 import com.gf.ballet_wiki.adapters.MediaGalleryAdapter
+import com.gf.ballet_wiki.data.local.EuropeanaEntity
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.ActivityDetailBinding
@@ -21,8 +25,6 @@ import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.setTranslatedText
 import com.gf.ballet_wiki.utils.toLocalizedDate
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class DetailActivity : AppCompatActivity() {
 
@@ -30,14 +32,11 @@ class DetailActivity : AppCompatActivity() {
         const val EXTRA_WORK_ID = "extra_work_id"
     }
 
-    //    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val dateFormat =
-            SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
-
     private lateinit var binding: ActivityDetailBinding
     private lateinit var repository: BalletRepository
     private var workId: Int = -1
     private var currentBallet: BalletDto? = null
+    private var exoPlayer: ExoPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,22 +115,36 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun bindBalletData(ballet: BalletDto) {
-        // Translated title
+        // Translated title with original title if present
+        val titleText = buildString {
+            append(ballet.title)
+            if (!ballet.originalTitle.isNullOrBlank()) {
+                append(" (${ballet.originalTitle})")
+            }
+        }
         binding.tvDetailTitle.setTranslatedText(
-                originalText = ballet.title,
+                originalText = titleText,
                 sourceLanguage = "en",
                 showOriginalInParentheses = true
                                                )
 
         binding.tvDetailComposer.text = getString(R.string.composer_format, ballet.composer)
         binding.tvDetailChoreographer.text =
-                getString(R.string.choreographer_format, ballet.originalChoreographer)
+                getString(R.string.choreographer_format, ballet.originalChoreographer.orEmpty())
+
+        val premiereExtra = mutableListOf<String>()
+        ballet.style?.let { premiereExtra.add(it) }
+        ballet.epochPeriod?.let { premiereExtra.add(it) }
+        ballet.difficultyLevel?.let { premiereExtra.add(it) }
+        val extraInfo =
+                if (premiereExtra.isNotEmpty()) " • ${premiereExtra.joinToString(" • ")}" else ""
+
         binding.tvDetailPremiere.text = getString(
                 R.string.premiere_detail_format,
                 ballet.premiereYear,
-                ballet.premiereLocation,
+                ballet.premiereLocation.orEmpty(),
                 ballet.acts
-                                                 )
+                                                 ) + extraInfo
 
         // Cover image & zoom click with Room fallback
         val primaryCover = ballet.multimedia?.coverImageUrl
@@ -166,53 +179,65 @@ class DetailActivity : AppCompatActivity() {
                 showOriginalInParentheses = false
                                                   )
 
-        // Translated History
+        // Translated History, Performances & Companies
+        val historyContent = buildString {
+            append(ballet.historyAndEvolution.orEmpty())
+            val performances = ballet.historicalPerformances.orEmpty()
+            if (performances.isNotEmpty()) {
+                append("\n\nRepresentaciones Históricas:\n")
+                performances.forEach { p ->
+                    append("• ${p.year} - ${p.company} (${p.theater}): ${p.relevance}\n")
+                }
+            }
+            val companies = ballet.prominentCompanies.orEmpty()
+            if (companies.isNotEmpty()) {
+                append("\nCompañías Prominentes:\n")
+                companies.forEach { c ->
+                    append("• ${c.name} (${c.country}) - ${c.officialUrl}\n")
+                }
+            }
+        }
         binding.tvDetailHistory.setTranslatedText(
-                originalText = ballet.historyAndEvolution.orEmpty(),
+                originalText = historyContent,
                 sourceLanguage = "en",
                 showOriginalInParentheses = false
                                                  )
 
-        // Characters
+        // Characters & Key Variations
         val chars = ballet.characters.orEmpty()
-        if (chars.isNotEmpty()) {
-            binding.tvDetailCharacters.text = chars.joinToString("\n") { "• $it" }
-        }
-        else {
-            binding.tvDetailCharacters.text = getString(R.string.unavailable)
+        val variations = ballet.keyVariations.orEmpty()
+        binding.tvDetailCharacters.text = buildString {
+            if (chars.isNotEmpty()) {
+                append(chars.joinToString("\n") { "• $it" })
+            }
+            if (variations.isNotEmpty()) {
+                if (chars.isNotEmpty()) append("\n\n")
+                append("Variaciones Clave:\n")
+                append(variations.joinToString("\n") { "• $it" })
+            }
+            if (chars.isEmpty() && variations.isEmpty()) {
+                append(getString(R.string.unavailable))
+            }
         }
     }
 
     private fun loadOpenOpusInfo(composerName: String) {
         lifecycleScope.launch {
-
-            //            binding.tvOpenOpusHeader.visibility = View.VISIBLE
-            //            binding.tvOpenOpusInfo.visibility = View.VISIBLE
-            //            binding.ivComposer.visibility = View.VISIBLE
-
             // Fetch from API and save to Room
             repository.searchComposer(composerName)
 
-            // Read and display exclusively the LOCAL ROOM ENTITY
+            // Read and display formatted composer entity + portrait
             val cachedComposer = repository.getCachedComposer(composerName)
             if (cachedComposer != null) {
-                //                Log.i("BALLET_API_RAW", "DISPLAYING LOCAL ROOM COMPOSER ENTITY: $cachedComposer")
                 binding.groupComposer.visibility = View.VISIBLE
                 val dates = cachedComposer.birth.toLocalizedDate(
                         DateStyle.YEAR_ONLY
                                                                 ) + " - " + cachedComposer.death.toLocalizedDate(
                         DateStyle.YEAR_ONLY
                                                                                                                 )
-                Log.i("BALLET_API_RAW", dates)
                 binding.tvOpenOpusHeader.text = cachedComposer.completeName
                 binding.tvOpenOpusInfo.text = dates
                 binding.ivComposer.loadUrl(cachedComposer.portrait)
-
-                //                        "ENTIDAD LOCAL ROOM (ComposerEntity):\n\n$cachedComposer"
-
-            }
-            else {
-                binding.tvOpenOpusInfo.text = "No se encontraron datos de compositor en Room."
             }
         }
     }
@@ -221,17 +246,12 @@ class DetailActivity : AppCompatActivity() {
         lifecycleScope.launch {
             binding.tvEuropeanaHeader.visibility = View.VISIBLE
 
-            // Fetch from API and save to Room
+            // Fetch from API and replace Room records for this workId
             repository.getEuropeanaImages(searchTerm, workId)
 
             // Read from Room cache and populate 3 modules
             val cachedRecords = repository.getCachedEuropeanaRecords(workId)
             if (cachedRecords.isNotEmpty()) {
-                Log.i(
-                        "BALLET_API_RAW",
-                        "EUROPEANA MODULES LOADED FROM ROOM (${cachedRecords.size} records)"
-                     )
-
                 val images =
                         cachedRecords.filter { it.mediaType.equals("IMAGE", ignoreCase = true) }
                 val sounds = cachedRecords.filter {
@@ -258,15 +278,25 @@ class DetailActivity : AppCompatActivity() {
                     binding.rvMediaGallery.visibility = View.GONE
                 }
 
-                // Module 2: Audio Records
+                // Module 2: Audio Records with Media3 ExoPlayer Playlist
                 if (sounds.isNotEmpty()) {
                     binding.layoutAudioSection.visibility = View.VISIBLE
-                    binding.tvAudioList.text = buildString {
-                        sounds.forEachIndexed { idx, s ->
-                            append("${idx + 1}. ${s.title}")
-                            if (!s.dataProvider.isNullOrBlank()) append(" — [${s.dataProvider}]")
-                            append("\n")
-                        }
+                    val playableSounds = sounds.filter { sound ->
+                        val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
+                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(
+                                ".wav"
+                                                                                    ) || url.endsWith(
+                                ".aac"
+                                                                                                     ) || url.contains(
+                                ".mp3?"
+                                                                                                                      )
+                    }
+                    if (playableSounds.isNotEmpty()) {
+                        binding.cardAudioPlayer.visibility = View.VISIBLE
+                        setupAudioPlayer(playableSounds)
+                    }
+                    else {
+                        binding.cardAudioPlayer.visibility = View.GONE
                     }
                 }
                 else {
@@ -276,13 +306,6 @@ class DetailActivity : AppCompatActivity() {
                 // Module 3: Video Records
                 if (videos.isNotEmpty()) {
                     binding.layoutVideoSection.visibility = View.VISIBLE
-                    binding.tvVideoList.text = buildString {
-                        videos.forEachIndexed { idx, v ->
-                            append("${idx + 1}. ${v.title}")
-                            if (!v.dataProvider.isNullOrBlank()) append(" — [${v.dataProvider}]")
-                            append("\n")
-                        }
-                    }
                 }
                 else {
                     binding.layoutVideoSection.visibility = View.GONE
@@ -294,6 +317,67 @@ class DetailActivity : AppCompatActivity() {
                 binding.layoutAudioSection.visibility = View.GONE
                 binding.layoutVideoSection.visibility = View.GONE
             }
+        }
+    }
+
+    private fun setupAudioPlayer(playableSounds: List<EuropeanaEntity>) {
+        if (exoPlayer == null) {
+            exoPlayer = ExoPlayer.Builder(this).build().apply {
+                val mediaItems = playableSounds.mapNotNull {
+                    val url = it.highResUrl ?: it.previewUrl
+                    url?.let { u -> MediaItem.fromUri(u) }
+                }
+                if (mediaItems.isNotEmpty()) {
+                    setMediaItems(mediaItems)
+                    prepare()
+                }
+
+                addListener(object : Player.Listener {
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                        val currentIdx = currentMediaItemIndex
+                        if (currentIdx in playableSounds.indices) {
+                            val track = playableSounds[currentIdx]
+                            binding.tvAudioCurrentTrack.text =
+                                    "Pista ${currentIdx + 1} de ${playableSounds.size} — ${track.title}"
+                            binding.tvAudioProvider.text = track.dataProvider ?: "Europeana Sounds"
+                        }
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        binding.btnAudioPlayPause.setImageResource(
+                                if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+                                                                  )
+                    }
+                })
+            }
+
+            if (playableSounds.isNotEmpty()) {
+                val firstTrack = playableSounds[0]
+                binding.tvAudioCurrentTrack.text =
+                        "Pista 1 de ${playableSounds.size} — ${firstTrack.title}"
+                binding.tvAudioProvider.text = firstTrack.dataProvider ?: "Europeana Sounds"
+            }
+        }
+
+        binding.btnAudioPlayPause.setOnClickListener {
+            exoPlayer?.let { player ->
+                if (player.isPlaying) {
+                    player.pause()
+                    binding.btnAudioPlayPause.setImageResource(android.R.drawable.ic_media_play)
+                }
+                else {
+                    player.play()
+                    binding.btnAudioPlayPause.setImageResource(android.R.drawable.ic_media_pause)
+                }
+            }
+        }
+
+        binding.btnAudioPrev.setOnClickListener {
+            exoPlayer?.seekToPrevious()
+        }
+
+        binding.btnAudioNext.setOnClickListener {
+            exoPlayer?.seekToNext()
         }
     }
 
@@ -337,13 +421,25 @@ class DetailActivity : AppCompatActivity() {
 
     private fun showContent() {
         binding.detailProgressBar.visibility = View.GONE
-        binding.scrollViewContent.visibility = View.VISIBLE
         binding.detailLayoutError.visibility = View.GONE
+        binding.scrollViewContent.visibility = View.VISIBLE
     }
 
     private fun showError() {
         binding.detailProgressBar.visibility = View.GONE
         binding.scrollViewContent.visibility = View.GONE
         binding.detailLayoutError.visibility = View.VISIBLE
+    }
+
+    override fun onStop() {
+        super.onStop()
+        exoPlayer?.release()
+        exoPlayer = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        exoPlayer?.release()
+        exoPlayer = null
     }
 }

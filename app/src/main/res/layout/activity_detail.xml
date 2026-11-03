@@ -54,7 +54,6 @@
                             android:id="@+id/ivDetailCover"
                             android:layout_width="match_parent"
                             android:layout_height="350dp"
-
                             android:contentDescription="@string/app_name"
                             android:scaleType="centerCrop"
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
@@ -228,12 +227,11 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
                 <!-- Extra: Europeana Multimedia Modules -->
                 <TextView
                     android:id="@+id/tvEuropeanaHeader"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:text="@string/section_europeana"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
@@ -262,7 +260,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_media_gallery" />
 
-                <!-- Module 2: Audio Records -->
+                <!-- Module 2: Audio Records with Media3 ExoPlayer Playlist -->
                 <LinearLayout
                     android:id="@+id/layoutAudioSection"
                     android:layout_width="match_parent"
@@ -279,13 +277,88 @@
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvAudioList"
+                    <!-- Player Card for Direct Playable Audios -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAudioPlayer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        tools:text="• Título de audio 1\n• Título de audio 2" />
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/ballet_surface_container"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="2dp"
+                        app:strokeColor="@color/ballet_stroke_outline"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:id="@+id/tvAudioCurrentTrack"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="@color/ballet_text_high_emphasis"
+                                android:textStyle="bold"
+                                tools:text="Pista 1 de 3 — Recording title" />
+
+                            <TextView
+                                android:id="@+id/tvAudioProvider"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="@color/ballet_gold_primary"
+                                tools:text="National Library of France" />
+
+                            <!-- Playback Controls -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <ImageButton
+                                    android:id="@+id/btnAudioPrev"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:contentDescription="@string/app_name"
+                                    android:src="@android:drawable/ic_media_previous"
+                                    app:tint="@color/ballet_gold_primary" />
+
+                                <ImageButton
+                                    android:id="@+id/btnAudioPlayPause"
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:layout_marginHorizontal="16dp"
+                                    android:background="@drawable/bg_era_badge"
+                                    android:contentDescription="@string/app_name"
+                                    android:padding="8dp"
+                                    android:scaleType="fitCenter"
+                                    android:src="@android:drawable/ic_media_play"
+                                    app:tint="@color/ballet_gold_primary" />
+
+                                <ImageButton
+                                    android:id="@+id/btnAudioNext"
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:contentDescription="@string/app_name"
+                                    android:src="@android:drawable/ic_media_next"
+                                    app:tint="@color/ballet_gold_primary" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -305,14 +378,6 @@
                         android:text="@string/section_video_recordings"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvVideoList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        tools:text="• Vídeo 1\n• Vídeo 2" />
 
                 </LinearLayout>
 
