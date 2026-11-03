@@ -55,7 +55,7 @@ class CatalogFragment : Fragment() {
         setupSwipeRefresh()
         setupHeaderActions()
 
-        // Restore cached styles from SharedPreferences at 0 ms launch
+        // Restore cached styles from SharedPreferences at launch for instant rendering (0 ms)
         val cachedStyles = repository.getSavedStyles()
         if (cachedStyles.isNotEmpty()) {
             setupStyleChips(cachedStyles)
@@ -134,6 +134,16 @@ class CatalogFragment : Fragment() {
 
     private fun setupStyleChips(styles: Set<String>) {
         val chipGroup = binding.chipGroupStyles
+
+        // Remember previously checked style tags across refreshes
+        val previouslyCheckedTags = mutableSetOf<String>()
+        for (i in 0 until chipGroup.childCount) {
+            val child = chipGroup.getChildAt(i) as? Chip
+            if (child != null && child.id != binding.chipAll.id && child.isChecked) {
+                (child.tag as? String)?.let { previouslyCheckedTags.add(it) }
+            }
+        }
+
         // Keep chipAll, remove previous dynamic chips
         val toRemove = mutableListOf<View>()
         for (i in 0 until chipGroup.childCount) {
@@ -152,7 +162,7 @@ class CatalogFragment : Fragment() {
                 tag = rawStyle // Keep raw English string for filtering
                 text = getTranslatedStyleLabel(rawStyle)
                 isCheckable = true
-                isChecked = false
+                isChecked = previouslyCheckedTags.contains(rawStyle)
                 setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
                         binding.chipAll.isChecked = false
@@ -181,6 +191,7 @@ class CatalogFragment : Fragment() {
             "neoclassical" -> "Neoclásico"
             "contemporary" -> "Contemporáneo"
             "modern / avant-garde" -> "Vanguardia"
+            "modernist" -> "Modernista"
             else -> rawStyle
         }
     }
@@ -235,7 +246,7 @@ class CatalogFragment : Fragment() {
             }
         }
 
-        val filtered = fullBalletList.filter { ballet ->
+        val filteredList = fullBalletList.filter { ballet ->
             val matchesFavorite = if (filterOnlyFavorites) {
                 repository.isFavorite(ballet.id)
             } else {
@@ -251,15 +262,13 @@ class CatalogFragment : Fragment() {
                 true
             }
             else {
-                ballet.style != null && selectedStyleTags.any { tag ->
-                    ballet.style.equals(tag, ignoreCase = true)
-                }
+                selectedStyleTags.contains(ballet.style?.trim())
             }
             matchesFavorite && matchesQuery && matchesStyle
         }
 
-        adapter.submitList(filtered) {
-            binding.tvEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        adapter.submitList(filteredList) {
+            binding.tvEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 

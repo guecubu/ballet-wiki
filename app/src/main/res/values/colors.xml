@@ -1,37 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Surfaces (Light: Porcelaine Éditoriale) -->
-    <!-- Superficies con separación real de planos -->
+    <!-- ============================================================== -->
+    <!-- CAPA 1: PALETA PRIMITIVA / IDENTIDAD DE MARCA (VALORES HEX)    -->
+    <!-- ============================================================== -->
+    <!-- Superficies Claras -->
     <color name="ballet_window_background">#FAF5F2</color>
-    <color name="ballet_surface_container">#F3ECE7</color>
-    <!-- El variant cobra vida: rosa satinado suave en vez de beige sucio -->
-    <color name="ballet_surface_variant">#FCEBED</color>
+    <color name="ballet_surface_container">#FFFFFF</color>
+    <color name="ballet_surface_variant">#F5EBE6</color>
     <color name="ballet_surface_container_lowest">#FFFFFF</color>
-    <!-- Fondo semitransparente claro para el badge (80% blanco porcelana) -->
-    <color name="ballet_badge_background">#FCEBED</color>
-    <color name="ballet_badge_text">@color/ballet_logo_tutu_end</color> <!-- #201A1E -->
 
-    <!-- Typography Hierarchy -->
-    <color name="ballet_text_high_emphasis">#201A1E</color>
-    <color name="ballet_text_medium_emphasis">#6D6469</color>
+    <!-- Tipografía -->
+    <color name="ballet_text_high_emphasis">#1D171B</color>         <!-- Mulberry oscuro -->
+    <color name="ballet_text_medium_emphasis">#594F55</color>       <!-- Ciruela medio -->
+    <color name="ballet_text_on_accent">#FFFFFF</color>            <!-- Blanco puro sobre color -->
     <color name="ballet_text_disabled">#9E949A</color>
 
-    <!-- Brand Accent 1: Antique Gold -->
-    <color name="ballet_gold_primary">#9E6B30</color>
-    <color name="ballet_gold_light">#F9EEDF</color>
-    <color name="ballet_gold_container">#F9EEDF</color>
+    <!-- Familia Rosa Ballet / Frambuesa -->
+    <color name="ballet_rose_accent">#B84D65</color>                <!-- Frambuesa saturado -->
+    <color name="ballet_rose_highlight">#E8A5B2</color>
+    <color name="ballet_rose_container">#FCECEE</color>             <!-- Rosa pastel empolvado -->
 
-    <!-- Brand Accent 2: Classical Ballet Rose -->
-    <color name="ballet_rose_accent">#C05C72</color>
-    <color name="ballet_rose_highlight">#F7AAB9</color>
-    <color name="ballet_rose_container">#FCEBED</color>
+    <!-- Familia Oro / Bronce -->
+    <color name="ballet_gold_primary">#8A5920</color>               <!-- Bronce calibrado claro -->
+    <color name="ballet_gold_container">#FAEDE0</color>
+    <color name="ballet_gold_light">#F5D6B3</color>
 
-    <!-- Color del scrim al centro y al final para Modo Claro -->
-    <color name="ballet_scrim_gradient_center">#33FCEBED</color>
-    <color name="ballet_scrim_gradient_end">#F3ECE7</color>
+    <!-- Bordes físicos -->
+    <color name="ballet_stroke_outline">#D8C7BD</color>
 
-    <!-- Contours & Dividers -->
-    <color name="ballet_stroke_outline">#E0D3CB</color>
+    <!-- Scrim (Tu calibración validada al 30%) -->
+    <color name="ballet_scrim_gradient_center">#4DFCEBED</color>
+    <color name="ballet_scrim_gradient_end">#FFFFFF</color>
+
+    <!-- ============================================================== -->
+    <!-- CAPA 2: TOKENS SEMÁNTICOS DE COMPONENTE (SÓLO REFERENCIAS @)   -->
+    <!-- MODO CLARO: Resuelven a la paleta audaz (Frambuesa & Blanco)   -->
+    <!-- ============================================================== -->
+    <!-- Chips de Estilo Coreográfico -->
+    <color name="ballet_chip_bg_active">@color/ballet_rose_accent</color>
+    <color name="ballet_chip_text_active">@color/ballet_text_on_accent</color>
+    <color name="ballet_chip_stroke_active">@color/ballet_rose_accent</color>
+    <color name="ballet_chip_bg_inactive">@color/ballet_surface_container</color>
+    <color name="ballet_chip_text_inactive">@color/ballet_text_high_emphasis</color>
+    <color name="ballet_chip_stroke_inactive">@color/ballet_stroke_outline</color>
+
+    <!-- Badge de Época / Coreógrafo (sobre foto) -->
+    <color name="ballet_badge_era_bg">@color/ballet_rose_container</color>
+    <color name="ballet_badge_era_text">@color/ballet_rose_accent</color>
+    <color name="ballet_badge_era_stroke">@color/ballet_stroke_outline</color>
+
+    <!-- Acentos de Interacción en Tarjeta ("4 Actos →", Lupa, Bookmark) -->
+    <color name="ballet_card_accent_action">@color/ballet_rose_accent</color>
+    <color name="ballet_search_icon_tint">@color/ballet_rose_accent</color>
+    <color name="ballet_search_bg">@color/ballet_surface_container</color>
+    <color name="ballet_search_stroke">@color/ballet_stroke_outline</color>
+
+    <!-- Barra de Navegación Inferior (BottomNavigationView) -->
+    <color name="ballet_bottom_nav_bg">@color/ballet_surface_container</color>
+    <color name="ballet_bottom_nav_item_active">@color/ballet_text_high_emphasis</color>
+    <color name="ballet_bottom_nav_item_inactive">@color/ballet_text_medium_emphasis</color>
+    <color name="ballet_bottom_nav_indicator">@color/ballet_rose_highlight</color>         <!-- Texto
+    oscuro definido -->
 
     <!-- Logo Tokens (Modo Claro) -->
     <!-- Contenedor -->
@@ -56,8 +85,5 @@
     <color name="ballet_logo_page_base_end">#3B2332</color>
 
     <!-- Cintas de zapatillas y detalles -->
-    <color name="ballet_logo_highlights">#FDE5D4</color>
-
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="ballet_logo_highlights">#AD3752</color>
 </resources>

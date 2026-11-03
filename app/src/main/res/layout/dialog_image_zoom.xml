@@ -24,6 +24,6 @@
         android:padding="8dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_close"
-        app:tint="@color/ballet_badge_text" />
+        app:tint="@color/ballet_badge_era_text" />
 
 </FrameLayout>

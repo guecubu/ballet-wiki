@@ -1,40 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Surfaces (Dark: Obsidian Théâtrale) -->
+    <!-- ============================================================== -->
+    <!-- CAPA 1: PALETA PRIMITIVA / IDENTIDAD DE MARCA (VALORES HEX)    -->
+    <!-- ============================================================== -->
+    <!-- Superficies Oscuras (Obsidiana Teatral) -->
     <color name="ballet_window_background">#121113</color>
     <color name="ballet_surface_container">#1C1A1E</color>
     <color name="ballet_surface_variant">#2A262D</color>
     <color name="ballet_surface_container_lowest">#121114</color>
-    <!-- Fondo semitransparente oscuro para el badge (75% obsidiana) -->
-    <color name="ballet_badge_background">#BF121113</color>
-    <color name="ballet_badge_text">@color/ballet_gold_primary</color> <!-- #F8F3ED -->
 
-    <!-- Typography Hierarchy -->
-    <color name="ballet_text_high_emphasis">#F8F3ED</color>
-    <color name="ballet_text_medium_emphasis">#B8B0B5</color>
+    <!-- Tipografía -->
+    <color name="ballet_text_high_emphasis">#F8F3ED</color>         <!-- Perla / Marfil -->
+    <color name="ballet_text_medium_emphasis">#B8B0B5</color>       <!-- Plata medio -->
+    <color name="ballet_text_on_accent">#121113</color>
     <color name="ballet_text_disabled">#686066</color>
 
-    <!-- Brand Accent 1: Antique Leaf Gold -->
-    <color name="ballet_gold_primary">#E2A96B</color>
+    <!-- Familia Oro Primario / Bronce -->
+    <color name="ballet_gold_primary">#E2A96B</color>               <!-- Oro primario luminoso -->
     <color name="ballet_gold_light">#FCE1BE</color>
-    <color name="ballet_gold_container">#3D2D1B</color>
+    <color name="ballet_gold_container">#3D2D1B</color>             <!-- Contenedor ámbar cálido -->
 
-    <!-- Brand Accent 2: Classical Ballet Rose -->
+    <!-- Familia Rosa en Oscuro -->
     <color name="ballet_rose_accent">#E88096</color>
     <color name="ballet_rose_highlight">#FFCAD4</color>
     <color name="ballet_rose_container">#421D26</color>
 
-    <!-- Color del scrim al centro y al final para Modo Oscuro -->
-    <color name="ballet_scrim_gradient_center">#CC121113</color>
-    <color name="ballet_scrim_gradient_end">#1C1A1E</color>
-
-    <!-- Contours & Dividers -->
+    <!-- Contornos físicos -->
     <color name="ballet_stroke_outline">#38323C</color>
 
-    <!-- Logo Specific Layers -->
-    <color name="ballet_page_layer_top">#4DE88096</color>
-    <color name="ballet_page_layer_mid">#8CE2A96B</color>
-    <color name="ballet_page_layer_base">#6E481D</color>
+    <!-- Scrim Oscuro Original -->
+    <color name="ballet_scrim_gradient_center">#661C1A1E</color>
+    <color name="ballet_scrim_gradient_end">#1C1A1E</color>
+
+    <!-- ============================================================== -->
+    <!-- CAPA 2: TOKENS SEMÁNTICOS DE COMPONENTE (SÓLO REFERENCIAS @)   -->
+    <!-- MODO OSCURO: Resuelven a la paleta dorada y obsidiana original -->
+    <!-- ============================================================== -->
+    <!-- Chips de Estilo Coreográfico -->
+    <color name="ballet_chip_bg_active">@color/ballet_gold_container</color>
+    <color name="ballet_chip_text_active">@color/ballet_gold_primary</color>
+    <color name="ballet_chip_stroke_active">@color/ballet_gold_primary</color>
+    <color name="ballet_chip_bg_inactive">@color/ballet_surface_container</color>
+    <color name="ballet_chip_text_inactive">@color/ballet_text_medium_emphasis</color>
+    <color name="ballet_chip_stroke_inactive">@color/ballet_stroke_outline</color>
+
+    <!-- Badge de Época / Coreógrafo (sobre foto) -->
+    <color name="ballet_badge_era_bg">@color/ballet_surface_container</color>
+    <color name="ballet_badge_era_text">@color/ballet_rose_accent</color>
+    <color name="ballet_badge_era_stroke">@color/ballet_stroke_outline</color>
+
+    <!-- Acentos de Interacción en Tarjeta ("4 Actos →", Lupa, Bookmark) -->
+    <color name="ballet_card_accent_action">@color/ballet_gold_primary</color>
+    <color name="ballet_search_icon_tint">@color/ballet_gold_primary</color>
+    <color name="ballet_search_bg">@color/ballet_surface_variant</color>
+    <color name="ballet_search_stroke">@color/ballet_stroke_outline</color>
+
+    <!-- Barra de Navegación Inferior (BottomNavigationView) -->
+    <color name="ballet_bottom_nav_bg">@color/ballet_surface_container</color>
+    <color name="ballet_bottom_nav_item_active">@color/ballet_gold_primary</color>
+    <color name="ballet_bottom_nav_item_inactive">@color/ballet_text_medium_emphasis</color>
+    <color name="ballet_bottom_nav_indicator">@color/ballet_rose_container</color>
 
     <!-- Logo Tokens (Modo Oscuro) -->
     <!-- Contenedor (con 35% de alfa en el borde dorado: #59E2A96B) -->

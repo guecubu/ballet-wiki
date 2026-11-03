@@ -48,7 +48,7 @@
             android:includeFontPadding="false"
             android:paddingVertical="4dp"
             android:background="@drawable/bg_era_badge"
-            android:textColor="@color/ballet_badge_text"
+            android:textColor="@color/ballet_badge_era_text"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.04"

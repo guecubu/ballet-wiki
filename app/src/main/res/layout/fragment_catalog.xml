@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="16dp"
-            android:background="@color/ballet_surface_container_lowest"
+            android:background="@color/ballet_window_background"
             android:paddingTop="8dp"
             android:paddingBottom="4dp">
 
@@ -112,7 +112,7 @@
                     android:layout_marginEnd="12dp"
                     android:contentDescription="@string/search_hint"
                     android:src="@drawable/ic_search"
-                    app:tint="@color/ballet_gold_primary" />
+                    app:tint="@color/ballet_search_icon_tint" />
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearch"
@@ -124,7 +124,6 @@
                     android:inputType="text"
                     android:maxLines="1"
                     android:textColor="@color/ballet_text_high_emphasis"
-                    android:textColorHint="@color/ballet_text_disabled"
                     android:textSize="14sp" />
 
             </LinearLayout>

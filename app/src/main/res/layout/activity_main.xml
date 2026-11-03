@@ -18,14 +18,26 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Bottom Navigation Bar (Persistent) -->
+    <!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
+    <!--        android:id="@+id/bottomNavigationView"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="80dp"-->
+    <!--        android:background="@color/ballet_surface_container"-->
+    <!--        android:theme="@style/ThemeOverlay.BottomNav.Clear"-->
+    <!--        app:itemIconTint="@color/ballet_gold_primary"-->
+    <!--        app:itemTextColor="@color/ballet_text_medium_emphasis"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:menu="@menu/menu_bottom_nav" />-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        style="@style/Widget.Ballet.BottomNavigationView"
         android:background="@color/ballet_surface_container"
-        android:theme="@style/ThemeOverlay.BottomNav.Clear"
-        app:itemIconTint="@color/ballet_gold_primary"
-        app:itemTextColor="@color/ballet_text_medium_emphasis"
+        android:layout_height="wrap_content"
+        app:itemIconTint="@color/ballet_bottom_nav_selector"
+        app:itemTextColor="@color/ballet_bottom_nav_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

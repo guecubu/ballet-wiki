@@ -24,10 +24,14 @@
         <item name="colorOutline">@color/ballet_stroke_outline</item>
     </style>
 
-    <!-- Overlay exclusivo para la barra inferior en modo claro -->
-    <style name="ThemeOverlay.BottomNav.Clear" parent="">
-        <!-- Reemplazamos únicamente el contenedor de la pastilla por ballet_rose_highlight con contraste frente a ballet_surface_container (#F3ECE7) -->
-        <item name="colorSecondaryContainer">@color/ballet_rose_highlight</item>
+    <!-- En el estilo de tu aplicación (Theme.BalletWiki o similar) o en un estilo de BottomNav -->
+    <style name="Widget.Ballet.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@style/Widget.Ballet.BottomNav.Indicator</item>
+    </style>
+
+    <style name="Widget.Ballet.BottomNav.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <!-- Apunta al token semántico: en claro será rosa suave, en oscuro será ámbar/oro oscuro -->
+        <item name="android:color">@color/ballet_bottom_nav_indicator</item>
     </style>
 
     <!-- Estilo sutil y estilizado para los Chips de Estilo Coreográfico -->
