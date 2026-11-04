@@ -214,29 +214,45 @@ class CatalogFragment : Fragment() {
     }
 
     private fun setupScrollParallaxMiniLogo() {
+        // Calculamos una sola vez los valores máximos en píxeles (36dp de logo + 10dp de margen)
+        val density = resources.displayMetrics.density
+        val maxLogoSizePx = (36 * density).toInt()
+        val maxMarginEndPx = (10 * density).toInt()
+
         binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val totalRange = appBarLayout.totalScrollRange.toFloat()
 
-            // 1. Evitar pull-to-refresh accidental mientras la cabecera no esté 100% expandida
+            // Evitar pull-to-refresh accidental mientras no esté expandido arriba
             binding.swipeRefreshLayout.isEnabled = (verticalOffset == 0)
 
             if (totalRange > 0f) {
-                // factor de colapso: 0.0 (arriba del todo) a 1.0 (totalmente replegado)
+                // Factor de colapso continuo: 0.0 (arriba) a 1.0 (totalmente replegado)
                 val collapseProgress = (-verticalOffset / totalRange).coerceIn(0f, 1f)
 
-                // Hacemos que la transición ocurra en el último tramo del scroll (entre el 60% y el 100%)
-                if (collapseProgress > 0.6f) {
-                    val appearProgress = ((collapseProgress - 0.6f) / 0.4f).coerceIn(0f, 1f)
-
-                    binding.ivMiniLogo.visibility = View.VISIBLE
-                    binding.ivMiniLogo.alpha = appearProgress
-                    binding.ivMiniLogo.scaleX = appearProgress
-                    binding.ivMiniLogo.scaleY = appearProgress
+                // Hacemos que la transición del ancho ocurra progresivamente entre el 50% y el 100% del colapso
+                val startThreshold = 0.20f
+                val progress = if (collapseProgress > startThreshold) {
+                    ((collapseProgress - startThreshold) / (1f - startThreshold)).coerceIn(0f, 1f)
                 }
                 else {
-                    binding.ivMiniLogo.alpha = 0f
-                    binding.ivMiniLogo.visibility = View.GONE
+                    0f
                 }
+
+                // 1. Modulamos el ancho físico y el margen del mini-logo de forma continua
+                val targetWidth = (maxLogoSizePx * progress).toInt()
+                val targetMargin = (maxMarginEndPx * progress).toInt()
+
+                val params = binding.ivMiniLogo.layoutParams as? ViewGroup.MarginLayoutParams
+                if (params != null && (params.width != targetWidth || params.marginEnd != targetMargin)) {
+                    params.width = targetWidth
+                    params.marginEnd = targetMargin
+                    binding.ivMiniLogo.layoutParams = params
+                }
+
+                // 2. Modulamos alpha y escala visual para sincronizar la aparición del icono
+                binding.ivMiniLogo.alpha = progress
+                binding.ivMiniLogo.scaleX = progress
+                binding.ivMiniLogo.scaleY = progress
             }
         }
     }

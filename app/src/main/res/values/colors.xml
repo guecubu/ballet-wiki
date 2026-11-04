@@ -65,7 +65,7 @@
     <!-- Logo Tokens (Modo Claro) -->
     <!-- Contenedor -->
     <color name="ballet_logo_bg">#F5EFEA</color>
-    <color name="ballet_logo_stroke">#D8C8BD</color>
+    <color name="ballet_logo_stroke">@color/ballet_logo_silhouette</color>
 
     <!-- Silueta (Mulberry de alto contraste) -->
     <color name="ballet_logo_silhouette">#241722</color>
@@ -77,7 +77,7 @@
 
     <!-- Páginas del Libro (con canal alfa integrado en el hex #AARRGGBB) -->
     <!-- 45% alfa de #F7AAB9 = #73F7AAB9 -->
-    <color name="ballet_logo_page_top">#73F7AAB9</color>
+    <color name="ballet_logo_page_top">#DAF7AAB9</color>
     <!-- 60% alfa de #C58B58 = #99C58B58 -->
     <color name="ballet_logo_page_mid">#99C58B58</color>
     <!-- Base sólida: Mulberry bronce -->

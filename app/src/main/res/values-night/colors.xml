@@ -26,7 +26,8 @@
     <color name="ballet_rose_container">#421D26</color>
 
     <!-- Contornos físicos -->
-    <color name="ballet_stroke_outline">#38323C</color>
+    <!--    <color name="ballet_stroke_outline">#503920</color>-->
+    <color name="ballet_stroke_outline">#4DE2A96B</color>
 
     <!-- Scrim Oscuro Original -->
     <color name="ballet_scrim_gradient_center">#661C1A1E</color>
@@ -51,6 +52,8 @@
 
     <!-- Acentos de Interacción en Tarjeta ("4 Actos →", Lupa, Bookmark) -->
     <color name="ballet_card_accent_action">@color/ballet_gold_primary</color>
+
+    <!-- Seach Bar -->
     <color name="ballet_search_icon_tint">@color/ballet_gold_primary</color>
     <color name="ballet_search_bg">@color/ballet_surface_variant</color>
     <color name="ballet_search_stroke">@color/ballet_stroke_outline</color>
@@ -64,7 +67,7 @@
     <!-- Logo Tokens (Modo Oscuro) -->
     <!-- Contenedor (con 35% de alfa en el borde dorado: #59E2A96B) -->
     <color name="ballet_logo_bg">#121114</color>
-    <color name="ballet_logo_stroke">#59E2A96B</color>
+    <color name="ballet_logo_stroke">#CCE2A96B</color>
 
     <!-- Silueta (Oro de marca sobre obsidiana) -->
     <color name="ballet_logo_silhouette">#E2A96B</color>
@@ -84,5 +87,6 @@
     <color name="ballet_logo_page_base_end">#6E481D</color>
 
     <!-- Cintas de zapatillas y detalles -->
-    <color name="ballet_logo_highlights">#FCE1BE</color>
+    <color name="ballet_logo_highlights">#E88096</color>
+    <!--    <color name="ballet_logo_highlights">#FCE1BE</color>-->
 </resources>
