@@ -54,6 +54,7 @@ class CatalogFragment : Fragment() {
         setupSearchAndFilters()
         setupSwipeRefresh()
         setupHeaderActions()
+        setupScrollParallaxMiniLogo()
 
         // Restore cached styles from SharedPreferences at launch for instant rendering (0 ms)
         val cachedStyles = repository.getSavedStyles()
@@ -209,6 +210,34 @@ class CatalogFragment : Fragment() {
     private fun setupHeaderActions() {
         binding.btnProfile.setOnClickListener {
             Toast.makeText(requireContext(), getString(R.string.about_title), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupScrollParallaxMiniLogo() {
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalRange = appBarLayout.totalScrollRange.toFloat()
+
+            // 1. Evitar pull-to-refresh accidental mientras la cabecera no esté 100% expandida
+            binding.swipeRefreshLayout.isEnabled = (verticalOffset == 0)
+
+            if (totalRange > 0f) {
+                // factor de colapso: 0.0 (arriba del todo) a 1.0 (totalmente replegado)
+                val collapseProgress = (-verticalOffset / totalRange).coerceIn(0f, 1f)
+
+                // Hacemos que la transición ocurra en el último tramo del scroll (entre el 60% y el 100%)
+                if (collapseProgress > 0.6f) {
+                    val appearProgress = ((collapseProgress - 0.6f) / 0.4f).coerceIn(0f, 1f)
+
+                    binding.ivMiniLogo.visibility = View.VISIBLE
+                    binding.ivMiniLogo.alpha = appearProgress
+                    binding.ivMiniLogo.scaleX = appearProgress
+                    binding.ivMiniLogo.scaleY = appearProgress
+                }
+                else {
+                    binding.ivMiniLogo.alpha = 0f
+                    binding.ivMiniLogo.visibility = View.GONE
+                }
+            }
         }
     }
 

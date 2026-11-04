@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,93 +9,119 @@
     <!-- Top Header Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/ballet_window_background"
-        app:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:elevation="0dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/headerContainer"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:background="@color/ballet_window_background"
-            android:paddingTop="8dp"
-            android:paddingBottom="4dp">
+            app:contentScrim="@android:color/transparent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:statusBarScrim="@android:color/transparent">
 
-            <ImageView
-                android:id="@+id/logoImageView"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/logo_content_description"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_ballet_logo" />
-
-            <TextView
-                android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/headerContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:includeFontPadding="false"
-                android:paddingHorizontal="6dp"
-                android:textStyle="bold"
-                android:textAppearance="?attr/textAppearanceTitleLarge"
-                app:layout_constraintStart_toEndOf="@+id/logoImageView"
-                app:layout_constraintBottom_toTopOf="@+id/subtitleTextView"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/subtitleTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:paddingHorizontal="6dp"
-                android:text="@string/app_slogan"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textStyle="italic"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/logoImageView"
-                app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
-
-            <!-- Profile Avatar Button (Interactive, `@+id/btnProfile`) -->
-            <FrameLayout
-                android:id="@+id/btnProfile"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/bg_search_pill"
-                android:backgroundTint="@color/ballet_gold_container"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:background="@color/ballet_window_background"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp"
+                app:layout_collapseMode="parallax">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    app:tint="@color/ballet_gold_primary"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/ic_profile" />
+                    android:id="@+id/logoImageView"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:contentDescription="@string/logo_content_description"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_ballet_logo" />
 
-            </FrameLayout>
+                <TextView
+                    android:id="@+id/titleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/app_name"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/subtitleTextView"
+                    app:layout_constraintStart_toEndOf="@+id/logoImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/subtitleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/app_slogan"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/logoImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
-        <!-- Search Input (Pill Style) -->
-        <FrameLayout
-            android:id="@+id/searchContainer"
+                <!-- Profile Avatar Button (Interactive, `@+id/btnProfile`) -->
+                <FrameLayout
+                    android:id="@+id/btnProfile"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_search_pill"
+                    android:backgroundTint="@color/ballet_gold_container"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/app_name"
+                        android:src="@drawable/ic_profile"
+                        app:tint="@color/ballet_gold_primary" />
+
+                </FrameLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <LinearLayout
+            android:id="@+id/searchRowContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <!-- Mini logo for parallax view -->
+            <ImageView
+                android:id="@+id/ivMiniLogo"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:alpha="0"
+                android:contentDescription="@string/logo_content_description"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_ballet_logo" />
+        <!-- Search Input (Pill Style) -->
+        <FrameLayout
+            android:id="@+id/searchContainer"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_search_pill"
             android:paddingHorizontal="16dp"
             android:paddingVertical="4dp">
@@ -129,7 +155,7 @@
             </LinearLayout>
 
         </FrameLayout>
-
+        </LinearLayout>
         <!-- Dynamic Style Filter Chips (Horizontal Scroll) -->
         <HorizontalScrollView
             android:id="@+id/scrollStyles"
@@ -167,12 +193,9 @@
     <!-- Main Content Container (RecyclerView + Loading/Error States) -->
     <FrameLayout
         android:id="@+id/contentContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
@@ -242,4 +265,4 @@
 
     </FrameLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
