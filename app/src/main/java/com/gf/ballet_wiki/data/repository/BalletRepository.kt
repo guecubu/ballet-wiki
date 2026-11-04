@@ -232,6 +232,12 @@ class BalletRepository(
 
     fun saveStyles(styles: Set<String>) = sessionManager.saveStyles(styles)
 
+    fun getStyleTranslations(): Map<String, String> = sessionManager.getStyleTranslations()
+
+    fun saveStyleTranslation(
+            rawStyle: String, translatedLabel: String
+                            ) = sessionManager.saveStyleTranslation(rawStyle, translatedLabel)
+
     // --- Local: Room (Notes CRUD) ---
 
     suspend fun getNotesForWork(workId: Int): List<NoteEntity> = withContext(Dispatchers.IO) {
