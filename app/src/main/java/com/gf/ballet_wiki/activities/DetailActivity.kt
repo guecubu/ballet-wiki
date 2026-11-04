@@ -23,6 +23,7 @@ import com.gf.ballet_wiki.databinding.DialogImageZoomBinding
 import com.gf.ballet_wiki.utils.DateStyle
 import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.setTranslatedText
+import com.gf.ballet_wiki.utils.setTranslatedTitleText
 import com.gf.ballet_wiki.utils.toLocalizedDate
 import kotlinx.coroutines.launch
 
@@ -116,16 +117,10 @@ class DetailActivity : AppCompatActivity() {
 
     private fun bindBalletData(ballet: BalletDto) {
         // Translated title with original title if present
-        val titleText = buildString {
-            append(ballet.title)
-            if (!ballet.originalTitle.isNullOrBlank()) {
-                append(" (${ballet.originalTitle})")
-            }
-        }
-        binding.tvDetailTitle.setTranslatedText(
-                originalText = titleText,
-                sourceLanguage = "en",
-                showOriginalInParentheses = true
+        binding.tvDetailTitle.setTranslatedTitleText(
+                baseTitle = ballet.title,
+                originalTitle = ballet.originalTitle,
+                sourceLanguage = "en"
                                                )
 
         binding.tvDetailComposer.text = getString(R.string.composer_format, ballet.composer)

@@ -164,3 +164,96 @@ private fun Translator.translateAndDisplay(originalText: String, textView: TextV
 private fun TextView.setOriginal(textToShow: String) {
     text = textToShow
 }
+
+fun buildTitleString(translatedTitle: String, originalTitle: String?): String {
+    if (originalTitle.isNullOrBlank()) {
+        return translatedTitle
+    }
+    if (translatedTitle.trim().equals(originalTitle.trim(), ignoreCase = true)) {
+        return translatedTitle
+    }
+    return "$translatedTitle ($originalTitle)"
+}
+
+fun TextView.setTranslatedTitleText(
+        baseTitle: String, originalTitle: String?, sourceLanguage: String = "en"
+                                   ) {
+    val context = this.context
+    val activeLang = TranslationManager.getActiveLanguage()
+    val formattedOriginal = buildTitleString(baseTitle, originalTitle)
+
+    if (activeLang == sourceLanguage || baseTitle.isBlank()) {
+        setOriginal(formattedOriginal)
+        return
+    }
+
+    val targetLangTag = TranslateLanguage.fromLanguageTag(activeLang) ?: TranslateLanguage.SPANISH
+    val sourceLangTag =
+            TranslateLanguage.fromLanguageTag(sourceLanguage) ?: TranslateLanguage.ENGLISH
+    val model = TranslateRemoteModel.Builder(targetLangTag).build()
+    val modelManager = RemoteModelManager.getInstance()
+
+    setText(R.string.translating)
+
+    val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLangTag)
+            .setTargetLanguage(targetLangTag)
+            .build()
+    val translator = Translation.getClient(options)
+
+    modelManager.isModelDownloaded(model).addOnSuccessListener { isDownloaded ->
+        if (isDownloaded) {
+            translator.translateAndDisplayTitle(baseTitle, originalTitle, this)
+        }
+        else if (TranslationManager.isWifiConnected(context)) {
+            val conditions = DownloadConditions.Builder().requireWifi().build()
+            translator.downloadModelIfNeeded(conditions)
+                    .addOnSuccessListener {
+                        translator.translateAndDisplayTitle(
+                                baseTitle, originalTitle, this
+                                                           )
+                    }
+                    .addOnFailureListener { setOriginal(formattedOriginal) }
+        }
+        else {
+            AlertDialog.Builder(context)
+                    .setTitle(R.string.translation_dialog_title)
+                    .setMessage(R.string.translation_dialog_message)
+                    .setPositiveButton(R.string.download) { _, _ ->
+                        setText(R.string.translating)
+                        translator.downloadModelIfNeeded()
+                                .addOnSuccessListener {
+                                    translator.translateAndDisplayTitle(
+                                            baseTitle, originalTitle, this
+                                                                       )
+                                }
+                                .addOnFailureListener { setOriginal(formattedOriginal) }
+                    }
+                    .setNegativeButton(R.string.view_original) { _, _ ->
+                        setOriginal(
+                                formattedOriginal
+                                   )
+                    }
+                    .setOnCancelListener { setOriginal(formattedOriginal) }
+                    .show()
+        }
+    }.addOnFailureListener { setOriginal(formattedOriginal) }
+}
+
+private fun Translator.translateAndDisplayTitle(
+        baseTitle: String, originalTitle: String?, textView: TextView
+                                               ) {
+    if (baseTitle.isBlank()) {
+        textView.setOriginal(buildTitleString(baseTitle, originalTitle))
+        return
+    }
+
+    translate(baseTitle)
+            .addOnSuccessListener { translatedBase ->
+                val finalString = buildTitleString(translatedBase, originalTitle)
+                textView.setOriginal(finalString)
+            }
+            .addOnFailureListener {
+                textView.setOriginal(buildTitleString(baseTitle, originalTitle))
+            }
+}

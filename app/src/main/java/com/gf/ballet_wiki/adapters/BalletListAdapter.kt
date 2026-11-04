@@ -10,7 +10,7 @@ import com.gf.ballet_wiki.R
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.databinding.ItemBalletBinding
 import com.gf.ballet_wiki.utils.loadUrl
-import com.gf.ballet_wiki.utils.setTranslatedText
+import com.gf.ballet_wiki.utils.setTranslatedTitleText
 
 class BalletListAdapter(
     private val onBalletClick: (BalletDto) -> Unit,
@@ -37,11 +37,11 @@ class BalletListAdapter(
         fun bind(ballet: BalletDto) {
             val context = binding.root.context
 
-            // Title with translation and original in parentheses
-            binding.tvTitle.setTranslatedText(
-                originalText = ballet.title,
-                sourceLanguage = "en",
-                showOriginalInParentheses = true
+            // Title with translation and original title in parentheses
+            binding.tvTitle.setTranslatedTitleText(
+                    baseTitle = ballet.title,
+                    originalTitle = ballet.originalTitle,
+                    sourceLanguage = "en"
             )
 
             binding.tvComposer.text = ballet.composer
