@@ -15,6 +15,7 @@ class SessionManager(context: Context) {
         private const val KEY_LAST_VIEWED_ID = "key_last_viewed_work_id"
         private const val KEY_SAVED_STYLES = "key_saved_styles"
         private const val KEY_STYLE_TRANSLATIONS = "key_style_translations"
+        private const val KEY_TEXT_TRANSLATIONS = "key_text_translations"
 
         @Volatile
         private var instance: SessionManager? = null
@@ -92,5 +93,51 @@ class SessionManager(context: Context) {
         current[rawStyle.lowercase().trim()] = translatedLabel
         val set = current.map { "${it.key}:${it.value}" }.toSet()
         prefs.edit { putStringSet(KEY_STYLE_TRANSLATIONS, set) }
+    }
+
+    fun getStyleTranslation(rawStyle: String): String {
+        val key = rawStyle.lowercase().trim()
+        val cachedMap = getStyleTranslations()
+        val cached = cachedMap[key]
+        if (!cached.isNullOrBlank()) {
+            return cached
+        }
+        val label = when (key) {
+            "classical" -> "Clásico"
+            "romantic" -> "Romántico"
+            "neoclassical" -> "Neoclásico"
+            "contemporary" -> "Contemporáneo"
+            "modern / avant-garde" -> "Vanguardia"
+            "modernist" -> "Modernista"
+            else -> rawStyle
+        }
+        saveStyleTranslation(rawStyle, label)
+        return label
+    }
+
+    fun getCachedTranslation(sourceText: String, languageTag: String): String? {
+        val map = getTextTranslations()
+        val key = "${languageTag}_${sourceText.hashCode()}"
+        return map[key]
+    }
+
+    fun cacheTranslation(sourceText: String, languageTag: String, translatedText: String) {
+        val current = getTextTranslations().toMutableMap()
+        val key = "${languageTag}_${sourceText.hashCode()}"
+        current[key] = translatedText
+        val set = current.map { "${it.key}:${it.value}" }.toSet()
+        prefs.edit { putStringSet(KEY_TEXT_TRANSLATIONS, set) }
+    }
+
+    private fun getTextTranslations(): Map<String, String> {
+        val set = prefs.getStringSet(KEY_TEXT_TRANSLATIONS, emptySet()) ?: emptySet()
+        val map = mutableMapOf<String, String>()
+        for (item in set) {
+            val parts = item.split(":", limit = 2)
+            if (parts.size == 2) {
+                map[parts[0]] = parts[1]
+            }
+        }
+        return map
     }
 }

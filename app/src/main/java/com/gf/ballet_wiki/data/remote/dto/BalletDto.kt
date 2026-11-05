@@ -1,5 +1,6 @@
 package com.gf.ballet_wiki.data.remote.dto
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 
 data class BalletDto(
@@ -99,6 +100,29 @@ data class ProminentCompanyDto(
 
     @SerializedName("official_url")
     val officialUrl: String,
+                              )
+
+data class AttributionCoverDto(
+        @SerializedName("creator")
+        val creator: String? = null,
+
+        @SerializedName("source")
+        val source: String? = null,
+
+        @SerializedName("source_url")
+        val sourceUrl: String? = null,
+
+        @SerializedName("license")
+        val license: String? = null,
+
+        @SerializedName("license_url")
+        val licenseUrl: String? = null,
+
+        @SerializedName("rights")
+        val rights: String? = null,
+
+        @SerializedName("credit")
+        val credit: String? = null
 )
 
 data class MultimediaDto(
@@ -115,5 +139,36 @@ data class MultimediaDto(
     val youtubeUrl: String? = null,
 
     @SerializedName("attribution_cover")
-    val attributionCover: String? = null,
-)
+    private val rawAttributionCover: JsonElement? = null,
+                        ) {
+    val attributionCoverObj: AttributionCoverDto?
+        get() {
+            val element = rawAttributionCover ?: return null
+            return try {
+                if (element.isJsonObject) {
+                    com.google.gson.Gson().fromJson(element, AttributionCoverDto::class.java)
+                }
+                else null
+            }
+            catch (e: Exception) {
+                null
+            }
+        }
+
+    val attributionCover: String?
+        get() {
+            val element = rawAttributionCover ?: return null
+            return when {
+                element.isJsonPrimitive -> element.asString
+                element.isJsonObject -> {
+                    val obj = attributionCoverObj
+                    val textParts =
+                            listOfNotNull(obj?.credit, obj?.rights, obj?.source, obj?.creator)
+                                    .filter { it.isNotBlank() }
+                    if (textParts.isNotEmpty()) textParts.first() else element.toString()
+                }
+
+                else -> null
+            }
+        }
+}

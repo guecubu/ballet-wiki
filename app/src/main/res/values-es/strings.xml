@@ -24,6 +24,7 @@
     <string name="section_synopsis">Sinopsis y argumento</string>
     <string name="section_history">Historia y evolución</string>
     <string name="section_characters">Personajes principales</string>
+    <string name="section_variations">Variaciones clave</string>
     <string name="section_open_opus">Información del compositor (Open Opus)</string>
     <string name="section_europeana">Colección digital (Europeana)</string>
     <string name="section_image_gallery">Galería de Imágenes</string>
@@ -61,4 +62,7 @@
     <string name="nav_repertoire">Repertorio</string>
     <string name="nav_selection">Selección</string>
     <string name="nav_notes">Notas</string>
+    <string name="tradition">Tradición</string>
+    <string name="genre">Género</string>
+    <string name="school">Escuela</string>
 </resources>

@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gf.ballet_wiki.R
 import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.databinding.ItemBalletBinding
+import com.gf.ballet_wiki.utils.TranslationManager
+import com.gf.ballet_wiki.utils.buildTitleString
 import com.gf.ballet_wiki.utils.loadUrl
-import com.gf.ballet_wiki.utils.setTranslatedTitleText
 
 class BalletListAdapter(
     private val onBalletClick: (BalletDto) -> Unit,
@@ -38,10 +39,17 @@ class BalletListAdapter(
             val context = binding.root.context
 
             // Title with translation and original title in parentheses
-            binding.tvTitle.setTranslatedTitleText(
-                    baseTitle = ballet.title,
-                    originalTitle = ballet.originalTitle,
-                    sourceLanguage = "en"
+            TranslationManager.translate(
+                    context = context,
+                    originalText = ballet.title,
+                    sourceLanguage = "en",
+                    onTranslating = {
+                        binding.tvTitle.text = context.getString(R.string.translating)
+                    },
+                    onTranslated = { translatedTitle ->
+                        binding.tvTitle.text =
+                                buildTitleString(translatedTitle, ballet.originalTitle)
+                    }
             )
 
             binding.tvComposer.text = ballet.composer

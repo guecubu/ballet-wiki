@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="8dp" />
-    <solid android:color="@color/ballet_logo_bg" />
+    <solid android:color="@color/ballet_search_bg" />
     <stroke
         android:width="0.5dp"
         android:color="@color/ballet_stroke_outline" />

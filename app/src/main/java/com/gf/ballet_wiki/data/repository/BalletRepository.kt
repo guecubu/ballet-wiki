@@ -93,7 +93,13 @@ class BalletRepository(
 
     suspend fun getBalletById(id: Int): Result<BalletDto> = withContext(Dispatchers.IO) {
         try {
-            val item = balletApi.getBalletById(id)
+            val item = try {
+                balletApi.getBalletById(id)
+            }
+            catch (e: Exception) {
+                val fullList = balletApi.getBallets()
+                fullList.firstOrNull { it.id == id } ?: throw e
+            }
             val enrichedItem = try {
                 if (item.coverImage.isNullOrBlank()) {
                     val cachedRecords = europeanaDao.getRecordsForWork(id)
@@ -182,36 +188,45 @@ class BalletRepository(
 
     suspend fun searchComposer(composerName: String): Result<List<OpenOpusComposerDto>> = withContext(Dispatchers.IO) {
         if (composerName.isBlank()) return@withContext Result.success(emptyList())
-        try {
-            val response = openOpusApi.searchComposer(composerName)
-            val composers = response.composers
+        val names = composerName.split("/", "•", ",").map { it.trim() }.filter { it.isNotBlank() }
+        if (names.isEmpty()) return@withContext Result.success(emptyList())
 
-            // Map and save first composer to Room
-            if (composers.isNotEmpty()) {
-                val comp = composers.first()
-                val entity = ComposerEntity(
-                        composerId = comp.id,
-                        name = comp.name,
-                        completeName = comp.completeName,
-                        birth = comp.birth,
-                        death = comp.death,
-                        epoch = comp.epoch,
-                        portrait = comp.portrait
-                                           )
-                composerDao.insertComposer(entity)
+        val allComposers = mutableListOf<OpenOpusComposerDto>()
+        for (name in names) {
+            try {
+                val existing = composerDao.getComposerByName(name)
+                if (existing == null) {
+                    val response = openOpusApi.searchComposer(name)
+                    val composers = response.composers
+                    if (composers.isNotEmpty()) {
+                        val comp = composers.first()
+                        val entity = ComposerEntity(
+                                composerId = comp.id,
+                                name = comp.name,
+                                completeName = comp.completeName,
+                                birth = comp.birth,
+                                death = comp.death,
+                                epoch = comp.epoch,
+                                portrait = comp.portrait
+                                                   )
+                        composerDao.insertComposer(entity)
+                        allComposers.add(comp)
+                    }
+                }
             }
-
-            Result.success(composers)
-        } catch (e: Exception) {
-            Log.e(RAW_TAG, "OPEN OPUS FETCH ERROR: ${e.message}", e)
-            Result.failure(e)
+            catch (e: Exception) {
+                Log.e(RAW_TAG, "OPEN OPUS FETCH ERROR FOR $name: ${e.message}", e)
+            }
         }
+        Result.success(allComposers)
     }
 
-    suspend fun getCachedComposer(composerName: String): ComposerEntity? = withContext(
+    suspend fun getCachedComposers(composerName: String): List<ComposerEntity> = withContext(
             Dispatchers.IO
-                                                                                      ) {
-        composerDao.getComposerByName(composerName)
+                                                                                            ) {
+        if (composerName.isBlank()) return@withContext emptyList()
+        val names = composerName.split("/", "•", ",").map { it.trim() }.filter { it.isNotBlank() }
+        names.mapNotNull { name -> composerDao.getComposerByName(name) }
     }
 
     // --- Local: SessionManager (Favorites & Preferences) ---
@@ -233,6 +248,8 @@ class BalletRepository(
     fun saveStyles(styles: Set<String>) = sessionManager.saveStyles(styles)
 
     fun getStyleTranslations(): Map<String, String> = sessionManager.getStyleTranslations()
+
+    fun getStyleTranslation(rawStyle: String): String = sessionManager.getStyleTranslation(rawStyle)
 
     fun saveStyleTranslation(
             rawStyle: String, translatedLabel: String

@@ -25,6 +25,7 @@
     <string name="section_synopsis">Synopsis and plot</string>
     <string name="section_history">History and evolution</string>
     <string name="section_characters">Main characters</string>
+    <string name="section_variations">Key variations</string>
     <string name="section_open_opus">Composer information (Open Opus)</string>
     <string name="section_europeana">Digital collection (Europeana)</string>
     <string name="section_image_gallery">Image Gallery</string>

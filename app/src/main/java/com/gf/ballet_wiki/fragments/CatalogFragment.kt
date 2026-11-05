@@ -185,17 +185,9 @@ class CatalogFragment : Fragment() {
         }
     }
 
-    private fun getTranslatedStyleLabel(rawStyle: String): String {
-        return when (rawStyle.lowercase().trim()) {
-            "classical" -> "Clásico"
-            "romantic" -> "Romántico"
-            "neoclassical" -> "Neoclásico"
-            "contemporary" -> "Contemporáneo"
-            "modern / avant-garde" -> "Vanguardia"
-            "modernist" -> "Modernista"
-            else -> rawStyle
-        }
-    }
+    private fun getTranslatedStyleLabel(rawStyle: String): String = repository.getStyleTranslation(
+            rawStyle
+                                                                                                  )
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
@@ -292,11 +284,24 @@ class CatalogFragment : Fragment() {
             }
         }
 
+        val ctx = context
+        val sessionManager = ctx?.let { com.gf.ballet_wiki.utils.SessionManager.getInstance(it) }
+        val activeLang = TranslationManager.getActiveLanguage()
+
         val filteredList = fullBalletList.filter { ballet ->
             val matchesFavorite = !filterOnlyFavorites || repository.isFavorite(ballet.id)
+
+            val cachedTitle = sessionManager?.getCachedTranslation(ballet.title, activeLang)
             val matchesQuery = currentSearchQuery.isEmpty() ||
                                ballet.title.contains(currentSearchQuery, ignoreCase = true) ||
+                               (!ballet.originalTitle.isNullOrBlank() && ballet.originalTitle.contains(
+                                       currentSearchQuery, ignoreCase = true
+                                                                                                      )) ||
+                               (!cachedTitle.isNullOrBlank() && cachedTitle.contains(
+                                       currentSearchQuery, ignoreCase = true
+                                                                                    )) ||
                                ballet.composer.contains(currentSearchQuery, ignoreCase = true)
+
             val matchesStyle = selectedStyleTags.isEmpty() ||
                                binding.chipAll.isChecked ||
                                selectedStyleTags.contains(ballet.style?.trim())

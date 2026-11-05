@@ -24,9 +24,10 @@ import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.ActivityDetailBinding
 import com.gf.ballet_wiki.databinding.DialogImageZoomBinding
 import com.gf.ballet_wiki.utils.DateStyle
+import com.gf.ballet_wiki.utils.TranslationManager
 import com.gf.ballet_wiki.utils.loadUrl
-import com.gf.ballet_wiki.utils.setTranslatedText
 import com.gf.ballet_wiki.utils.toLocalizedDate
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -136,51 +137,73 @@ class DetailActivity : AppCompatActivity() {
 
     private fun bindBalletData(ballet: BalletDto) {
         // Translated title in editorial sheet
-        binding.tvTitle.setTranslatedText(
+        TranslationManager.translate(
+                context = this,
                 originalText = ballet.title,
                 sourceLanguage = "en",
-                showOriginalInParentheses = false
-                                         )
+                onTranslating = { binding.tvTitle.text = getString(R.string.translating) },
+                onTranslated = { translatedTitle ->
+                    binding.tvTitle.text = translatedTitle
 
-        // Original title as separate data field
-        val showOriginal = !ballet.originalTitle.isNullOrBlank() &&
-                           !ballet.originalTitle.equals(ballet.title, ignoreCase = true)
-        binding.tvOriginalTitle.isVisible = showOriginal
-        binding.tvOriginalTitle.text = ballet.originalTitle
+                    // Original title as separate data field compared against actual translated title
+                    val showOriginal = !ballet.originalTitle.isNullOrBlank() &&
+                                       !ballet.originalTitle.equals(
+                                               translatedTitle, ignoreCase = true
+                                                                   )
+                    binding.tvOriginalTitle.isVisible = showOriginal
+                    binding.tvOriginalTitle.text = ballet.originalTitle
+                }
+                                    )
 
         // Creators
         binding.tvCreators.text = "${ballet.composer} • ${ballet.originalChoreographer.orEmpty()}"
 
-        // Badges on photo
-        binding.tvBadgeStyle.text = ballet.style ?: "Classical"
+        // Floating Badges on photo (Optimized batch translation & repository cache)
+        val styleLabel = if (!ballet.style.isNullOrBlank()) repository.getStyleTranslation(
+                ballet.style
+                                                                                          )
+        else "Classical"
+        binding.tvBadgeStyle.text = styleLabel
         binding.tvBadgeActs.text = getString(R.string.acts_format, ballet.acts)
+
+        val epochRaw = ballet.epochPeriod.orEmpty()
+        val diffRaw = ballet.difficultyLevel.orEmpty()
+
+        binding.tvBadgeEpoch.isVisible = epochRaw.isNotBlank()
+        binding.tvBadgeDifficulty.isVisible = diffRaw.isNotBlank()
+
+        if (epochRaw.isNotBlank() || diffRaw.isNotBlank()) {
+            val termsToTranslate = listOf(epochRaw, diffRaw).filter { it.isNotBlank() }
+            TranslationManager.translateList(this, termsToTranslate) { translatedTerms ->
+                var idx = 0
+                if (epochRaw.isNotBlank() && idx < translatedTerms.size) {
+                    binding.tvBadgeEpoch.text = translatedTerms[idx++]
+                }
+                if (diffRaw.isNotBlank() && idx < translatedTerms.size) {
+                    binding.tvBadgeDifficulty.text = translatedTerms[idx++]
+                }
+            }
+        }
 
         // Photo credit
         val credit = ballet.multimedia?.attributionCover
         binding.tvPhotoCredit.text = credit ?: ""
         binding.tvPhotoCredit.isVisible = !credit.isNullOrBlank()
 
-        // Modular Box 1: Genre
-        val genreFormatted = if (!ballet.genre.isNullOrEmpty()) {
-            ballet.genre.joinToString(" • ")
+        // Modular Box 1: Genre (translated item by item)
+        val rawGenres = ballet.genre.orEmpty().filter { it.isNotBlank() }
+        if (rawGenres.isNotEmpty()) {
+            TranslationManager.translateList(this, rawGenres) { translatedGenres ->
+                binding.tvValueGenre.text = translatedGenres.joinToString(" • ")
+            }
         }
         else {
-            ballet.style ?: "Classical • Full-length"
+            binding.tvValueGenre.text = ballet.style ?: "Classical • Full-length"
         }
-        binding.tvValueGenre.text = genreFormatted
 
-        // Modular Box 2: Tradition & Schools (Dynamic columns with inner pills)
+        // Modular Box 2: Tradition & Schools (Dynamic columns with inner pills, translated item by item)
         val traditionsList = ballet.traditions.orEmpty().filter { it.isNotBlank() }
         val schoolsList = ballet.schools.orEmpty().filter { it.isNotBlank() }
-
-        val finalTraditions = if (traditionsList.isNotEmpty()) traditionsList
-        else listOf(
-                getString(R.string.unavailable)
-                   )
-        val finalSchools = if (schoolsList.isNotEmpty()) schoolsList
-        else listOf(
-                getString(R.string.unavailable)
-                   )
 
         val density = resources.displayMetrics.density
         val padH = (8 * density).toInt()
@@ -188,48 +211,67 @@ class DetailActivity : AppCompatActivity() {
         val marginTopItem = (6 * density).toInt()
 
         // Populate Traditions
-        binding.layoutTraditionItems.removeAllViews()
-        for ((index, item) in finalTraditions.withIndex()) {
-            val tv = TextView(this).apply {
-                text = item
-                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
-                setTextColor(getColor(R.color.ballet_text_high_emphasis))
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setBackgroundResource(R.drawable.bg_pill_item_inner)
-                setPadding(padH, padV, padH, padV)
-                layoutParams = LinearLayout.LayoutParams(
+        TranslationManager.translateList(this, traditionsList) { translatedTraditions ->
+            val finalTraditions = if (translatedTraditions.isNotEmpty()) translatedTraditions
+            else listOf(getString(R.string.unavailable))
+
+            binding.layoutTraditionItems.removeAllViews()
+            for ((index, item) in finalTraditions.withIndex()) {
+                val tv = TextView(this).apply {
+                    text = item
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
+                    setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                    setBackgroundResource(R.drawable.bg_pill_item_inner)
+                    setPadding(padH, padV, padH, padV)
+                    layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
-                                                        ).apply {
-                    if (index > 0) topMargin = marginTopItem
+                                                            ).apply {
+                        if (index > 0) topMargin = marginTopItem
+                    }
                 }
+                binding.layoutTraditionItems.addView(tv)
             }
-            binding.layoutTraditionItems.addView(tv)
         }
 
         // Populate Schools
-        binding.layoutSchoolsItems.removeAllViews()
-        for ((index, item) in finalSchools.withIndex()) {
-            val tv = TextView(this).apply {
-                text = item
-                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
-                setTextColor(getColor(R.color.ballet_text_high_emphasis))
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setBackgroundResource(R.drawable.bg_pill_item_inner)
-                setPadding(padH, padV, padH, padV)
-                layoutParams = LinearLayout.LayoutParams(
+        TranslationManager.translateList(this, schoolsList) { translatedSchools ->
+            val finalSchools = if (translatedSchools.isNotEmpty()) translatedSchools
+            else listOf(getString(R.string.unavailable))
+
+            binding.layoutSchoolsItems.removeAllViews()
+            for ((index, item) in finalSchools.withIndex()) {
+                val tv = TextView(this).apply {
+                    text = item
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
+                    setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                    setBackgroundResource(R.drawable.bg_pill_item_inner)
+                    setPadding(padH, padV, padH, padV)
+                    layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
-                                                        ).apply {
-                    if (index > 0) topMargin = marginTopItem
+                                                            ).apply {
+                        if (index > 0) topMargin = marginTopItem
+                    }
                 }
+                binding.layoutSchoolsItems.addView(tv)
             }
-            binding.layoutSchoolsItems.addView(tv)
         }
 
-        // Modular Box 3: Premiere
+        // Modular Box 3: Premiere (location translated item by item splitting by comma)
         binding.tvLabelPremiere.text = "Estreno • ${ballet.premiereYear}"
-        binding.tvValuePremiere.text = ballet.premiereLocation.orEmpty()
+        val rawLoc = ballet.premiereLocation.orEmpty()
+        if (rawLoc.isNotBlank()) {
+            val locParts = rawLoc.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            TranslationManager.translateList(this, locParts) { translatedLocs ->
+                binding.tvValuePremiere.text = translatedLocs.joinToString(", ")
+            }
+        }
+        else {
+            binding.tvValuePremiere.text = ""
+        }
 
         // Cover image & zoom click with Room fallback
         val primaryCover = ballet.multimedia?.coverImageUrl
@@ -258,11 +300,15 @@ class DetailActivity : AppCompatActivity() {
         updateFavoriteIcon(repository.isFavorite(workId))
 
         // Translated Synopsis
-        binding.tvDetailSynopsis.setTranslatedText(
+        TranslationManager.translate(
+                context = this,
                 originalText = ballet.synopsis.orEmpty(),
                 sourceLanguage = "en",
-                showOriginalInParentheses = false
-                                                  )
+                onTranslating = { binding.tvDetailSynopsis.text = getString(R.string.translating) },
+                onTranslated = { translatedSynopsis ->
+                    binding.tvDetailSynopsis.text = translatedSynopsis
+                }
+                                    )
 
         // Translated History, Performances & Companies
         val historyContent = buildString {
@@ -282,26 +328,68 @@ class DetailActivity : AppCompatActivity() {
                 }
             }
         }
-        binding.tvDetailHistory.setTranslatedText(
+        TranslationManager.translate(
+                context = this,
                 originalText = historyContent,
                 sourceLanguage = "en",
-                showOriginalInParentheses = false
-                                                 )
+                onTranslating = { binding.tvDetailHistory.text = getString(R.string.translating) },
+                onTranslated = { translatedHistory ->
+                    binding.tvDetailHistory.text = translatedHistory
+                }
+                                    )
 
-        // Characters & Key Variations
-        val chars = ballet.characters.orEmpty()
-        val variations = ballet.keyVariations.orEmpty()
-        binding.tvDetailCharacters.text = buildString {
-            if (chars.isNotEmpty()) {
-                append(chars.joinToString("\n") { "• $it" })
+        // Characters & Key Variations (translated item by item, separated into 2 distinct cards)
+        val chars = ballet.characters.orEmpty().filter { it.isNotBlank() }
+        val variations = ballet.keyVariations.orEmpty().filter { it.isNotBlank() }
+
+        TranslationManager.translateList(this, chars) { translatedChars ->
+            binding.chipGroupCharacters.removeAllViews()
+            val chipBackgrounds = listOf(
+                    R.drawable.bg_badge_rose,
+                    R.drawable.bg_badge_light,
+                    R.drawable.bg_badge_rose_light,
+                    R.drawable.bg_badge_gold
+                                        )
+            val chipTextColors = listOf(
+                    getColor(R.color.ballet_floating_chip_rose_text),
+                    getColor(R.color.ballet_floating_chip_light_text),
+                    getColor(R.color.ballet_floating_chip_rose_light_text),
+                    getColor(R.color.ballet_floating_chip_gold_text)
+                                       )
+
+            if (translatedChars.isNotEmpty()) {
+                translatedChars.forEachIndexed { index, characterName ->
+                    val chip = Chip(this).apply {
+                        text = characterName
+                        isClickable = false
+                        isCheckable = false
+                        setBackgroundResource(chipBackgrounds[index % chipBackgrounds.size])
+                        setTextColor(chipTextColors[index % chipTextColors.size])
+                        textSize = 12f
+                    }
+                    binding.chipGroupCharacters.addView(chip)
+                }
             }
-            if (variations.isNotEmpty()) {
-                if (chars.isNotEmpty()) append("\n\n")
-                append("Variaciones Clave:\n")
-                append(variations.joinToString("\n") { "• $it" })
+            else {
+                val chip = Chip(this).apply {
+                    text = getString(R.string.unavailable)
+                    isClickable = false
+                    setBackgroundResource(R.drawable.bg_badge_light)
+                    setTextColor(getColor(R.color.ballet_floating_chip_light_text))
+                    textSize = 12f
+                }
+                binding.chipGroupCharacters.addView(chip)
             }
-            if (chars.isEmpty() && variations.isEmpty()) {
-                append(getString(R.string.unavailable))
+        }
+
+        TranslationManager.translateList(this, variations) { translatedVariations ->
+            binding.tvDetailVariations.text = buildString {
+                if (translatedVariations.isNotEmpty()) {
+                    append(translatedVariations.joinToString("\n") { "• $it" })
+                }
+                else {
+                    append(getString(R.string.unavailable))
+                }
             }
         }
     }
@@ -309,14 +397,30 @@ class DetailActivity : AppCompatActivity() {
     private fun loadOpenOpusInfo(composerName: String) {
         lifecycleScope.launch {
             repository.searchComposer(composerName)
-            val cachedComposer = repository.getCachedComposer(composerName)
-            if (cachedComposer != null) {
+            val cachedComposers = repository.getCachedComposers(composerName)
+            if (cachedComposers.isNotEmpty()) {
                 binding.groupComposer.visibility = View.VISIBLE
-                val dates = cachedComposer.birth.toLocalizedDate(DateStyle.YEAR_ONLY) +
-                            " - " + cachedComposer.death.toLocalizedDate(DateStyle.YEAR_ONLY)
-                binding.tvOpenOpusHeader.text = cachedComposer.completeName
-                binding.tvOpenOpusInfo.text = dates
-                binding.ivComposer.loadUrl(cachedComposer.portrait)
+                val primaryComposer = cachedComposers.firstOrNull { !it.portrait.isNullOrBlank() }
+                                      ?: cachedComposers.first()
+                if (cachedComposers.size == 1) {
+                    val comp = cachedComposers.first()
+                    binding.tvOpenOpusHeader.text = comp.completeName
+                    val b = comp.birth.toLocalizedDate(DateStyle.YEAR_ONLY)
+                    val d = comp.death.toLocalizedDate(DateStyle.YEAR_ONLY)
+                    binding.tvOpenOpusInfo.text =
+                            if (b.isNotBlank() && d.isNotBlank()) "$b - $d" else if (b.isNotBlank()) b else ""
+                    binding.ivComposer.loadUrl(comp.portrait)
+                }
+                else {
+                    val names = cachedComposers.joinToString(", ") { it.name }
+                    binding.tvOpenOpusHeader.text = names
+                    binding.tvOpenOpusInfo.text =
+                            "Música compilada • ${cachedComposers.size} compositores"
+                    binding.ivComposer.loadUrl(primaryComposer.portrait)
+                }
+            }
+            else {
+                binding.groupComposer.visibility = View.GONE
             }
         }
     }

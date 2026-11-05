@@ -3,7 +3,6 @@ package com.gf.ballet_wiki.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import com.gf.ballet_wiki.R
@@ -15,8 +14,16 @@ import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Decoupled Singleton Translation Infrastructure.
+ * Manages ML Kit translation clients, persistent caching, active language detection,
+ * Wi-Fi verification, and atomic mutex locking for single-alert dialog prompts.
+ * Strictly decoupled from Android UI View widgets (no TextView extensions).
+ */
 object TranslationManager {
+    private val dialogShowingLock = AtomicBoolean(false)
 
     fun getActiveLanguage(): String {
         val appLocales = AppCompatDelegate.getApplicationLocales()
@@ -52,119 +59,226 @@ object TranslationManager {
                 }
             }
     }
-}
 
-fun TextView.setTranslatedText(originalText: String, sourceLanguage: String = "en", showOriginalInParentheses: Boolean = false) {
-    val context = this.context
-    val activeLang = TranslationManager.getActiveLanguage()
-
-    if (activeLang == sourceLanguage || originalText.isBlank()) {
-        setOriginal(originalText)
-        return
-    }
-
-    val targetLangTag = TranslateLanguage.fromLanguageTag(activeLang) ?: TranslateLanguage.SPANISH
-    val sourceLangTag = TranslateLanguage.fromLanguageTag(sourceLanguage) ?: TranslateLanguage.ENGLISH
-    val model = TranslateRemoteModel.Builder(targetLangTag).build()
-    val modelManager = RemoteModelManager.getInstance()
-
-    setText(R.string.translating)
-
-    val options = TranslatorOptions.Builder()
-        .setSourceLanguage(sourceLangTag)
-        .setTargetLanguage(targetLangTag)
-        .build()
-    val translator = Translation.getClient(options)
-
-    modelManager.isModelDownloaded(model).addOnSuccessListener { isDownloaded ->
-        if (isDownloaded) {
-            translator.translateAndDisplay(originalText, this, showOriginalInParentheses)
-        } else if (TranslationManager.isWifiConnected(context)) {
-            val conditions = DownloadConditions.Builder().requireWifi().build()
-            translator.downloadModelIfNeeded(conditions)
-                .addOnSuccessListener { translator.translateAndDisplay(originalText, this, showOriginalInParentheses) }
-                .addOnFailureListener { setOriginal(originalText) }
-        } else {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.translation_dialog_title)
-                .setMessage(R.string.translation_dialog_message)
-                .setPositiveButton(R.string.download) { _, _ ->
-                    setText(R.string.translating)
-                    translator.downloadModelIfNeeded()
-                        .addOnSuccessListener { translator.translateAndDisplay(originalText, this, showOriginalInParentheses) }
-                        .addOnFailureListener { setOriginal(originalText) }
-                }
-                .setNegativeButton(R.string.view_original) { _, _ -> setOriginal(originalText) }
-                .setOnCancelListener { setOriginal(originalText) }
-                .show()
+    internal fun showDownloadDialogIfNeeded(
+            context: Context,
+            onConfirmed: () -> Unit,
+            onCancelled: () -> Unit
+                                           ) {
+        if (dialogShowingLock.compareAndSet(false, true)) {
+            try {
+                AlertDialog.Builder(context)
+                        .setTitle(R.string.translation_dialog_title)
+                        .setMessage(R.string.translation_dialog_message)
+                        .setPositiveButton(R.string.download) { _, _ ->
+                            dialogShowingLock.set(false)
+                            onConfirmed()
+                        }
+                        .setNegativeButton(R.string.view_original) { _, _ ->
+                            dialogShowingLock.set(false)
+                            onCancelled()
+                        }
+                        .setOnCancelListener {
+                            dialogShowingLock.set(false)
+                            onCancelled()
+                        }
+                        .show()
+            }
+            catch (e: Exception) {
+                dialogShowingLock.set(false)
+                onCancelled()
+            }
         }
-    }.addOnFailureListener { setOriginal(originalText) }
-}
-
-private fun Translator.translateAndDisplay(originalText: String, textView: TextView, showOriginalInParentheses: Boolean) {
-    if (originalText.isBlank()) {
-        textView.setOriginal(originalText)
-        return
+        else {
+            onCancelled()
+        }
     }
 
-    val paragraphs = originalText.split("\n\n")
-    if (paragraphs.size <= 1) {
-        translate(originalText)
-                .addOnSuccessListener { translatedText ->
-                    if (showOriginalInParentheses && !translatedText.equals(
-                                    originalText, ignoreCase = true
+    /**
+     * Pure string-based translation method.
+     * Decoupled from UI widgets. Calls [onTranslating] when network/download work begins,
+     * and delivers the final translated (or fallback) text to [onTranslated].
+     */
+    fun translate(
+            context: Context,
+            originalText: String,
+            sourceLanguage: String = "en",
+            onTranslating: (() -> Unit)? = null,
+            onTranslated: (String) -> Unit
+                 ) {
+        val activeLang = getActiveLanguage()
+
+        if (activeLang == sourceLanguage || originalText.isBlank()) {
+            onTranslated(originalText)
+            return
+        }
+
+        val sessionManager = SessionManager.getInstance(context)
+        val cached = sessionManager.getCachedTranslation(originalText, activeLang)
+        if (!cached.isNullOrBlank()) {
+            onTranslated(cached)
+            return
+        }
+
+        val targetLangTag =
+                TranslateLanguage.fromLanguageTag(activeLang) ?: TranslateLanguage.SPANISH
+        val sourceLangTag =
+                TranslateLanguage.fromLanguageTag(sourceLanguage) ?: TranslateLanguage.ENGLISH
+        val model = TranslateRemoteModel.Builder(targetLangTag).build()
+        val modelManager = RemoteModelManager.getInstance()
+
+        onTranslating?.invoke()
+
+        val options = TranslatorOptions.Builder()
+                .setSourceLanguage(sourceLangTag)
+                .setTargetLanguage(targetLangTag)
+                .build()
+        val translator = Translation.getClient(options)
+
+        modelManager.isModelDownloaded(model).addOnSuccessListener { isDownloaded ->
+            if (isDownloaded) {
+                translator.translateStringWithCache(
+                        originalText, activeLang, sessionManager, onTranslated
+                                                   )
+            }
+            else if (isWifiConnected(context)) {
+                val conditions = DownloadConditions.Builder().requireWifi().build()
+                translator.downloadModelIfNeeded(conditions)
+                        .addOnSuccessListener {
+                            translator.translateStringWithCache(
+                                    originalText, activeLang, sessionManager, onTranslated
+                                                               )
+                        }
+                        .addOnFailureListener { onTranslated(originalText) }
+            }
+            else {
+                showDownloadDialogIfNeeded(
+                        context = context,
+                        onConfirmed = {
+                            onTranslating?.invoke()
+                            translator.downloadModelIfNeeded()
+                                    .addOnSuccessListener {
+                                        translator.translateStringWithCache(
+                                                originalText, activeLang, sessionManager,
+                                                onTranslated
                                                                            )
-                    ) {
-                        textView.setOriginal("$translatedText ($originalText)")
-                    }
-                    else {
-                        textView.setOriginal(translatedText)
-                    }
-                }
-                .addOnFailureListener { textView.setOriginal(originalText) }
+                                    }
+                                    .addOnFailureListener { onTranslated(originalText) }
+                        },
+                        onCancelled = { onTranslated(originalText) }
+                                          )
+            }
+        }.addOnFailureListener { onTranslated(originalText) }
     }
-    else {
-        val translatedParagraphs = arrayOfNulls<String>(paragraphs.size)
-        var completedCount = 0
 
-        paragraphs.forEachIndexed { index, paragraph ->
-            if (paragraph.isBlank()) {
-                translatedParagraphs[index] = paragraph
-                completedCount++
-                if (completedCount == paragraphs.size) {
-                    val fullTranslation = translatedParagraphs.filterNotNull().joinToString("\n\n")
-                    textView.setOriginal(fullTranslation)
+    fun translateList(
+            context: Context,
+            items: List<String>,
+            sourceLanguage: String = "en",
+            onTranslated: (List<String>) -> Unit
+                     ) {
+        if (items.isEmpty()) {
+            onTranslated(emptyList())
+            return
+        }
+        val results = arrayOfNulls<String>(items.size)
+        var completed = 0
+        items.forEachIndexed { index, item ->
+            if (item.isBlank()) {
+                results[index] = item
+                completed++
+                if (completed == items.size) {
+                    onTranslated(results.filterNotNull())
                 }
             }
             else {
-                translate(paragraph)
+                translate(
+                        context = context,
+                        originalText = item,
+                        sourceLanguage = sourceLanguage,
+                        onTranslating = null,
+                        onTranslated = { translatedItem ->
+                            results[index] = translatedItem
+                            completed++
+                            if (completed == items.size) {
+                                onTranslated(results.filterNotNull())
+                            }
+                        }
+                         )
+            }
+        }
+    }
+
+    private fun Translator.translateStringWithCache(
+            originalText: String,
+            activeLang: String,
+            sessionManager: SessionManager,
+            onTranslated: (String) -> Unit
+                                                   ) {
+        if (originalText.isBlank()) {
+            onTranslated(originalText)
+            return
+        }
+
+        val paragraphs = originalText.split("\n\n")
+        if (paragraphs.size <= 1) {
+            translate(originalText)
+                .addOnSuccessListener { translatedText ->
+                    sessionManager.cacheTranslation(originalText, activeLang, translatedText)
+                    onTranslated(translatedText)
+                }
+                    .addOnFailureListener { onTranslated(originalText) }
+        }
+        else {
+            val translatedParagraphs = arrayOfNulls<String>(paragraphs.size)
+            var completedCount = 0
+
+            paragraphs.forEachIndexed { index, paragraph ->
+                if (paragraph.isBlank()) {
+                    translatedParagraphs[index] = paragraph
+                    completedCount++
+                    if (completedCount == paragraphs.size) {
+                        val fullTranslation =
+                                translatedParagraphs.filterNotNull().joinToString("\n\n")
+                        sessionManager.cacheTranslation(originalText, activeLang, fullTranslation)
+                        onTranslated(fullTranslation)
+                    }
+                }
+                else {
+                    translate(paragraph)
                         .addOnSuccessListener { transPara ->
                             translatedParagraphs[index] = transPara
                             completedCount++
                             if (completedCount == paragraphs.size) {
                                 val fullTranslation =
                                         translatedParagraphs.filterNotNull().joinToString("\n\n")
-                                textView.setOriginal(fullTranslation)
+                                sessionManager.cacheTranslation(
+                                        originalText, activeLang, fullTranslation
+                                                               )
+                                onTranslated(fullTranslation)
                             }
                         }
-                        .addOnFailureListener {
-                            translatedParagraphs[index] = paragraph
-                            completedCount++
-                            if (completedCount == paragraphs.size) {
-                                val fullTranslation =
-                                        translatedParagraphs.filterNotNull().joinToString("\n\n")
-                                textView.setOriginal(fullTranslation)
+                            .addOnFailureListener {
+                                translatedParagraphs[index] = paragraph
+                                completedCount++
+                                if (completedCount == paragraphs.size) {
+                                    val fullTranslation = translatedParagraphs.filterNotNull()
+                                            .joinToString("\n\n")
+                                    sessionManager.cacheTranslation(
+                                            originalText, activeLang, fullTranslation
+                                                                   )
+                                    onTranslated(fullTranslation)
+                                }
                             }
-                        }
+                }
             }
         }
     }
 }
 
-private fun TextView.setOriginal(textToShow: String) {
-    text = textToShow
-}
-
+/**
+ * Pure string utility for composing titles with original title in parentheses.
+ */
 fun buildTitleString(translatedTitle: String, originalTitle: String?): String {
     if (originalTitle.isNullOrBlank()) {
         return translatedTitle
@@ -173,87 +287,4 @@ fun buildTitleString(translatedTitle: String, originalTitle: String?): String {
         return translatedTitle
     }
     return "$translatedTitle ($originalTitle)"
-}
-
-fun TextView.setTranslatedTitleText(
-        baseTitle: String, originalTitle: String?, sourceLanguage: String = "en"
-                                   ) {
-    val context = this.context
-    val activeLang = TranslationManager.getActiveLanguage()
-    val formattedOriginal = buildTitleString(baseTitle, originalTitle)
-
-    if (activeLang == sourceLanguage || baseTitle.isBlank()) {
-        setOriginal(formattedOriginal)
-        return
-    }
-
-    val targetLangTag = TranslateLanguage.fromLanguageTag(activeLang) ?: TranslateLanguage.SPANISH
-    val sourceLangTag =
-            TranslateLanguage.fromLanguageTag(sourceLanguage) ?: TranslateLanguage.ENGLISH
-    val model = TranslateRemoteModel.Builder(targetLangTag).build()
-    val modelManager = RemoteModelManager.getInstance()
-
-    setText(R.string.translating)
-
-    val options = TranslatorOptions.Builder()
-            .setSourceLanguage(sourceLangTag)
-            .setTargetLanguage(targetLangTag)
-            .build()
-    val translator = Translation.getClient(options)
-
-    modelManager.isModelDownloaded(model).addOnSuccessListener { isDownloaded ->
-        if (isDownloaded) {
-            translator.translateAndDisplayTitle(baseTitle, originalTitle, this)
-        }
-        else if (TranslationManager.isWifiConnected(context)) {
-            val conditions = DownloadConditions.Builder().requireWifi().build()
-            translator.downloadModelIfNeeded(conditions)
-                    .addOnSuccessListener {
-                        translator.translateAndDisplayTitle(
-                                baseTitle, originalTitle, this
-                                                           )
-                    }
-                    .addOnFailureListener { setOriginal(formattedOriginal) }
-        }
-        else {
-            AlertDialog.Builder(context)
-                    .setTitle(R.string.translation_dialog_title)
-                    .setMessage(R.string.translation_dialog_message)
-                    .setPositiveButton(R.string.download) { _, _ ->
-                        setText(R.string.translating)
-                        translator.downloadModelIfNeeded()
-                                .addOnSuccessListener {
-                                    translator.translateAndDisplayTitle(
-                                            baseTitle, originalTitle, this
-                                                                       )
-                                }
-                                .addOnFailureListener { setOriginal(formattedOriginal) }
-                    }
-                    .setNegativeButton(R.string.view_original) { _, _ ->
-                        setOriginal(
-                                formattedOriginal
-                                   )
-                    }
-                    .setOnCancelListener { setOriginal(formattedOriginal) }
-                    .show()
-        }
-    }.addOnFailureListener { setOriginal(formattedOriginal) }
-}
-
-private fun Translator.translateAndDisplayTitle(
-        baseTitle: String, originalTitle: String?, textView: TextView
-                                               ) {
-    if (baseTitle.isBlank()) {
-        textView.setOriginal(buildTitleString(baseTitle, originalTitle))
-        return
-    }
-
-    translate(baseTitle)
-            .addOnSuccessListener { translatedBase ->
-                val finalString = buildTitleString(translatedBase, originalTitle)
-                textView.setOriginal(finalString)
-            }
-            .addOnFailureListener {
-                textView.setOriginal(buildTitleString(baseTitle, originalTitle))
-            }
 }

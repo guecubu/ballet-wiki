@@ -73,10 +73,10 @@
                     android:id="@+id/layoutHeroBadges"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center|fill_horizontal"
+                    android:layout_gravity="start"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="100dp"
-                    android:gravity="center_vertical"
+                    android:layout_marginTop="64dp"
+                    android:gravity="center"
                     android:orientation="horizontal">
 
                     <!-- Badge de Estilo / Género -->
@@ -102,15 +102,50 @@
                         android:id="@+id/tvBadgeActs"
                         android:layout_width="wrap_content"
                         android:layout_height="32dp"
-                        android:layout_gravity="end"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/bg_badge_light"
-                        android:gravity="center|end"
+                        android:gravity="center"
                         android:paddingHorizontal="12dp"
                         android:textColor="@color/ballet_floating_chip_light_text"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         tools:text="3 Actos" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                    <!-- Badge de Época -->
+                    <TextView
+                        android:id="@+id/tvBadgeEpoch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_badge_era"
+                        android:gravity="center"
+                        android:paddingHorizontal="12dp"
+                        android:textColor="@color/ballet_badge_era_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:text="Romantic" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                    <!-- Badge de Dificultad -->
+                    <TextView
+                        android:id="@+id/tvBadgeDifficulty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_badge_gold"
+                        android:gravity="center"
+                        android:paddingHorizontal="12dp"
+                        android:textColor="@color/ballet_floating_chip_gold_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:text="Advanced" />
 
                 </LinearLayout>
 
@@ -161,12 +196,13 @@
                         android:id="@+id/tvTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.01"
                         android:fontFamily="@font/bodoni_moda"
-                        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                        android:letterSpacing="0.01"
+                        android:textAppearance="?attr/textAppearanceHeadlineMediumEmphasized"
                         android:textColor="@color/ballet_text_high_emphasis"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        tools:text="The Winter's Tale" />
+                        tools:text="Lago de los cisnes" />
 
                     <!-- Título Original: sin paréntesis, cursiva legible -->
                     <TextView
@@ -192,6 +228,49 @@
                         android:textSize="13sp"
                         tools:text="Joby Talbot • Christopher Wheeldon" />
 
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="4dp" />
+
+                    <!-- CAJA MODULAR 3: ESTRENO (Lugar y fecha) -->
+                    <LinearLayout
+                        android:id="@+id/boxPremiere"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:background="@drawable/bg_box_premiere"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvLabelPremiere"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.04"
+                            android:textColor="@color/ballet_text_high_emphasis"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:text="Estreno • 2014" />
+
+                        <TextView
+                            android:id="@+id/tvValuePremiere"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="@color/ballet_text_medium_emphasis"
+                            android:textSize="12sp"
+                            tools:text="Royal Opera House, Covent Garden, London" />
+
+                    </LinearLayout>
+
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="6dp" />
+
                     <!-- CAJA MODULAR 2: TRADICIÓN / ESCUELA COREOGRÁFICA -->
                     <LinearLayout
                         android:id="@+id/rowTraditionSchools"
@@ -213,16 +292,32 @@
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="12dp">
 
-                            <!-- Cabecera de Columna -->
-                            <TextView
-                                android:id="@+id/tvLabelTradition"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:letterSpacing="0.08"
-                                android:text="@string/tradition"
-                                android:textColor="@color/ballet_rose_accent"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <!-- Cabecera de Columna -->
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:contentDescription="@string/logo_content_description"
+                                    android:src="@drawable/ic_tradition"
+                                    app:tint="@color/ballet_rose_accent" />
+
+                                <TextView
+                                    android:id="@+id/tvLabelTradition"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:letterSpacing="0.08"
+                                    android:text="@string/tradition"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/ballet_rose_accent"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
 
                             <!-- Contenedor dinámico para items de Tradición -->
                             <LinearLayout
@@ -246,17 +341,34 @@
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="12dp">
 
-                            <!-- Cabecera de Columna -->
-                            <TextView
-                                android:id="@+id/tvLabelSchools"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:letterSpacing="0.08"
-                                android:text="@string/school"
-                                android:textColor="@color/ballet_gold_primary"
-                                android:textSize="10sp"
-                                android:textStyle="bold" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
+                                <!-- Cabecera de Columna -->
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:contentDescription="@string/logo_content_description"
+                                    android:src="@drawable/ic_school"
+                                    app:tint="@color/ballet_gold_primary" />
+
+                                <!-- Cabecera de Columna -->
+                                <TextView
+                                    android:id="@+id/tvLabelSchools"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:letterSpacing="0.08"
+                                    android:text="@string/school"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/ballet_gold_primary"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
                             <!-- Contenedor dinámico para items de Escuelas -->
                             <LinearLayout
                                 android:id="@+id/layoutSchoolsItems"
@@ -285,7 +397,7 @@
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.08"
                             android:text="@string/genre"
-                            android:textColor="@color/ballet_rose_accent"
+                            android:textColor="@color/ballet_floating_chip_purple_light_text"
                             android:textSize="12sp"
                             android:textStyle="bold" />
 
@@ -294,42 +406,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
-                            android:textColor="@color/ballet_text_high_emphasis"
+                            android:textColor="@color/ballet_floating_chip_purple_light_text"
                             android:textSize="13sp"
                             android:textStyle="bold"
                             tools:text="Narrative • Dramatic • Full-length" />
-
-                    </LinearLayout>
-
-                    <!-- CAJA MODULAR 3: ESTRENO (Lugar y fecha) -->
-                    <LinearLayout
-                        android:id="@+id/boxPremiere"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/bg_box_premiere"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="12dp">
-
-                        <TextView
-                            android:id="@+id/tvLabelPremiere"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:letterSpacing="0.04"
-                            android:textColor="@color/ballet_text_high_emphasis"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            tools:text="Estreno • 2014" />
-
-                        <TextView
-                            android:id="@+id/tvValuePremiere"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:textColor="@color/ballet_text_medium_emphasis"
-                            android:textSize="12sp"
-                            tools:text="Royal Opera House, Covent Garden, London" />
 
                     </LinearLayout>
 
@@ -352,111 +432,219 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
+                android:paddingTop="12dp"
                 android:paddingBottom="48dp">
 
                 <!-- Synopsis section -->
-                <TextView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/section_synopsis"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold" />
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/tvDetailSynopsis"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:lineSpacingExtra="3dp"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    tools:text="Synopsis de la obra..." />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/section_synopsis"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_rose_accent"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvDetailSynopsis"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="3dp"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textColor="@color/ballet_text_high_emphasis"
+                            tools:text="Synopsis de la obra..." />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- History and evolution -->
-                <TextView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/section_history"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/tvDetailHistory"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/section_history"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_gold_primary"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvDetailHistory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="3dp"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="@color/ballet_text_high_emphasis"
+                            tools:text="Historia y evolución..." />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Characters Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:lineSpacingExtra="3dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    tools:text="Historia y evolución..." />
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
 
-                <!-- Characters & Key Variations -->
-                <TextView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/section_characters"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_rose_accent"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chipGroupCharacters"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:chipSpacingHorizontal="8dp"
+                            app:chipSpacingVertical="6dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Key Variations Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/section_characters"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/tvDetailCharacters"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    tools:text="• Odette/Odile\n• Prince Siegfried" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                <!-- Extra: Open Opus Composer Info -->
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="20dp" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Variaciones Clave"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_gold_primary"
+                            android:textStyle="bold" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                        <TextView
+                            android:id="@+id/tvDetailVariations"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:lineSpacingExtra="3dp"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="@color/ballet_text_high_emphasis"
+                            tools:text="• Grand pas de deux\n• 32 Fouettés" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Extra: Open Opus Composer Info Card -->
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/groupComposer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
 
-                    <ImageView
-                        android:id="@+id/ivComposer"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:contentDescription="@string/logo_content_description"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@drawable/bg_image_placeholder" />
-
-                    <TextView
-                        android:id="@+id/tvOpenOpusHeader"
-                        android:layout_width="0dp"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/section_open_opus"
-                        android:textAppearance="?attr/textAppearanceTitleMedium"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/ivComposer"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Pyotr Ilyich Tchaikovsky" />
+                        android:padding="18dp">
 
-                    <TextView
-                        android:id="@+id/tvOpenOpusInfo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="2dp"
-                        android:textAppearance="?attr/textAppearanceBodyMedium"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/ivComposer"
-                        app:layout_constraintTop_toBottomOf="@+id/tvOpenOpusHeader"
-                        tools:text="1840 - 1893" />
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivComposer"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:contentDescription="@string/logo_content_description"
+                            android:scaleType="centerCrop"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                            app:strokeColor="@color/ballet_rose_accent"
+                            app:strokeWidth="2dp"
+                            tools:src="@drawable/bg_image_placeholder" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:id="@+id/tvOpenOpusHeader"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_gold_primary"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivComposer"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Pyotr Ilyich Tchaikovsky" />
+
+                        <TextView
+                            android:id="@+id/tvOpenOpusInfo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="@color/ballet_text_high_emphasis"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivComposer"
+                            app:layout_constraintTop_toBottomOf="@+id/tvOpenOpusHeader"
+                            tools:text="1840 - 1893" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Extra: Europeana Multimedia Modules -->
                 <TextView
