@@ -86,6 +86,16 @@
                         </LinearLayout>
 
                         <TextView
+                            android:id="@+id/tvDetailOriginalTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:visibility="gone"
+                            tools:text="Título original: Лебединое озеро" />
+
+                        <TextView
                             android:id="@+id/tvDetailComposer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
