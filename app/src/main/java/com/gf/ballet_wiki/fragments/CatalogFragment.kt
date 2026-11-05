@@ -268,7 +268,8 @@ class CatalogFragment : Fragment() {
 
                 // Extract unique styles and save to SharedPreferences + update chips
                 val extractedStyles =
-                        ballets.mapNotNull { it.style?.trim() }.filter { it.isNotBlank() }.toSet()
+                        ballets.asSequence().mapNotNull { it.style?.trim() }
+                                .filter { it.isNotBlank() }.toSet()
                 if (extractedStyles.isNotEmpty()) {
                     repository.saveStyles(extractedStyles)
                     setupStyleChips(extractedStyles)
@@ -292,23 +293,13 @@ class CatalogFragment : Fragment() {
         }
 
         val filteredList = fullBalletList.filter { ballet ->
-            val matchesFavorite = if (filterOnlyFavorites) {
-                repository.isFavorite(ballet.id)
-            } else {
-                true
-            }
-            val matchesQuery = if (currentSearchQuery.isEmpty()) {
-                true
-            } else {
-                ballet.title.contains(currentSearchQuery, ignoreCase = true) ||
-                        ballet.composer.contains(currentSearchQuery, ignoreCase = true)
-            }
-            val matchesStyle = if (selectedStyleTags.isEmpty() || binding.chipAll.isChecked) {
-                true
-            }
-            else {
-                selectedStyleTags.contains(ballet.style?.trim())
-            }
+            val matchesFavorite = !filterOnlyFavorites || repository.isFavorite(ballet.id)
+            val matchesQuery = currentSearchQuery.isEmpty() ||
+                               ballet.title.contains(currentSearchQuery, ignoreCase = true) ||
+                               ballet.composer.contains(currentSearchQuery, ignoreCase = true)
+            val matchesStyle = selectedStyleTags.isEmpty() ||
+                               binding.chipAll.isChecked ||
+                               selectedStyleTags.contains(ballet.style?.trim())
             matchesFavorite && matchesQuery && matchesStyle
         }
 

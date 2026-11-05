@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -167,21 +169,62 @@ class DetailActivity : AppCompatActivity() {
         }
         binding.tvValueGenre.text = genreFormatted
 
-        // Modular Box 2: Tradition / School
-        val traditionText = buildString {
-            val trads = ballet.traditions.orEmpty()
-            val schs = ballet.schools.orEmpty()
-            val combined = (trads + schs).distinct()
-            if (combined.isNotEmpty()) {
-                append(combined.joinToString(" • "))
+        // Modular Box 2: Tradition & Schools (Dynamic columns with inner pills)
+        val traditionsList = ballet.traditions.orEmpty().filter { it.isNotBlank() }
+        val schoolsList = ballet.schools.orEmpty().filter { it.isNotBlank() }
+
+        val finalTraditions = if (traditionsList.isNotEmpty()) traditionsList
+        else listOf(
+                getString(R.string.unavailable)
+                   )
+        val finalSchools = if (schoolsList.isNotEmpty()) schoolsList
+        else listOf(
+                getString(R.string.unavailable)
+                   )
+
+        val density = resources.displayMetrics.density
+        val padH = (8 * density).toInt()
+        val padV = (6 * density).toInt()
+        val marginTopItem = (6 * density).toInt()
+
+        // Populate Traditions
+        binding.layoutTraditionItems.removeAllViews()
+        for ((index, item) in finalTraditions.withIndex()) {
+            val tv = TextView(this).apply {
+                text = item
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
+                setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setBackgroundResource(R.drawable.bg_pill_item_inner)
+                setPadding(padH, padV, padH, padV)
+                layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                                        ).apply {
+                    if (index > 0) topMargin = marginTopItem
+                }
             }
+            binding.layoutTraditionItems.addView(tv)
         }
-        if (traditionText.isNotBlank()) {
-            binding.boxTradition.visibility = View.VISIBLE
-            binding.tvValueTradition.text = traditionText
-        }
-        else {
-            binding.boxTradition.visibility = View.GONE
+
+        // Populate Schools
+        binding.layoutSchoolsItems.removeAllViews()
+        for ((index, item) in finalSchools.withIndex()) {
+            val tv = TextView(this).apply {
+                text = item
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
+                setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setBackgroundResource(R.drawable.bg_pill_item_inner)
+                setPadding(padH, padV, padH, padV)
+                layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                                        ).apply {
+                    if (index > 0) topMargin = marginTopItem
+                }
+            }
+            binding.layoutSchoolsItems.addView(tv)
         }
 
         // Modular Box 3: Premiere

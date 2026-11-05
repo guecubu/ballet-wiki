@@ -15,6 +15,7 @@
     <color name="ballet_text_medium_emphasis">#594F55</color>       <!-- Ciruela medio -->
     <color name="ballet_text_on_accent">#FFFFFF</color>            <!-- Blanco puro sobre color -->
     <color name="ballet_text_disabled">#9E949A</color>
+    <color name="ballet_text_on_accent_dark">#52434f</color>
 
     <!-- Familia Rosa Ballet / Frambuesa -->
     <color name="ballet_rose_accent">#B84D65</color>                <!-- Frambuesa saturado -->
@@ -62,6 +63,19 @@
     <color name="ballet_bottom_nav_item_inactive">@color/ballet_text_medium_emphasis</color>
     <color name="ballet_bottom_nav_indicator">@color/ballet_rose_highlight</color>         <!-- Texto
     oscuro definido -->
+
+    <!-- Chips Flotantes -->
+    <color name="ballet_floating_chip_rose">@color/ballet_rose_accent</color>
+    <color name="ballet_floating_chip_rose_text">@color/ballet_text_on_accent</color>
+    <color name="ballet_floating_chip_light">@color/ballet_surface_container</color>
+    <color name="ballet_floating_chip_light_text">@color/ballet_text_high_emphasis</color>
+    <color name="ballet_floating_chip_rose_light">@color/ballet_rose_container</color>
+    <color name="ballet_floating_chip_rose_light_text">@color/ballet_rose_accent</color>
+    <color name="ballet_floating_chip_purple_light">@color/ballet_surface_variant</color>
+    <color name="ballet_floating_chip_purple_light_text">@color/ballet_text_on_accent_dark</color>
+    <color name="ballet_floating_chip_gold">@color/ballet_gold_container</color>
+    <color name="ballet_floating_chip_gold_text">@color/ballet_gold_primary</color>
+
 
     <!-- Logo Tokens (Modo Claro) -->
     <!-- Contenedor -->

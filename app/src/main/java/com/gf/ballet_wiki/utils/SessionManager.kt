@@ -44,7 +44,7 @@ class SessionManager(context: Context) {
             currentFavorites.add(idString)
             true
         }
-        prefs.edit().putStringSet(KEY_FAVORITES, currentFavorites).apply()
+        prefs.edit { putStringSet(KEY_FAVORITES, currentFavorites) }
         return isNowFavorite
     }
 
@@ -56,7 +56,7 @@ class SessionManager(context: Context) {
         } else {
             currentFavorites.remove(idString)
         }
-        prefs.edit().putStringSet(KEY_FAVORITES, currentFavorites).apply()
+        prefs.edit { putStringSet(KEY_FAVORITES, currentFavorites) }
     }
 
     fun getLastViewedWorkId(): Int {
@@ -64,7 +64,7 @@ class SessionManager(context: Context) {
     }
 
     fun setLastViewedWorkId(workId: Int) {
-        prefs.edit().putInt(KEY_LAST_VIEWED_ID, workId).apply()
+        prefs.edit { putInt(KEY_LAST_VIEWED_ID, workId) }
     }
 
     fun getSavedStyles(): Set<String> {

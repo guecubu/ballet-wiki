@@ -62,4 +62,7 @@
     <string name="nav_repertoire">Repertoire</string>
     <string name="nav_selection">Selection</string>
     <string name="nav_notes">Notes</string>
+    <string name="tradition">Tradition</string>
+    <string name="genre">Genre</string>
+    <string name="school">School</string>
 </resources>

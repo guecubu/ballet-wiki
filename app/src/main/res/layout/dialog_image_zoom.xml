@@ -19,7 +19,7 @@
         android:layout_gravity="top|end"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="64dp"
-        android:background="@drawable/bg_era_badge"
+        android:background="@drawable/bg_badge_era"
         android:contentDescription="@string/close"
         android:padding="2dp"
         android:scaleType="centerInside"
