@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -25,6 +26,7 @@ import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.setTranslatedText
 import com.gf.ballet_wiki.utils.toLocalizedDate
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class DetailActivity : AppCompatActivity() {
 
@@ -44,7 +46,7 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.detailMain) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.coordinatorDetail) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -63,11 +65,12 @@ class DetailActivity : AppCompatActivity() {
 
         setupToolbar()
         setupListeners()
+        setupParallaxListener()
         loadBalletDetail()
     }
 
     private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
+        binding.toolbarDetail.setNavigationOnClickListener {
             finish()
         }
     }
@@ -88,6 +91,21 @@ class DetailActivity : AppCompatActivity() {
 
         binding.btnDetailRetry.setOnClickListener {
             loadBalletDetail()
+        }
+    }
+
+    private fun setupParallaxListener() {
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange.toFloat()
+            if (totalScrollRange == 0f) return@addOnOffsetChangedListener
+
+            // Progreso del colapso: 0.0 (arriba) a 1.0 (totalmente colapsado)
+            val collapseProgress = abs(verticalOffset) / totalScrollRange
+
+            // 1. Desvanecer los badges sobre la foto cuando la card empieza a cubrirla
+            val badgeAlpha = (1f - (collapseProgress * 2f)).coerceIn(0f, 1f)
+            binding.layoutHeroBadges.alpha = badgeAlpha
+            binding.tvPhotoCredit.alpha = badgeAlpha
         }
     }
 
@@ -115,48 +133,67 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun bindBalletData(ballet: BalletDto) {
-        // Translated title (without parentheses)
-        binding.tvDetailTitle.setTranslatedText(
+        // Translated title in editorial sheet
+        binding.tvTitle.setTranslatedText(
                 originalText = ballet.title,
                 sourceLanguage = "en",
                 showOriginalInParentheses = false
-                                               )
+                                         )
 
-        // Original title as a separate data field without label
-        if (!ballet.originalTitle.isNullOrBlank() && !ballet.originalTitle.trim()
-                        .equals(ballet.title.trim(), ignoreCase = true)
-        ) {
-            binding.tvDetailOriginalTitle.visibility = View.VISIBLE
-            binding.tvDetailOriginalTitle.text = ballet.originalTitle
+        // Original title as separate data field
+        val showOriginal = !ballet.originalTitle.isNullOrBlank() &&
+                           !ballet.originalTitle.equals(ballet.title, ignoreCase = true)
+        binding.tvOriginalTitle.isVisible = showOriginal
+        binding.tvOriginalTitle.text = ballet.originalTitle
+
+        // Creators
+        binding.tvCreators.text = "${ballet.composer} • ${ballet.originalChoreographer.orEmpty()}"
+
+        // Badges on photo
+        binding.tvBadgeStyle.text = ballet.style ?: "Classical"
+        binding.tvBadgeActs.text = getString(R.string.acts_format, ballet.acts)
+
+        // Photo credit
+        val credit = ballet.multimedia?.attributionCover
+        binding.tvPhotoCredit.text = credit ?: ""
+        binding.tvPhotoCredit.isVisible = !credit.isNullOrBlank()
+
+        // Modular Box 1: Genre
+        val genreFormatted = if (!ballet.genre.isNullOrEmpty()) {
+            ballet.genre.joinToString(" • ")
         }
         else {
-            binding.tvDetailOriginalTitle.visibility = View.GONE
+            ballet.style ?: "Classical • Full-length"
+        }
+        binding.tvValueGenre.text = genreFormatted
+
+        // Modular Box 2: Tradition / School
+        val traditionText = buildString {
+            val trads = ballet.traditions.orEmpty()
+            val schs = ballet.schools.orEmpty()
+            val combined = (trads + schs).distinct()
+            if (combined.isNotEmpty()) {
+                append(combined.joinToString(" • "))
+            }
+        }
+        if (traditionText.isNotBlank()) {
+            binding.boxTradition.visibility = View.VISIBLE
+            binding.tvValueTradition.text = traditionText
+        }
+        else {
+            binding.boxTradition.visibility = View.GONE
         }
 
-        binding.tvDetailComposer.text = getString(R.string.composer_format, ballet.composer)
-        binding.tvDetailChoreographer.text =
-                getString(R.string.choreographer_format, ballet.originalChoreographer.orEmpty())
-
-        val premiereExtra = mutableListOf<String>()
-        ballet.style?.let { premiereExtra.add(it) }
-        ballet.epochPeriod?.let { premiereExtra.add(it) }
-        ballet.difficultyLevel?.let { premiereExtra.add(it) }
-        val extraInfo =
-                if (premiereExtra.isNotEmpty()) " • ${premiereExtra.joinToString(" • ")}" else ""
-
-        binding.tvDetailPremiere.text = getString(
-                R.string.premiere_detail_format,
-                ballet.premiereYear,
-                ballet.premiereLocation.orEmpty(),
-                ballet.acts
-                                                 ) + extraInfo
+        // Modular Box 3: Premiere
+        binding.tvLabelPremiere.text = "Estreno • ${ballet.premiereYear}"
+        binding.tvValuePremiere.text = ballet.premiereLocation.orEmpty()
 
         // Cover image & zoom click with Room fallback
         val primaryCover = ballet.multimedia?.coverImageUrl
         if (!primaryCover.isNullOrBlank()) {
-            binding.ivDetailCover.loadUrl(primaryCover)
-            binding.ivDetailCover.tag = primaryCover
-            binding.ivDetailCover.setOnClickListener {
+            binding.ivHeroCover.loadUrl(primaryCover)
+            binding.ivHeroCover.tag = primaryCover
+            binding.ivHeroCover.setOnClickListener {
                 showImageZoomDialog(primaryCover)
             }
         }
@@ -166,15 +203,15 @@ class DetailActivity : AppCompatActivity() {
                 val fallbackImg =
                         cachedRecords.firstOrNull { !it.highResUrl.isNullOrBlank() }?.highResUrl
                         ?: cachedRecords.firstOrNull { !it.previewUrl.isNullOrBlank() }?.previewUrl
-                binding.ivDetailCover.loadUrl(fallbackImg)
-                binding.ivDetailCover.tag = fallbackImg
-                binding.ivDetailCover.setOnClickListener {
+                binding.ivHeroCover.loadUrl(fallbackImg)
+                binding.ivHeroCover.tag = fallbackImg
+                binding.ivHeroCover.setOnClickListener {
                     showImageZoomDialog(fallbackImg)
                 }
             }
         }
 
-        // Favorite icon
+        // Favorite icon in toolbar
         updateFavoriteIcon(repository.isFavorite(workId))
 
         // Translated Synopsis
@@ -228,18 +265,12 @@ class DetailActivity : AppCompatActivity() {
 
     private fun loadOpenOpusInfo(composerName: String) {
         lifecycleScope.launch {
-            // Fetch from API and save to Room
             repository.searchComposer(composerName)
-
-            // Read and display formatted composer entity + portrait
             val cachedComposer = repository.getCachedComposer(composerName)
             if (cachedComposer != null) {
                 binding.groupComposer.visibility = View.VISIBLE
-                val dates = cachedComposer.birth.toLocalizedDate(
-                        DateStyle.YEAR_ONLY
-                                                                ) + " - " + cachedComposer.death.toLocalizedDate(
-                        DateStyle.YEAR_ONLY
-                                                                                                                )
+                val dates = cachedComposer.birth.toLocalizedDate(DateStyle.YEAR_ONLY) +
+                            " - " + cachedComposer.death.toLocalizedDate(DateStyle.YEAR_ONLY)
                 binding.tvOpenOpusHeader.text = cachedComposer.completeName
                 binding.tvOpenOpusInfo.text = dates
                 binding.ivComposer.loadUrl(cachedComposer.portrait)
@@ -250,11 +281,7 @@ class DetailActivity : AppCompatActivity() {
     private fun loadEuropeanaInfo(searchTerm: String) {
         lifecycleScope.launch {
             binding.tvEuropeanaHeader.visibility = View.VISIBLE
-
-            // Fetch from API and replace Room records for this workId
             repository.getEuropeanaImages(searchTerm, workId)
-
-            // Read from Room cache and populate 3 modules
             val cachedRecords = repository.getCachedEuropeanaRecords(workId)
             if (cachedRecords.isNotEmpty()) {
                 val images =
@@ -267,7 +294,6 @@ class DetailActivity : AppCompatActivity() {
                 val videos =
                         cachedRecords.filter { it.mediaType.equals("VIDEO", ignoreCase = true) }
 
-                // Module 1: Image Gallery RecyclerView
                 if (images.isNotEmpty()) {
                     binding.tvImageGalleryHeader.visibility = View.VISIBLE
                     binding.rvMediaGallery.visibility = View.VISIBLE
@@ -283,18 +309,12 @@ class DetailActivity : AppCompatActivity() {
                     binding.rvMediaGallery.visibility = View.GONE
                 }
 
-                // Module 2: Audio Records with Media3 ExoPlayer Playlist
                 if (sounds.isNotEmpty()) {
                     binding.layoutAudioSection.visibility = View.VISIBLE
                     val playableSounds = sounds.filter { sound ->
                         val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
-                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(
-                                ".wav"
-                                                                                    ) || url.endsWith(
-                                ".aac"
-                                                                                                     ) || url.contains(
-                                ".mp3?"
-                                                                                                                      )
+                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(".wav") ||
+                        url.endsWith(".aac") || url.contains(".mp3?")
                     }
                     if (playableSounds.isNotEmpty()) {
                         binding.cardAudioPlayer.visibility = View.VISIBLE
@@ -308,7 +328,6 @@ class DetailActivity : AppCompatActivity() {
                     binding.layoutAudioSection.visibility = View.GONE
                 }
 
-                // Module 3: Video Records
                 if (videos.isNotEmpty()) {
                     binding.layoutVideoSection.visibility = View.VISIBLE
                 }
@@ -420,19 +439,19 @@ class DetailActivity : AppCompatActivity() {
 
     private fun showLoading() {
         binding.detailProgressBar.visibility = View.VISIBLE
-        binding.scrollViewContent.visibility = View.GONE
+        binding.nestedScrollContent.visibility = View.GONE
         binding.detailLayoutError.visibility = View.GONE
     }
 
     private fun showContent() {
         binding.detailProgressBar.visibility = View.GONE
         binding.detailLayoutError.visibility = View.GONE
-        binding.scrollViewContent.visibility = View.VISIBLE
+        binding.nestedScrollContent.visibility = View.VISIBLE
     }
 
     private fun showError() {
         binding.detailProgressBar.visibility = View.GONE
-        binding.scrollViewContent.visibility = View.GONE
+        binding.nestedScrollContent.visibility = View.GONE
         binding.detailLayoutError.visibility = View.VISIBLE
     }
 

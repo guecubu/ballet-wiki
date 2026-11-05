@@ -8,7 +8,7 @@
     <color name="ballet_surface_container">#FFFFFF</color>
     <color name="ballet_surface_variant">#F5EBE6</color>
     <color name="ballet_surface_container_lowest">#FFFFFF</color>
-    <color name="ballet_surface_container_high">#DCABE6</color>
+    <color name="ballet_surface_container_high">#EBDFED</color>
 
     <!-- Tipografía -->
     <color name="ballet_text_high_emphasis">#1D171B</color>         <!-- Mulberry oscuro -->
