@@ -53,20 +53,20 @@
                     android:background="@drawable/scrim_card_bottom" />
 
                 <!-- Crédito de fotografía flotante -->
-                <TextView
-                    android:id="@+id/tvPhotoCredit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:layout_margin="16dp"
-                    android:layout_marginTop="68dp"
-                    android:background="#66000000"
-                    android:letterSpacing="0.04"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="3dp"
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="11sp"
-                    tools:text="© Johan Persson" />
+                <!--                <TextView-->
+                <!--                    android:id="@+id/tvPhotoCredit"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_gravity="top|end"-->
+                <!--                    android:layout_margin="16dp"-->
+                <!--                    android:layout_marginTop="68dp"-->
+                <!--                    android:background="#66000000"-->
+                <!--                    android:letterSpacing="0.04"-->
+                <!--                    android:paddingHorizontal="8dp"-->
+                <!--                    android:paddingVertical="3dp"-->
+                <!--                    android:textColor="#E6FFFFFF"-->
+                <!--                    android:textSize="11sp"-->
+                <!--                    tools:text="© Johan Persson" />-->
 
                 <!-- Badges flotantes en la base de la fotografía -->
                 <LinearLayout
@@ -180,6 +180,8 @@
                 app:cardBackgroundColor="@color/ballet_surface_container"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="4dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 app:strokeColor="@color/ballet_stroke_outline"
                 app:strokeWidth="1dp">
 
@@ -234,36 +236,57 @@
                         android:layout_marginVertical="4dp" />
 
                     <!-- CAJA MODULAR 3: ESTRENO (Lugar y fecha) -->
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/boxPremiere"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
                         android:background="@drawable/bg_box_premiere"
                         android:orientation="vertical"
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="12dp">
 
+                        <ImageView
+                            android:id="@+id/ivIconPremiere"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:contentDescription="@string/logo_content_description"
+                            android:scaleX="-1"
+                            android:src="@drawable/twotone_theater_comedy_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/ballet_gold_primary" />
+
                         <TextView
                             android:id="@+id/tvLabelPremiere"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:letterSpacing="0.04"
                             android:textColor="@color/ballet_text_high_emphasis"
                             android:textSize="13sp"
                             android:textStyle="bold"
+                            android:layout_marginStart="12dp"
+                            android:textAllCaps="true"
+                            app:layout_constraintBottom_toTopOf="@id/tvValuePremiere"
+                            app:layout_constraintStart_toEndOf="@+id/ivIconPremiere"
+                            app:layout_constraintTop_toTopOf="parent"
                             tools:text="Estreno • 2014" />
 
                         <TextView
                             android:id="@+id/tvValuePremiere"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:textColor="@color/ballet_text_medium_emphasis"
-                            android:textSize="12sp"
+                            android:layout_marginStart="12dp"
+                            android:textSize="14sp"
+                            android:textStyle="italic"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivIconPremiere"
+                            app:layout_constraintTop_toBottomOf="@+id/tvLabelPremiere"
                             tools:text="Royal Opera House, Covent Garden, London" />
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
                     <com.google.android.material.divider.MaterialDivider
@@ -416,11 +439,16 @@
                     <!-- Botón Notas Personales -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnOpenNotes"
-                        style="@style/Widget.Material3.Button.TonalButton"
+                        style="@style/Widget.Material3.Button.ElevatedButton"
+                        android:stateListAnimator="@null"
+                        android:text="@string/btn_notes"
+                        android:textColor="@color/ballet_text_on_accent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="@string/btn_notes" />
+                        android:translationZ="4dp"
+                        app:backgroundTint="@color/ballet_text_on_accent_dark"
+                        app:elevation="4dp" />
 
                 </LinearLayout>
 
@@ -478,11 +506,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardBackgroundColor="@color/ballet_gold_container"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
-                    app:strokeColor="@color/ballet_stroke_outline"
-                    app:strokeWidth="1dp">
+                    app:cardElevation="3dp"
+                    app:strokeColor="@color/ballet_chip_stroke_selector"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -533,7 +561,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/section_characters"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
-                            android:textColor="@color/ballet_rose_accent"
+                            android:textColor="@color/ballet_text_on_accent_dark"
                             android:textStyle="bold" />
 
                         <com.google.android.material.chip.ChipGroup
@@ -552,10 +580,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardBackgroundColor="@color/ballet_floating_chip_purple_light"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="2dp"
-                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeColor="@color/ballet_floating_chip_purple_light_text"
                     app:strokeWidth="1dp">
 
                     <LinearLayout
@@ -567,7 +595,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Variaciones Clave"
+                            android:text="@string/section_variations"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="@color/ballet_gold_primary"
                             android:textStyle="bold" />

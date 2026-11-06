@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#F2121113">
 
     <com.github.chrisbanes.photoview.PhotoView
@@ -25,5 +26,20 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_close"
         app:tint="@color/ballet_badge_era_text" />
+
+    <TextView
+        android:id="@+id/tvPhotoCredit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:layout_marginTop="68dp"
+        android:background="#66000000"
+        android:letterSpacing="0.04"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="3dp"
+        android:textColor="#E6FFFFFF"
+        android:textSize="11sp"
+        tools:text="© Johan Persson" />
 
 </FrameLayout>

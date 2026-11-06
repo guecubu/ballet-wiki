@@ -7,7 +7,7 @@
     <color name="ballet_window_background">#FAF5F2</color>
     <color name="ballet_surface_container">#FFFFFF</color>
     <color name="ballet_surface_variant">#F5EBE6</color>
-    <color name="ballet_surface_container_lowest">#FFFFFF</color>
+    <color name="ballet_surface_container_lowest">#CEC5BB</color>
     <color name="ballet_surface_container_high">#EBDFED</color>
 
     <!-- Tipografía -->
@@ -71,7 +71,7 @@
     <color name="ballet_floating_chip_light_text">@color/ballet_text_high_emphasis</color>
     <color name="ballet_floating_chip_rose_light">@color/ballet_rose_container</color>
     <color name="ballet_floating_chip_rose_light_text">@color/ballet_rose_accent</color>
-    <color name="ballet_floating_chip_purple_light">@color/ballet_surface_variant</color>
+    <color name="ballet_floating_chip_purple_light">@color/ballet_surface_container_high</color>
     <color name="ballet_floating_chip_purple_light_text">@color/ballet_text_on_accent_dark</color>
     <color name="ballet_floating_chip_gold">@color/ballet_gold_container</color>
     <color name="ballet_floating_chip_gold_text">@color/ballet_gold_primary</color>

@@ -15,6 +15,7 @@
     <color name="ballet_text_medium_emphasis">#B8B0B5</color>       <!-- Plata medio -->
     <color name="ballet_text_on_accent">#121113</color>
     <color name="ballet_text_disabled">#686066</color>
+    <color name="ballet_text_on_accent_dark">#B693AD</color>
 
     <!-- Familia Oro Primario / Bronce -->
     <color name="ballet_gold_primary">#E2A96B</color>               <!-- Oro primario luminoso -->
@@ -70,6 +71,12 @@
     <color name="ballet_floating_chip_rose_text">@color/ballet_rose_container</color>
     <color name="ballet_floating_chip_light">@color/ballet_text_medium_emphasis</color>
     <color name="ballet_floating_chip_light_text">@color/ballet_surface_variant</color>
+    <color name="ballet_floating_chip_rose_light">@color/ballet_rose_container</color>
+    <color name="ballet_floating_chip_rose_light_text">@color/ballet_rose_accent</color>
+    <color name="ballet_floating_chip_purple_light">@color/ballet_surface_container_high</color>
+    <color name="ballet_floating_chip_purple_light_text">@color/ballet_text_on_accent_dark</color>
+    <color name="ballet_floating_chip_gold">@color/ballet_gold_container</color>
+    <color name="ballet_floating_chip_gold_text">@color/ballet_gold_primary</color>
 
 
     <!-- Logo Tokens (Modo Oscuro) -->

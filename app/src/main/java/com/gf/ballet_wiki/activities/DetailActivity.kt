@@ -108,7 +108,7 @@ class DetailActivity : AppCompatActivity() {
             // 1. Desvanecer los badges sobre la foto cuando la card empieza a cubrirla
             val badgeAlpha = (1f - (collapseProgress * 2f)).coerceIn(0f, 1f)
             binding.layoutHeroBadges.alpha = badgeAlpha
-            binding.tvPhotoCredit.alpha = badgeAlpha
+            //            binding.tvPhotoCredit.alpha = badgeAlpha
         }
     }
 
@@ -186,9 +186,9 @@ class DetailActivity : AppCompatActivity() {
         }
 
         // Photo credit
-        val credit = ballet.multimedia?.attributionCover
-        binding.tvPhotoCredit.text = credit ?: ""
-        binding.tvPhotoCredit.isVisible = !credit.isNullOrBlank()
+        //        val credit = ballet.multimedia?.attributionCover
+        //        binding.tvPhotoCredit.text = credit ?: ""
+        //        binding.tvPhotoCredit.isVisible = !credit.isNullOrBlank()
 
         // Modular Box 1: Genre (translated item by item)
         val rawGenres = ballet.genre.orEmpty().filter { it.isNotBlank() }
@@ -344,15 +344,25 @@ class DetailActivity : AppCompatActivity() {
 
         TranslationManager.translateList(this, chars) { translatedChars ->
             binding.chipGroupCharacters.removeAllViews()
-            val chipBackgrounds = listOf(
-                    R.drawable.bg_badge_rose,
-                    R.drawable.bg_badge_light,
-                    R.drawable.bg_badge_rose_light,
-                    R.drawable.bg_badge_gold
+            val chipBackgroundsColors = listOf(
+                    //                    getColor(R.color.ballet_floating_chip_rose),
+                    //                    getColor(R.color.ballet_floating_chip_light),
+                    //                    getColor(R.color.ballet_floating_chip_rose_light),
+                    //                    getColor(R.color.ballet_floating_chip_gold)
+                    R.color.ballet_floating_chip_rose,
+                    //                    R.color.ballet_floating_chip_light,
+                    R.color.ballet_floating_chip_purple_light,
+                    R.color.ballet_floating_chip_rose_light,
+                    R.color.ballet_floating_chip_gold
+                    //                    R.drawable.bg_badge_rose,
+                    //                    R.drawable.bg_badge_light,
+                    //                    R.drawable.bg_badge_rose_light,
+                    //                    R.drawable.bg_badge_gold
                                         )
             val chipTextColors = listOf(
                     getColor(R.color.ballet_floating_chip_rose_text),
-                    getColor(R.color.ballet_floating_chip_light_text),
+                    //                    getColor(R.color.ballet_floating_chip_light_text),
+                    getColor(R.color.ballet_floating_chip_purple_light_text),
                     getColor(R.color.ballet_floating_chip_rose_light_text),
                     getColor(R.color.ballet_floating_chip_gold_text)
                                        )
@@ -363,7 +373,11 @@ class DetailActivity : AppCompatActivity() {
                         text = characterName
                         isClickable = false
                         isCheckable = false
-                        setBackgroundResource(chipBackgrounds[index % chipBackgrounds.size])
+                        //                        setBackgroundResource(chipBackgrounds[index % chipBackgrounds.size])
+                        setChipBackgroundColorResource(
+                                chipBackgroundsColors[index % chipBackgroundsColors.size]
+                                                      )
+                        //                        setBackgroundColor(chipBackgroundsColors[index % chipBackgroundsColors.size])
                         setTextColor(chipTextColors[index % chipTextColors.size])
                         textSize = 12f
                     }
@@ -456,31 +470,31 @@ class DetailActivity : AppCompatActivity() {
                     binding.rvMediaGallery.visibility = View.GONE
                 }
 
-                if (sounds.isNotEmpty()) {
-                    binding.layoutAudioSection.visibility = View.VISIBLE
-                    val playableSounds = sounds.filter { sound ->
-                        val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
-                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(".wav") ||
-                        url.endsWith(".aac") || url.contains(".mp3?")
-                    }
-                    if (playableSounds.isNotEmpty()) {
-                        binding.cardAudioPlayer.visibility = View.VISIBLE
-                        setupAudioPlayer(playableSounds)
-                    }
-                    else {
-                        binding.cardAudioPlayer.visibility = View.GONE
-                    }
-                }
-                else {
-                    binding.layoutAudioSection.visibility = View.GONE
-                }
-
-                if (videos.isNotEmpty()) {
-                    binding.layoutVideoSection.visibility = View.VISIBLE
-                }
-                else {
-                    binding.layoutVideoSection.visibility = View.GONE
-                }
+                //                if (sounds.isNotEmpty()) {
+                //                    binding.layoutAudioSection.visibility = View.VISIBLE
+                //                    val playableSounds = sounds.filter { sound ->
+                //                        val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
+                //                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(".wav") ||
+                //                        url.endsWith(".aac") || url.contains(".mp3?")
+                //                    }
+                //                    if (playableSounds.isNotEmpty()) {
+                //                        binding.cardAudioPlayer.visibility = View.VISIBLE
+                //                        setupAudioPlayer(playableSounds)
+                //                    }
+                //                    else {
+                //                        binding.cardAudioPlayer.visibility = View.GONE
+                //                    }
+                //                }
+                //                else {
+                //                    binding.layoutAudioSection.visibility = View.GONE
+                //                }
+                //
+                //                if (videos.isNotEmpty()) {
+                //                    binding.layoutVideoSection.visibility = View.VISIBLE
+                //                }
+                //                else {
+                //                    binding.layoutVideoSection.visibility = View.GONE
+                //                }
             }
             else {
                 binding.tvImageGalleryHeader.visibility = View.GONE
