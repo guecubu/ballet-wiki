@@ -539,6 +539,43 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Historical Performances Card (Vertical Timeline) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPerformances"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/section_historical_performances"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_rose_accent"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutPerformancesContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- Characters Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -609,6 +646,43 @@
                             android:textAppearance="?attr/textAppearanceBodyMedium"
                             android:textColor="@color/ballet_text_high_emphasis"
                             tools:text="• Grand pas de deux\n• 32 Fouettés" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Prominent Companies Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardCompanies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/ballet_surface_container"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/ballet_stroke_outline"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/section_prominent_companies"
+                            android:textAppearance="?attr/textAppearanceTitleMedium"
+                            android:textColor="@color/ballet_rose_accent"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutCompaniesContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical" />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

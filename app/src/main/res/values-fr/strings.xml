@@ -23,8 +23,10 @@
     <string name="btn_notes">Notes personnelles</string>
     <string name="section_synopsis">Synopsis et intrigue</string>
     <string name="section_history">Histoire et évolution</string>
+    <string name="section_historical_performances">Représentations historiques</string>
     <string name="section_characters">Personnages principaux</string>
     <string name="section_variations">Variations clés</string>
+    <string name="section_prominent_companies">Compagnies éminentes</string>
     <string name="section_open_opus">Informations sur le compositeur (Open Opus)</string>
     <string name="section_europeana">Collection numérique (Europeana)</string>
     <string name="section_image_gallery">Galerie d\'images</string>

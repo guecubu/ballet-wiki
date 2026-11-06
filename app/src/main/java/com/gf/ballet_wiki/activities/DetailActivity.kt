@@ -1,12 +1,14 @@
 package com.gf.ballet_wiki.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -310,24 +312,8 @@ class DetailActivity : AppCompatActivity() {
                 }
                                     )
 
-        // Translated History, Performances & Companies
-        val historyContent = buildString {
-            append(ballet.historyAndEvolution.orEmpty())
-            val performances = ballet.historicalPerformances.orEmpty()
-            if (performances.isNotEmpty()) {
-                append("\n\nRepresentaciones Históricas:\n")
-                performances.forEach { p ->
-                    append("• ${p.year} - ${p.company} (${p.theater}): ${p.relevance}\n")
-                }
-            }
-            val companies = ballet.prominentCompanies.orEmpty()
-            if (companies.isNotEmpty()) {
-                append("\nCompañías Prominentes:\n")
-                companies.forEach { c ->
-                    append("• ${c.name} (${c.country}) - ${c.officialUrl}\n")
-                }
-            }
-        }
+        // Translated History
+        val historyContent = ballet.historyAndEvolution.orEmpty()
         TranslationManager.translate(
                 context = this,
                 originalText = historyContent,
@@ -338,6 +324,212 @@ class DetailActivity : AppCompatActivity() {
                 }
                                     )
 
+        // Historical Performances Card (Vertical Timeline with Alternating Item Backgrounds)
+        val performances = ballet.historicalPerformances.orEmpty()
+        if (performances.isNotEmpty()) {
+            binding.cardPerformances.isVisible = true
+
+            val relevances = performances.map { it.relevance }
+            TranslationManager.translateList(this, relevances) { translatedRelevances ->
+                binding.layoutPerformancesContainer.removeAllViews()
+                val density = resources.displayMetrics.density
+                val padItem = (12 * density).toInt()
+                val marginBetween = (10 * density).toInt()
+
+                val alternatingBgs = listOf(
+                        R.color.ballet_surface_variant,
+                        R.color.ballet_floating_chip_purple_light
+                                           )
+
+                performances.forEachIndexed { index, perf ->
+                    val itemCard = com.google.android.material.card.MaterialCardView(this).apply {
+                        setCardBackgroundColor(
+                                getColor(alternatingBgs[index % alternatingBgs.size])
+                                              )
+                        radius = 12 * density
+                        cardElevation = 0f
+                        strokeWidth = 0
+                        layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                                                                ).apply {
+                            if (index > 0) topMargin = marginBetween
+                        }
+                    }
+
+                    val itemLayout = LinearLayout(this).apply {
+                        orientation = LinearLayout.VERTICAL
+                        setPadding(padItem, padItem, padItem, padItem)
+                    }
+
+                    // Row 1: Year badge + Company
+                    val topRow = LinearLayout(this).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER_VERTICAL
+                    }
+
+                    val tvYear = TextView(this).apply {
+                        text = perf.year.toString()
+                        setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
+                        setTextColor(getColor(R.color.ballet_badge_era_text))
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        setBackgroundResource(R.drawable.bg_badge_era)
+                        setPadding(
+                                (8 * density).toInt(), (4 * density).toInt(), (8 * density).toInt(),
+                                (4 * density).toInt()
+                                  )
+                    }
+
+                    val tvCompany = TextView(this).apply {
+                        text = "${perf.company} • ${perf.theater}"
+                        setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13f)
+                        setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                        setTypeface(null, android.graphics.Typeface.BOLD)
+                        layoutParams = LinearLayout
+                                .LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                            marginStart = (10 * density).toInt()
+                        }
+                    }
+
+                    topRow.addView(tvYear)
+                    topRow.addView(tvCompany)
+                    itemLayout.addView(topRow)
+
+                    // Choreographer
+                    if (perf.choreographer.isNotBlank()) {
+                        val tvChoreo = TextView(this).apply {
+                            text = "Coreografía: ${perf.choreographer}"
+                            setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
+                            setTextColor(getColor(R.color.ballet_gold_primary))
+                            layoutParams = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                                    ).apply {
+                                topMargin = (6 * density).toInt()
+                            }
+                        }
+                        itemLayout.addView(tvChoreo)
+                    }
+
+                    // Relevance (translated)
+                    val relText = translatedRelevances.getOrNull(index) ?: perf.relevance
+                    if (relText.isNotBlank()) {
+                        val tvRelevance = TextView(this).apply {
+                            text = relText
+                            setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
+                            setTextColor(getColor(R.color.ballet_text_medium_emphasis))
+                            setTypeface(null, android.graphics.Typeface.ITALIC)
+                            layoutParams = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                                    ).apply {
+                                topMargin = (6 * density).toInt()
+                            }
+                        }
+                        itemLayout.addView(tvRelevance)
+                    }
+
+                    itemCard.addView(itemLayout)
+                    binding.layoutPerformancesContainer.addView(itemCard)
+                }
+            }
+        }
+        else {
+            binding.cardPerformances.isVisible = false
+        }
+
+        // Prominent Companies Card with Browser URL Launcher
+        val companies = ballet.prominentCompanies.orEmpty()
+        if (companies.isNotEmpty()) {
+            binding.cardCompanies.isVisible = true
+            binding.layoutCompaniesContainer.removeAllViews()
+            val density = resources.displayMetrics.density
+            val padV = (8 * density).toInt()
+
+            companies.forEachIndexed { index, company ->
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding(0, padV, 0, padV)
+                }
+
+                val infoCol = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    layoutParams =
+                            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+
+                val tvName = TextView(this).apply {
+                    text = company.name
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14f)
+                    setTextColor(getColor(R.color.ballet_text_high_emphasis))
+                    setTypeface(null, android.graphics.Typeface.BOLD)
+                }
+
+                val tvCountry = TextView(this).apply {
+                    text = company.country
+                    setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12f)
+                    setTextColor(getColor(R.color.ballet_text_medium_emphasis))
+                }
+
+                infoCol.addView(tvName)
+                infoCol.addView(tvCountry)
+
+                val btnUrl = android.widget.ImageButton(this).apply {
+                    setImageResource(R.drawable.ic_open_in_new)
+                    setBackgroundResource(R.drawable.bg_badge_light)
+                    setPadding(
+                            (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(),
+                            (8 * density).toInt()
+                              )
+                    contentDescription = "Abrir sitio web"
+                    setOnClickListener {
+                        val rawUrl = company.officialUrl.trim()
+                        if (rawUrl.isNotBlank()) {
+                            try {
+                                val validUrl =
+                                        if (!rawUrl.startsWith("http://") && !rawUrl.startsWith(
+                                                        "https://"
+                                                                                               )
+                                        ) {
+                                            "https://$rawUrl"
+                                        }
+                                        else rawUrl
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(validUrl)))
+                            }
+                            catch (e: Exception) {
+                                Toast.makeText(
+                                        this@DetailActivity, "No se pudo abrir el sitio web",
+                                        Toast.LENGTH_SHORT
+                                              ).show()
+                            }
+                        }
+                    }
+                }
+
+                row.addView(infoCol)
+                row.addView(btnUrl)
+
+                binding.layoutCompaniesContainer.addView(row)
+
+                if (index < companies.size - 1) {
+                    val divider = com.google.android.material.divider.MaterialDivider(this).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                1
+                                                                ).apply {
+                            topMargin = (4 * density).toInt()
+                            bottomMargin = (4 * density).toInt()
+                        }
+                    }
+                    binding.layoutCompaniesContainer.addView(divider)
+                }
+            }
+        }
+        else {
+            binding.cardCompanies.isVisible = false
+        }
+
         // Characters & Key Variations (translated item by item, separated into 2 distinct cards)
         val chars = ballet.characters.orEmpty().filter { it.isNotBlank() }
         val variations = ballet.keyVariations.orEmpty().filter { it.isNotBlank() }
@@ -345,23 +537,13 @@ class DetailActivity : AppCompatActivity() {
         TranslationManager.translateList(this, chars) { translatedChars ->
             binding.chipGroupCharacters.removeAllViews()
             val chipBackgroundsColors = listOf(
-                    //                    getColor(R.color.ballet_floating_chip_rose),
-                    //                    getColor(R.color.ballet_floating_chip_light),
-                    //                    getColor(R.color.ballet_floating_chip_rose_light),
-                    //                    getColor(R.color.ballet_floating_chip_gold)
                     R.color.ballet_floating_chip_rose,
-                    //                    R.color.ballet_floating_chip_light,
                     R.color.ballet_floating_chip_purple_light,
                     R.color.ballet_floating_chip_rose_light,
                     R.color.ballet_floating_chip_gold
-                    //                    R.drawable.bg_badge_rose,
-                    //                    R.drawable.bg_badge_light,
-                    //                    R.drawable.bg_badge_rose_light,
-                    //                    R.drawable.bg_badge_gold
                                         )
             val chipTextColors = listOf(
                     getColor(R.color.ballet_floating_chip_rose_text),
-                    //                    getColor(R.color.ballet_floating_chip_light_text),
                     getColor(R.color.ballet_floating_chip_purple_light_text),
                     getColor(R.color.ballet_floating_chip_rose_light_text),
                     getColor(R.color.ballet_floating_chip_gold_text)
@@ -373,11 +555,10 @@ class DetailActivity : AppCompatActivity() {
                         text = characterName
                         isClickable = false
                         isCheckable = false
-                        //                        setBackgroundResource(chipBackgrounds[index % chipBackgrounds.size])
+
                         setChipBackgroundColorResource(
                                 chipBackgroundsColors[index % chipBackgroundsColors.size]
                                                       )
-                        //                        setBackgroundColor(chipBackgroundsColors[index % chipBackgroundsColors.size])
                         setTextColor(chipTextColors[index % chipTextColors.size])
                         textSize = 12f
                     }
