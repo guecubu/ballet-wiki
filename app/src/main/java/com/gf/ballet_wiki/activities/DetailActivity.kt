@@ -182,7 +182,7 @@ class DetailActivity : AppCompatActivity() {
                     binding.tvBadgeEpoch.text = translatedTerms[idx++]
                 }
                 if (diffRaw.isNotBlank() && idx < translatedTerms.size) {
-                    binding.tvBadgeDifficulty.text = translatedTerms[idx++]
+                    binding.tvBadgeDifficulty.text = translatedTerms[idx]
                 }
             }
         }
@@ -214,8 +214,8 @@ class DetailActivity : AppCompatActivity() {
 
         // Populate Traditions
         TranslationManager.translateList(this, traditionsList) { translatedTraditions ->
-            val finalTraditions = if (translatedTraditions.isNotEmpty()) translatedTraditions
-            else listOf(getString(R.string.unavailable))
+            val finalTraditions =
+                    translatedTraditions.ifEmpty { listOf(getString(R.string.unavailable)) }
 
             binding.layoutTraditionItems.removeAllViews()
             for ((index, item) in finalTraditions.withIndex()) {
@@ -239,8 +239,7 @@ class DetailActivity : AppCompatActivity() {
 
         // Populate Schools
         TranslationManager.translateList(this, schoolsList) { translatedSchools ->
-            val finalSchools = if (translatedSchools.isNotEmpty()) translatedSchools
-            else listOf(getString(R.string.unavailable))
+            val finalSchools = translatedSchools.ifEmpty { listOf(getString(R.string.unavailable)) }
 
             binding.layoutSchoolsItems.removeAllViews()
             for ((index, item) in finalSchools.withIndex()) {
@@ -263,7 +262,7 @@ class DetailActivity : AppCompatActivity() {
         }
 
         // Modular Box 3: Premiere (location translated item by item splitting by comma)
-        binding.tvLabelPremiere.text = "Estreno • ${ballet.premiereYear}"
+        binding.tvLabelPremiere.text = getString(R.string.premiere_year_format, ballet.premiereYear)
         val rawLoc = ballet.premiereLocation.orEmpty()
         if (rawLoc.isNotBlank()) {
             val locParts = rawLoc.split(",").map { it.trim() }.filter { it.isNotBlank() }
@@ -765,6 +764,15 @@ class DetailActivity : AppCompatActivity() {
             Log.e("BALLET_API_RAW", "PhotoView scale error: ${e.message}", e)
         }
         dialogBinding.photoViewZoom.loadUrl(imageUrl)
+
+        val credit = currentBallet?.multimedia?.attributionCover
+        if (!credit.isNullOrBlank()) {
+            dialogBinding.tvPhotoCredit.text = credit
+            dialogBinding.tvPhotoCredit.visibility = View.VISIBLE
+        }
+        else {
+            dialogBinding.tvPhotoCredit.visibility = View.GONE
+        }
 
         dialogBinding.btnCloseZoom.setOnClickListener {
             dialog.dismiss()

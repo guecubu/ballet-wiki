@@ -27,24 +27,15 @@ class SessionManager(context: Context) {
         }
     }
 
-    fun getFavoriteIds(): Set<String> {
-        return prefs.getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
-    }
+    fun getFavoriteIds(): Set<String> = prefs.getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
 
-    fun isFavorite(workId: Int): Boolean {
-        return getFavoriteIds().contains(workId.toString())
-    }
+    fun isFavorite(workId: Int): Boolean = getFavoriteIds().contains(workId.toString())
 
     fun toggleFavorite(workId: Int): Boolean {
         val currentFavorites = getFavoriteIds().toMutableSet()
         val idString = workId.toString()
-        val isNowFavorite = if (currentFavorites.contains(idString)) {
-            currentFavorites.remove(idString)
-            false
-        } else {
-            currentFavorites.add(idString)
-            true
-        }
+        val isNowFavorite = !currentFavorites.remove(idString)
+        if (isNowFavorite) currentFavorites.add(idString)
         prefs.edit { putStringSet(KEY_FAVORITES, currentFavorites) }
         return isNowFavorite
     }
@@ -52,11 +43,7 @@ class SessionManager(context: Context) {
     fun setFavorite(workId: Int, isFav: Boolean) {
         val currentFavorites = getFavoriteIds().toMutableSet()
         val idString = workId.toString()
-        if (isFav) {
-            currentFavorites.add(idString)
-        } else {
-            currentFavorites.remove(idString)
-        }
+        if (isFav) currentFavorites.add(idString) else currentFavorites.remove(idString)
         prefs.edit { putStringSet(KEY_FAVORITES, currentFavorites) }
     }
 
