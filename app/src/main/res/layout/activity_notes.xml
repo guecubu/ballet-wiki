@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="?attr/homeAsUpIndicator"
+            android:background="@color/ballet_window_background"
             app:title="@string/notes_title" />
 
     </com.google.android.material.appbar.AppBarLayout>

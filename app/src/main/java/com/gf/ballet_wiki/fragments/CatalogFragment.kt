@@ -18,6 +18,7 @@ import com.gf.ballet_wiki.data.remote.dto.BalletDto
 import com.gf.ballet_wiki.data.repository.BalletRepository
 import com.gf.ballet_wiki.databinding.FragmentCatalogBinding
 import com.gf.ballet_wiki.utils.TranslationManager
+import com.gf.ballet_wiki.utils.fixAllMaterialCardsRecursively
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
@@ -67,6 +68,8 @@ class CatalogFragment : Fragment() {
         }
 
         loadBallets()
+
+        binding.root.fixAllMaterialCardsRecursively()
     }
 
     override fun onResume() {
@@ -106,6 +109,8 @@ class CatalogFragment : Fragment() {
 
         binding.rvBallets.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvBallets.adapter = adapter
+
+        //        binding.rvBallets.fixCardsInAdapter()
     }
 
     private fun setupSearchAndFilters() {

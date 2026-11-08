@@ -5,7 +5,7 @@
         android:angle="270"
         android:startColor="#00000000"
         android:centerColor="@color/ballet_scrim_gradient_center"
-        android:centerY="0.65"
+        android:centerY="0.55"
         android:endColor="@color/ballet_scrim_gradient_end"
         android:type="linear" />
 </shape>

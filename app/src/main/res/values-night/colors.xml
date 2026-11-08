@@ -32,8 +32,10 @@
     <color name="ballet_stroke_outline">#4DE2A96B</color>
 
     <!-- Scrim Oscuro Original -->
-    <color name="ballet_scrim_gradient_center">#661C1A1E</color>
+    <color name="ballet_scrim_gradient_center">#66DEA468</color>
     <color name="ballet_scrim_gradient_end">#1C1A1E</color>
+    <color name="ballet_scrim_gradient_center_detail">#40F5D6B3</color>
+    <color name="ballet_scrim_gradient_end_detail">#E2A96B</color>
 
     <!-- ============================================================== -->
     <!-- CAPA 2: TOKENS SEMÁNTICOS DE COMPONENTE (SÓLO REFERENCIAS @)   -->

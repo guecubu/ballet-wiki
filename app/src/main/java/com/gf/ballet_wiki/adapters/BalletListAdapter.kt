@@ -53,8 +53,11 @@ class BalletListAdapter(
             )
 
             binding.tvComposer.text = ballet.composer
-            binding.tvActs.text = context.getString(R.string.acts_format, ballet
-                    .acts)
+            binding.tvActs.text = context.resources.getQuantityString(
+                    R.plurals.acts_plural,
+                    ballet.acts,
+                    ballet.acts
+                                                                     )
 
             // Era badge (e.g. 1877 • Petipa)
             val choreographer = ballet.originalChoreographer?.takeIf { it.isNotBlank() }?.split(" ")?.last() ?: "Ballet"

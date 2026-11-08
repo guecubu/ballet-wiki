@@ -1,4 +1,10 @@
 <resources>
+
+    <style name="Widget.App.MaterialCardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="elevationOverlayColor">@android:color/transparent</item>
+    </style>
+
     <!-- Base application theme. -->
     <style name="Base.Theme.BalletWiki" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
@@ -22,6 +28,8 @@
 
         <!-- Outlines & Dividers -->
         <item name="colorOutline">@color/ballet_stroke_outline</item>
+
+        <item name="materialCardViewStyle">@style/Widget.App.MaterialCardView</item>
     </style>
 
     <!-- En el estilo de tu aplicación (Theme.BalletWiki o similar) o en un estilo de BottomNav -->
@@ -58,6 +66,12 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowAnimationStyle">@style/Animation.Ballet.ZoomDialog</item>
+    </style>
+
+    <style name="Widget.Ballet.MaterialCardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:background">@null</item>
     </style>
 
     <style name="Theme.BalletWiki" parent="Base.Theme.BalletWiki" />

@@ -4,11 +4,15 @@
     <!-- CAPA 1: PALETA PRIMITIVA / IDENTIDAD DE MARCA (VALORES HEX)    -->
     <!-- ============================================================== -->
     <!-- Superficies Claras -->
-    <color name="ballet_window_background">#FAF5F2</color>
+    <!--    <color name="ballet_window_background">#FAF5F2</color>-->
+    <color name="ballet_window_background">#F5EFEA</color>
     <color name="ballet_surface_container">#FFFFFF</color>
-    <color name="ballet_surface_variant">#F5EBE6</color>
-    <color name="ballet_surface_container_lowest">#CEC5BB</color>
-    <color name="ballet_surface_container_high">#EBDFED</color>
+    <!--    <color name="ballet_surface_variant">#F5EBE6</color>-->
+    <color name="ballet_surface_variant">#EFE3DD</color>
+    <!--    <color name="ballet_surface_container_lowest">#CEC5BB</color>-->
+    <color name="ballet_surface_container_lowest">#DCD2C8</color>
+    <!--    <color name="ballet_surface_container_high">#EBDFED</color>-->
+    <color name="ballet_surface_container_high">#E4D4E8</color>
 
     <!-- Tipografía -->
     <color name="ballet_text_high_emphasis">#1D171B</color>         <!-- Mulberry oscuro -->
@@ -31,8 +35,13 @@
     <color name="ballet_stroke_outline">#D8C7BD</color>
 
     <!-- Scrim (Tu calibración validada al 30%) -->
-    <color name="ballet_scrim_gradient_center">#4DFCEBED</color>
+    <!--    <color name="ballet_scrim_gradient_center">#4DFCEBED</color>-->
+    <color name="ballet_scrim_gradient_center">#4DF69B38</color>
+    <!--    <color name="ballet_scrim_gradient_center">#99FAEDE0</color>-->
     <color name="ballet_scrim_gradient_end">#FFFFFF</color>
+    <color name="ballet_scrim_gradient_center_detail">#66F0A34A</color>
+    <color name="ballet_scrim_gradient_end_detail">#3B2332</color>
+
 
     <!-- ============================================================== -->
     <!-- CAPA 2: TOKENS SEMÁNTICOS DE COMPONENTE (SÓLO REFERENCIAS @)   -->

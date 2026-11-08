@@ -14,7 +14,11 @@
     <string name="retry">Reintentar</string>
     <string name="empty_list">No hay obras disponibles.</string>
     <string name="premiere_year_format">Estreno: %1$d</string>
-    <string name="acts_format">%1$d Actos</string>
+    <plurals name="acts_plural">
+        <item quantity="one">%d Acto</item>
+        <item quantity="other">%d Actos</item>
+        <item quantity="many">%d Actos</item>
+    </plurals>
     <string name="search_hint">Buscar por título o compositor…</string>
     <string name="filter_all">Todos</string>
     <string name="filter_favorites">Favoritos</string>

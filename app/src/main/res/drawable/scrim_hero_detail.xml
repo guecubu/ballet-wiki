@@ -2,6 +2,9 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
         android:angle="270"
-        android:endColor="#99000000"
-        android:startColor="@android:color/transparent" />
+        android:centerColor="@color/ballet_scrim_gradient_center_detail"
+        android:endColor="@color/ballet_scrim_gradient_end_detail"
+        android:startColor="@android:color/transparent"
+        android:type="linear"
+        android:useLevel="false" />
 </shape>

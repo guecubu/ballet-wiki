@@ -14,7 +14,11 @@
     <string name="retry">Réessayer</string>
     <string name="empty_list">Aucune œuvre disponible.</string>
     <string name="premiere_year_format">Première : %1$d</string>
-    <string name="acts_format">%1$d Acts</string>
+    <plurals name="acts_plural">
+        <item quantity="one">%d Acte</item>
+        <item quantity="other">%d Actes</item>
+        <item quantity="many">%d Actes</item>
+    </plurals>
     <string name="search_hint">Rechercher un ballet, compositeur…</string>
     <string name="filter_all">Tous</string>
     <string name="filter_favorites">Favoris</string>

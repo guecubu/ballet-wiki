@@ -1,6 +1,7 @@
 package com.gf.ballet_wiki.activities
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -27,6 +28,7 @@ import com.gf.ballet_wiki.databinding.ActivityDetailBinding
 import com.gf.ballet_wiki.databinding.DialogImageZoomBinding
 import com.gf.ballet_wiki.utils.DateStyle
 import com.gf.ballet_wiki.utils.TranslationManager
+import com.gf.ballet_wiki.utils.fixAllMaterialCardsRecursively
 import com.gf.ballet_wiki.utils.loadUrl
 import com.gf.ballet_wiki.utils.toLocalizedDate
 import com.google.android.material.chip.Chip
@@ -56,6 +58,7 @@ class DetailActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        binding.root.fixAllMaterialCardsRecursively()
 
         repository = BalletRepository.getInstance(this)
         workId = intent.getIntExtra(EXTRA_WORK_ID, -1)
@@ -166,7 +169,8 @@ class DetailActivity : AppCompatActivity() {
                                                                                           )
         else "Classical"
         binding.tvBadgeStyle.text = styleLabel
-        binding.tvBadgeActs.text = getString(R.string.acts_format, ballet.acts)
+        binding.tvActs.text =
+                resources.getQuantityString(R.plurals.acts_plural, ballet.acts, ballet.acts)
 
         val epochRaw = ballet.epochPeriod.orEmpty()
         val diffRaw = ballet.difficultyLevel.orEmpty()
@@ -227,8 +231,8 @@ class DetailActivity : AppCompatActivity() {
                     setBackgroundResource(R.drawable.bg_pill_item_inner)
                     setPadding(padH, padV, padH, padV)
                     layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
                                                             ).apply {
                         if (index > 0) topMargin = marginTopItem
                     }
@@ -251,8 +255,8 @@ class DetailActivity : AppCompatActivity() {
                     setBackgroundResource(R.drawable.bg_pill_item_inner)
                     setPadding(padH, padV, padH, padV)
                     layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
                                                             ).apply {
                         if (index > 0) topMargin = marginTopItem
                     }
@@ -326,6 +330,21 @@ class DetailActivity : AppCompatActivity() {
         // Historical Performances Card (Vertical Timeline with Alternating Item Backgrounds)
         val performances = ballet.historicalPerformances.orEmpty()
         if (performances.isNotEmpty()) {
+            binding.cardPerformances.apply {
+                cardElevation = 4f
+                backgroundTintList = null
+                foreground = null
+                setCardBackgroundColor(getColor(R.color.ballet_surface_container))
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 20f * resources.displayMetrics.density
+                    setColor(getColor(R.color.ballet_surface_container))
+                    setStroke(
+                            (2 * resources.displayMetrics.density).toInt(), // 2dp de stroke
+                            getColor(R.color.ballet_stroke_outline)
+                             )
+                }
+            }
             binding.cardPerformances.isVisible = true
 
             val relevances = performances.map { it.relevance }
@@ -386,8 +405,8 @@ class DetailActivity : AppCompatActivity() {
                         setTypeface(null, android.graphics.Typeface.BOLD)
                         layoutParams = LinearLayout
                                 .LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                            marginStart = (10 * density).toInt()
-                        }
+                                    marginStart = (10 * density).toInt()
+                                }
                     }
 
                     topRow.addView(tvYear)
@@ -476,7 +495,7 @@ class DetailActivity : AppCompatActivity() {
 
                 val btnUrl = android.widget.ImageButton(this).apply {
                     setImageResource(R.drawable.ic_open_in_new)
-                    setBackgroundResource(R.drawable.bg_badge_light)
+                    setBackgroundResource(R.drawable.bg_box_tradition)
                     setPadding(
                             (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(),
                             (8 * density).toInt()
@@ -540,7 +559,7 @@ class DetailActivity : AppCompatActivity() {
                     R.color.ballet_floating_chip_purple_light,
                     R.color.ballet_floating_chip_rose_light,
                     R.color.ballet_floating_chip_gold
-                                        )
+                                              )
             val chipTextColors = listOf(
                     getColor(R.color.ballet_floating_chip_rose_text),
                     getColor(R.color.ballet_floating_chip_purple_light_text),

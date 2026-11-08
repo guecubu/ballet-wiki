@@ -15,7 +15,10 @@
     <string name="retry">Retry</string>
     <string name="empty_list">No works available.</string>
     <string name="premiere_year_format">Premiere: %1$d</string>
-    <string name="acts_format">%1$d Acts</string>
+    <plurals name="acts_plural">
+        <item quantity="one">%d Act</item>
+        <item quantity="other">%d Acts</item>
+    </plurals>
     <string name="search_hint">Search by title or composer…</string>
     <string name="filter_all">All</string>
     <string name="filter_favorites">Favorites</string>
