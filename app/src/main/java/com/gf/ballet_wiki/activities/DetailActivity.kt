@@ -2,7 +2,6 @@ package com.gf.ballet_wiki.activities
 
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -112,8 +112,8 @@ class DetailActivity : AppCompatActivity() {
 
             // 1. Desvanecer los badges sobre la foto cuando la card empieza a cubrirla
             val badgeAlpha = (1f - (collapseProgress * 2f)).coerceIn(0f, 1f)
-            binding.layoutHeroBadges.alpha = badgeAlpha
-            //            binding.tvPhotoCredit.alpha = badgeAlpha
+            binding.layoutHeroBadges.alpha =
+                    badgeAlpha //            binding.tvPhotoCredit.alpha = badgeAlpha
         }
     }
 
@@ -140,34 +140,34 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindBalletData(ballet: BalletDto) {
-        // Translated title in editorial sheet
+    private fun bindBalletData(ballet: BalletDto) { // Translated title in editorial sheet
         TranslationManager.translate(
-                context = this,
-                originalText = ballet.title,
-                sourceLanguage = "en",
+                context = this, originalText = ballet.title, sourceLanguage = "en",
                 onTranslating = { binding.tvTitle.text = getString(R.string.translating) },
                 onTranslated = { translatedTitle ->
                     binding.tvTitle.text = translatedTitle
 
                     // Original title as separate data field compared against actual translated title
-                    val showOriginal = !ballet.originalTitle.isNullOrBlank() &&
-                                       !ballet.originalTitle.equals(
-                                               translatedTitle, ignoreCase = true
-                                                                   )
+                    val showOriginal =
+                            !ballet.originalTitle.isNullOrBlank() && !ballet.originalTitle.equals(
+                                    translatedTitle, ignoreCase = true
+                                                                                                 )
                     binding.tvOriginalTitle.isVisible = showOriginal
                     binding.tvOriginalTitle.text = ballet.originalTitle
-                }
-                                    )
+                })
 
         // Creators
-        binding.tvCreators.text = "${ballet.composer} • ${ballet.originalChoreographer.orEmpty()}"
+        binding.tvCreators.text = getString(
+                R.string.creators_format,
+                ballet.composer,
+                ballet.originalChoreographer.orEmpty()
+                                           )
 
         // Floating Badges on photo (Optimized batch translation & repository cache)
         val styleLabel = if (!ballet.style.isNullOrBlank()) repository.getStyleTranslation(
                 ballet.style
                                                                                           )
-        else "Classical"
+        else getString(R.string.style_classical)
         binding.tvBadgeStyle.text = styleLabel
         binding.tvActs.text =
                 resources.getQuantityString(R.plurals.acts_plural, ballet.acts, ballet.acts)
@@ -181,12 +181,12 @@ class DetailActivity : AppCompatActivity() {
         if (epochRaw.isNotBlank() || diffRaw.isNotBlank()) {
             val termsToTranslate = listOf(epochRaw, diffRaw).filter { it.isNotBlank() }
             TranslationManager.translateList(this, termsToTranslate) { translatedTerms ->
-                var idx = 0
-                if (epochRaw.isNotBlank() && idx < translatedTerms.size) {
-                    binding.tvBadgeEpoch.text = translatedTerms[idx++]
+                if (epochRaw.isNotBlank()) {
+                    binding.tvBadgeEpoch.text = translatedTerms.firstOrNull() ?: epochRaw
                 }
-                if (diffRaw.isNotBlank() && idx < translatedTerms.size) {
-                    binding.tvBadgeDifficulty.text = translatedTerms[idx]
+                if (diffRaw.isNotBlank()) {
+                    val diffIndex = if (epochRaw.isNotBlank() && translatedTerms.size > 1) 1 else 0
+                    binding.tvBadgeDifficulty.text = translatedTerms.getOrNull(diffIndex) ?: diffRaw
                 }
             }
         }
@@ -306,26 +306,20 @@ class DetailActivity : AppCompatActivity() {
 
         // Translated Synopsis
         TranslationManager.translate(
-                context = this,
-                originalText = ballet.synopsis.orEmpty(),
-                sourceLanguage = "en",
+                context = this, originalText = ballet.synopsis.orEmpty(), sourceLanguage = "en",
                 onTranslating = { binding.tvDetailSynopsis.text = getString(R.string.translating) },
                 onTranslated = { translatedSynopsis ->
                     binding.tvDetailSynopsis.text = translatedSynopsis
-                }
-                                    )
+                })
 
         // Translated History
         val historyContent = ballet.historyAndEvolution.orEmpty()
         TranslationManager.translate(
-                context = this,
-                originalText = historyContent,
-                sourceLanguage = "en",
+                context = this, originalText = historyContent, sourceLanguage = "en",
                 onTranslating = { binding.tvDetailHistory.text = getString(R.string.translating) },
                 onTranslated = { translatedHistory ->
                     binding.tvDetailHistory.text = translatedHistory
-                }
-                                    )
+                })
 
         // Historical Performances Card (Vertical Timeline with Alternating Item Backgrounds)
         val performances = ballet.historicalPerformances.orEmpty()
@@ -355,8 +349,7 @@ class DetailActivity : AppCompatActivity() {
                 val marginBetween = (10 * density).toInt()
 
                 val alternatingBgs = listOf(
-                        R.color.ballet_surface_variant,
-                        R.color.ballet_floating_chip_purple_light
+                        R.color.ballet_surface_variant, R.color.ballet_floating_chip_purple_light
                                            )
 
                 performances.forEachIndexed { index, perf ->
@@ -399,7 +392,7 @@ class DetailActivity : AppCompatActivity() {
                     }
 
                     val tvCompany = TextView(this).apply {
-                        text = "${perf.company} • ${perf.theater}"
+                        text = getString(R.string.creators_format, perf.company, perf.theater)
                         setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13f)
                         setTextColor(getColor(R.color.ballet_text_high_emphasis))
                         setTypeface(null, android.graphics.Typeface.BOLD)
@@ -416,7 +409,9 @@ class DetailActivity : AppCompatActivity() {
                     // Choreographer
                     if (perf.choreographer.isNotBlank()) {
                         val tvChoreo = TextView(this).apply {
-                            text = "Coreografía: ${perf.choreographer}"
+                            text = getString(
+                                    R.string.choreographer_prefix_format, perf.choreographer
+                                            )
                             setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11f)
                             setTextColor(getColor(R.color.ballet_gold_primary))
                             layoutParams = LinearLayout.LayoutParams(
@@ -500,7 +495,7 @@ class DetailActivity : AppCompatActivity() {
                             (8 * density).toInt(), (8 * density).toInt(), (8 * density).toInt(),
                             (8 * density).toInt()
                               )
-                    contentDescription = "Abrir sitio web"
+                    contentDescription = getString(R.string.open_website_desc)
                     setOnClickListener {
                         val rawUrl = company.officialUrl.trim()
                         if (rawUrl.isNotBlank()) {
@@ -513,11 +508,11 @@ class DetailActivity : AppCompatActivity() {
                                             "https://$rawUrl"
                                         }
                                         else rawUrl
-                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(validUrl)))
+                                startActivity(Intent(Intent.ACTION_VIEW, validUrl.toUri()))
                             }
-                            catch (e: Exception) {
+                            catch (_: Exception) {
                                 Toast.makeText(
-                                        this@DetailActivity, "No se pudo abrir el sitio web",
+                                        this@DetailActivity, getString(R.string.error_opening_url),
                                         Toast.LENGTH_SHORT
                                               ).show()
                             }
@@ -533,8 +528,7 @@ class DetailActivity : AppCompatActivity() {
                 if (index < companies.size - 1) {
                     val divider = com.google.android.material.divider.MaterialDivider(this).apply {
                         layoutParams = LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                1
+                                LinearLayout.LayoutParams.MATCH_PARENT, 1
                                                                 ).apply {
                             topMargin = (4 * density).toInt()
                             bottomMargin = (4 * density).toInt()
@@ -555,10 +549,8 @@ class DetailActivity : AppCompatActivity() {
         TranslationManager.translateList(this, chars) { translatedChars ->
             binding.chipGroupCharacters.removeAllViews()
             val chipBackgroundsColors = listOf(
-                    R.color.ballet_floating_chip_rose,
-                    R.color.ballet_floating_chip_purple_light,
-                    R.color.ballet_floating_chip_rose_light,
-                    R.color.ballet_floating_chip_gold
+                    R.color.ballet_floating_chip_rose, R.color.ballet_floating_chip_purple_light,
+                    R.color.ballet_floating_chip_rose_light, R.color.ballet_floating_chip_gold
                                               )
             val chipTextColors = listOf(
                     getColor(R.color.ballet_floating_chip_rose_text),
@@ -620,15 +612,18 @@ class DetailActivity : AppCompatActivity() {
                     binding.tvOpenOpusHeader.text = comp.completeName
                     val b = comp.birth.toLocalizedDate(DateStyle.YEAR_ONLY)
                     val d = comp.death.toLocalizedDate(DateStyle.YEAR_ONLY)
-                    binding.tvOpenOpusInfo.text =
-                            if (b.isNotBlank() && d.isNotBlank()) "$b - $d" else if (b.isNotBlank()) b else ""
+                    binding.tvOpenOpusInfo.text = when {
+                        b.isNotBlank() && d.isNotBlank() -> "$b - $d"
+                        b.isNotBlank() -> b
+                        else -> ""
+                    }
                     binding.ivComposer.loadUrl(comp.portrait)
                 }
                 else {
                     val names = cachedComposers.joinToString(", ") { it.name }
                     binding.tvOpenOpusHeader.text = names
                     binding.tvOpenOpusInfo.text =
-                            "Música compilada • ${cachedComposers.size} compositores"
+                            getString(R.string.compiled_music_format, cachedComposers.size)
                     binding.ivComposer.loadUrl(primaryComposer.portrait)
                 }
             }
@@ -640,7 +635,6 @@ class DetailActivity : AppCompatActivity() {
 
     private fun loadEuropeanaInfo(searchTerm: String) {
         lifecycleScope.launch {
-            binding.tvEuropeanaHeader.visibility = View.VISIBLE
             repository.getEuropeanaImages(searchTerm, workId)
             val cachedRecords = repository.getCachedEuropeanaRecords(workId)
             if (cachedRecords.isNotEmpty()) {
@@ -654,7 +648,24 @@ class DetailActivity : AppCompatActivity() {
                 val videos =
                         cachedRecords.filter { it.mediaType.equals("VIDEO", ignoreCase = true) }
 
-                if (images.isNotEmpty()) {
+                val hasImages = images.isNotEmpty()
+                val playableSounds = sounds.filter { sound ->
+                    val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
+                    url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(
+                            ".wav"
+                                                                                ) || url.endsWith(
+                            ".aac"
+                                                                                                 ) || url.contains(
+                            ".mp3?"
+                                                                                                                  )
+                }
+                val hasAudio = playableSounds.isNotEmpty()
+                val hasVideos = videos.isNotEmpty()
+
+                val hasAnyMedia = hasImages || hasAudio || hasVideos
+                binding.tvEuropeanaHeader.isVisible = hasAnyMedia
+
+                if (hasImages) {
                     binding.tvImageGalleryHeader.visibility = View.VISIBLE
                     binding.rvMediaGallery.visibility = View.VISIBLE
                     val adapter = MediaGalleryAdapter { item ->
@@ -669,36 +680,29 @@ class DetailActivity : AppCompatActivity() {
                     binding.rvMediaGallery.visibility = View.GONE
                 }
 
-                //                if (sounds.isNotEmpty()) {
-                //                    binding.layoutAudioSection.visibility = View.VISIBLE
-                //                    val playableSounds = sounds.filter { sound ->
-                //                        val url = sound.highResUrl?.lowercase()?.trim().orEmpty()
-                //                        url.endsWith(".mp3") || url.endsWith(".m4a") || url.endsWith(".wav") ||
-                //                        url.endsWith(".aac") || url.contains(".mp3?")
-                //                    }
-                //                    if (playableSounds.isNotEmpty()) {
-                //                        binding.cardAudioPlayer.visibility = View.VISIBLE
-                //                        setupAudioPlayer(playableSounds)
-                //                    }
-                //                    else {
-                //                        binding.cardAudioPlayer.visibility = View.GONE
-                //                    }
-                //                }
-                //                else {
-                //                    binding.layoutAudioSection.visibility = View.GONE
-                //                }
-                //
-                //                if (videos.isNotEmpty()) {
-                //                    binding.layoutVideoSection.visibility = View.VISIBLE
-                //                }
-                //                else {
-                //                    binding.layoutVideoSection.visibility = View.GONE
-                //                }
+                if (hasAudio) {
+                    binding.layoutAudioSection.visibility = View.VISIBLE
+                    binding.cardAudioPlayer.visibility = View.VISIBLE
+                    setupAudioPlayer(playableSounds)
+                }
+                else {
+                    binding.layoutAudioSection.visibility = View.GONE
+                    binding.cardAudioPlayer.visibility = View.GONE
+                }
+
+                if (hasVideos) {
+                    binding.layoutVideoSection.visibility = View.VISIBLE
+                }
+                else {
+                    binding.layoutVideoSection.visibility = View.GONE
+                }
             }
             else {
+                binding.tvEuropeanaHeader.visibility = View.GONE
                 binding.tvImageGalleryHeader.visibility = View.GONE
                 binding.rvMediaGallery.visibility = View.GONE
                 binding.layoutAudioSection.visibility = View.GONE
+                binding.cardAudioPlayer.visibility = View.GONE
                 binding.layoutVideoSection.visibility = View.GONE
             }
         }
@@ -721,9 +725,13 @@ class DetailActivity : AppCompatActivity() {
                         val currentIdx = currentMediaItemIndex
                         if (currentIdx in playableSounds.indices) {
                             val track = playableSounds[currentIdx]
-                            binding.tvAudioCurrentTrack.text =
-                                    "Pista ${currentIdx + 1} de ${playableSounds.size} — ${track.title}"
-                            binding.tvAudioProvider.text = track.dataProvider ?: "Europeana Sounds"
+                            binding.tvAudioCurrentTrack.text = getString(
+                                    R.string.audio_track_format, currentIdx + 1,
+                                    playableSounds.size, track.title
+                                                                        )
+                            binding.tvAudioProvider.text = track.dataProvider ?: getString(
+                                    R.string.europeana_sounds_default
+                                                                                          )
                         }
                     }
 
@@ -737,9 +745,11 @@ class DetailActivity : AppCompatActivity() {
 
             if (playableSounds.isNotEmpty()) {
                 val firstTrack = playableSounds[0]
-                binding.tvAudioCurrentTrack.text =
-                        "Pista 1 de ${playableSounds.size} — ${firstTrack.title}"
-                binding.tvAudioProvider.text = firstTrack.dataProvider ?: "Europeana Sounds"
+                binding.tvAudioCurrentTrack.text = getString(
+                        R.string.audio_track_format, 1, playableSounds.size, firstTrack.title
+                                                            )
+                binding.tvAudioProvider.text =
+                        firstTrack.dataProvider ?: getString(R.string.europeana_sounds_default)
             }
         }
 

@@ -71,4 +71,18 @@
     <string name="tradition">Tradition</string>
     <string name="genre">Genre</string>
     <string name="school">School</string>
+    <string name="choreographer_prefix_format">Choreography: %1$s</string>
+    <string name="open_website_desc">Open website</string>
+    <string name="error_opening_url">Could not open website.</string>
+    <string name="compiled_music_format">Compiled music • %1$d composers</string>
+    <string name="europeana_sounds_default">Europeana Sounds</string>
+    <string name="style_classical">Classical</string>
+    <string name="style_romantic">Romantic</string>
+    <string name="style_neoclassical">Neoclassical</string>
+    <string name="style_contemporary">Contemporary</string>
+    <string name="style_avant_garde">Avant-garde</string>
+    <string name="style_modernist">Modernist</string>
+    <string name="europeana_archive_default">Europeana Archive</string>
+    <string name="audio_track_format">Track %1$d of %2$d — %3$s</string>
+    <string name="creators_format">%1$s • %2$s</string>
 </resources>

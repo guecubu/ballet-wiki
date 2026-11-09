@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.gf.ballet_wiki.R
 import com.gf.ballet_wiki.data.local.EuropeanaEntity
 import com.gf.ballet_wiki.databinding.ItemMediaGalleryBinding
 import com.gf.ballet_wiki.utils.loadUrl
@@ -32,7 +33,10 @@ class MediaGalleryAdapter(
 
         fun bind(item: EuropeanaEntity) {
             binding.tvMediaTitle.text = item.title
-            binding.tvMediaProvider.text = item.dataProvider ?: "Europeana Archive"
+            binding.tvMediaProvider.text =
+                    item.dataProvider ?: binding.root.context.getString(
+                            R.string.europeana_archive_default
+                                                                       )
 
             val imageUrl = item.highResUrl ?: item.previewUrl
             binding.ivMediaCover.loadUrl(imageUrl)

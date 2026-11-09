@@ -130,6 +130,19 @@ class BalletRepository(
             searchTerm: String, workId: Int = -1
                                   ): Result<List<EuropeanaItemDto>> = withContext(Dispatchers.IO) {
         if (searchTerm.isBlank()) return@withContext Result.success(emptyList())
+
+        val currentTime = System.currentTimeMillis()
+        val cacheTtlMs = 24 * 60 * 60 * 1000L // 24 hours TTL
+        val lastQueryTime =
+                if (workId != -1) sessionManager.getEuropeanaLastQueryTime(workId) else 0L
+        val cachedRecords =
+                if (workId != -1) europeanaDao.getRecordsForWork(workId) else emptyList()
+
+        // Cache hit: If Room already has records and the cache is valid (under 24 hours), skip network call!
+        if (workId != -1 && cachedRecords.isNotEmpty() && (currentTime - lastQueryTime) < cacheTtlMs) {
+            return@withContext Result.success(emptyList())
+        }
+
         try {
             val apiKey = BuildConfig.EUROPEANA_API_KEY
             val filteredQuery = "$searchTerm AND (TYPE:IMAGE OR TYPE:VIDEO OR TYPE:SOUND)"
@@ -137,15 +150,47 @@ class BalletRepository(
             if (response.success) {
                 val items = response.items
 
-                // Filter for useful items only and replace Room records for this workId
+                // Filter for usable and playable items, then update Room cache
                 if (workId != -1) {
                     val usefulItems = items.filter { item ->
-                        !item.isShownBy?.firstOrNull().isNullOrBlank() ||
-                        !item.edmPreview?.firstOrNull().isNullOrBlank()
+                        val mediaType = (item.type ?: "IMAGE").uppercase()
+                        val highRes = item.isShownBy?.firstOrNull()?.trim().orEmpty()
+                        val preview = item.edmPreview?.firstOrNull()?.trim().orEmpty()
+                        val url = highRes.ifBlank { preview }
+
+                        if (url.isBlank()) return@filter false
+
+                        when (mediaType) {
+                            "SOUND", "AUDIO" -> {
+                                val audioUrl = url.lowercase()
+                                audioUrl.endsWith(".mp3") || audioUrl.endsWith(
+                                        ".m4a"
+                                                                              ) || audioUrl.endsWith(
+                                        ".wav"
+                                                                                                    ) ||
+                                audioUrl.endsWith(".aac") || audioUrl.contains(".mp3?")
+                            }
+
+                            "VIDEO" -> {
+                                val videoUrl = url.lowercase()
+                                videoUrl.endsWith(".mp4") || videoUrl.endsWith(
+                                        ".webm"
+                                                                              ) || videoUrl.contains(
+                                        ".mp4?"
+                                                                                                    )
+                            }
+
+                            else -> true
+                        }
                     }
 
+                    europeanaDao.deleteRecordsForWork(workId)
                     if (usefulItems.isNotEmpty()) {
                         val entities = usefulItems.mapIndexed { idx, item ->
+                            val highRes = item.isShownBy?.firstOrNull()?.trim().orEmpty()
+                            val preview = item.edmPreview?.firstOrNull()?.trim().orEmpty()
+                            val bestUrl = highRes.ifBlank { preview }
+
                             EuropeanaEntity(
                                 europeanaId = item.id.ifBlank { "eur_${workId}_$idx" },
                                 workId = workId,
@@ -155,17 +200,17 @@ class BalletRepository(
                                                ?: item.provider?.firstOrNull(),
                                 license = item.rights?.firstOrNull(),
                                 sourceUrl = item.isShownAt?.firstOrNull(),
-                                highResUrl = item.isShownBy?.firstOrNull(),
-                                previewUrl = item.edmPreview?.firstOrNull(),
+                                highResUrl = bestUrl,
+                                previewUrl = preview.ifBlank { bestUrl },
                                 mediaType = item.type ?: "IMAGE",
                                 year = item.year?.firstOrNull(),
                                 country = item.country?.firstOrNull(),
                                 europeanaPageUrl = item.guid
                                            )
                         }
-                        europeanaDao.deleteRecordsForWork(workId)
                         europeanaDao.insertRecords(entities)
                     }
+                    sessionManager.setEuropeanaLastQueryTime(workId, currentTime)
                 }
 
                 Result.success(items)
