@@ -27,19 +27,74 @@
         android:src="@drawable/ic_close"
         app:tint="@color/ballet_badge_era_text" />
 
-    <TextView
-        android:id="@+id/tvPhotoCredit"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layoutPhotoInfo"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:layout_marginTop="68dp"
-        android:background="#66000000"
-        android:letterSpacing="0.04"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="3dp"
-        android:textColor="#E6FFFFFF"
-        android:textSize="11sp"
-        tools:text="© Johan Persson" />
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_zoom_attribution"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <TextView
+            android:id="@+id/tvZoomTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="Swan Lake, Act II" />
+
+        <TextView
+            android:id="@+id/tvZoomCreator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#E6FFFFFF"
+            android:textSize="12sp"
+            tools:text="Creator: Edgar Degas" />
+
+        <TextView
+            android:id="@+id/tvZoomProvider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#B3FFFFFF"
+            android:textSize="11sp"
+            tools:text="Provider: Europeana / Victoria and Albert Museum" />
+
+        <TextView
+            android:id="@+id/tvZoomLicense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#99FFFFFF"
+            android:textSize="11sp"
+            tools:text="Rights: Public Domain" />
+
+        <TextView
+            android:id="@+id/tvPhotoCredit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#99FFFFFF"
+            android:textSize="11sp"
+            android:visibility="gone"
+            tools:text="© Johan Persson" />
+    </LinearLayout>
 
 </FrameLayout>

@@ -280,11 +280,12 @@ class DetailActivity : AppCompatActivity() {
 
         // Cover image & zoom click with Room fallback
         val primaryCover = ballet.multimedia?.coverImageUrl
+        val coverAttribution = ballet.multimedia?.attributionCover
         if (!primaryCover.isNullOrBlank()) {
             binding.ivHeroCover.loadUrl(primaryCover)
             binding.ivHeroCover.tag = primaryCover
             binding.ivHeroCover.setOnClickListener {
-                showImageZoomDialog(primaryCover)
+                showImageZoomDialog(primaryCover, coverAttribution)
             }
         }
         else {
@@ -296,7 +297,7 @@ class DetailActivity : AppCompatActivity() {
                 binding.ivHeroCover.loadUrl(fallbackImg)
                 binding.ivHeroCover.tag = fallbackImg
                 binding.ivHeroCover.setOnClickListener {
-                    showImageZoomDialog(fallbackImg)
+                    showImageZoomDialog(fallbackImg, coverAttribution)
                 }
             }
         }
@@ -670,7 +671,7 @@ class DetailActivity : AppCompatActivity() {
                     binding.rvMediaGallery.visibility = View.VISIBLE
                     val adapter = MediaGalleryAdapter { item ->
                         val zoomUrl = item.highResUrl ?: item.previewUrl
-                        showImageZoomDialog(zoomUrl)
+                        showImageZoomDialog(zoomUrl, europeanaItem = item)
                     }
                     binding.rvMediaGallery.adapter = adapter
                     adapter.submitList(images)
@@ -775,7 +776,9 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun showImageZoomDialog(imageUrl: String?) {
+    private fun showImageZoomDialog(
+            imageUrl: String?, attribution: String? = null, europeanaItem: EuropeanaEntity? = null
+                                   ) {
         if (imageUrl.isNullOrBlank()) return
         val dialogBinding = DialogImageZoomBinding.inflate(LayoutInflater.from(this))
         val dialog = android.app.Dialog(this, R.style.Theme_Ballet_ZoomDialog)
@@ -794,13 +797,50 @@ class DetailActivity : AppCompatActivity() {
         }
         dialogBinding.photoViewZoom.loadUrl(imageUrl)
 
-        val credit = currentBallet?.multimedia?.attributionCover
-        if (!credit.isNullOrBlank()) {
-            dialogBinding.tvPhotoCredit.text = credit
+        if (europeanaItem != null) {
+            dialogBinding.tvZoomTitle.text =
+                    europeanaItem.title.ifBlank { getString(R.string.app_name) }
+            dialogBinding.tvZoomTitle.visibility =
+                    if (europeanaItem.title.isNotBlank()) View.VISIBLE else View.GONE
+
+            if (!europeanaItem.creator.isNullOrBlank()) {
+                dialogBinding.tvZoomCreator.text = "Creator: ${europeanaItem.creator}"
+                dialogBinding.tvZoomCreator.visibility = View.VISIBLE
+            }
+            else {
+                dialogBinding.tvZoomCreator.visibility = View.GONE
+            }
+
+            val provider =
+                    europeanaItem.dataProvider ?: getString(R.string.europeana_archive_default)
+            val yearStr =
+                    if (!europeanaItem.year.isNullOrBlank()) " (${europeanaItem.year})" else ""
+            dialogBinding.tvZoomProvider.text = "Provider: $provider$yearStr"
+            dialogBinding.tvZoomProvider.visibility = View.VISIBLE
+
+            if (!europeanaItem.license.isNullOrBlank()) {
+                dialogBinding.tvZoomLicense.text = "Rights: ${europeanaItem.license}"
+                dialogBinding.tvZoomLicense.visibility = View.VISIBLE
+            }
+            else {
+                dialogBinding.tvZoomLicense.visibility = View.GONE
+            }
+
+            dialogBinding.tvPhotoCredit.visibility = View.GONE
+            dialogBinding.layoutPhotoInfo.visibility = View.VISIBLE
+        }
+        else if (!attribution.isNullOrBlank()) {
+            dialogBinding.tvZoomTitle.visibility = View.GONE
+            dialogBinding.tvZoomCreator.visibility = View.GONE
+            dialogBinding.tvZoomProvider.visibility = View.GONE
+            dialogBinding.tvZoomLicense.visibility = View.GONE
+
+            dialogBinding.tvPhotoCredit.text = attribution
             dialogBinding.tvPhotoCredit.visibility = View.VISIBLE
+            dialogBinding.layoutPhotoInfo.visibility = View.VISIBLE
         }
         else {
-            dialogBinding.tvPhotoCredit.visibility = View.GONE
+            dialogBinding.layoutPhotoInfo.visibility = View.GONE
         }
 
         dialogBinding.btnCloseZoom.setOnClickListener {
