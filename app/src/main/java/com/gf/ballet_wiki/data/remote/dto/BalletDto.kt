@@ -67,11 +67,17 @@ data class BalletDto(
     @SerializedName("cover_image")
     val coverImage: String? = null,
 
+    @SerializedName("cover_aspect_ratio")
+    val coverAspectRatio: Double? = null,
+
     @SerializedName("multimedia")
     private val rawMultimedia: MultimediaDto? = null,
                     ) {
     val multimedia: MultimediaDto?
         get() = rawMultimedia ?: coverImage?.let { MultimediaDto(coverImageUrl = it) }
+
+    val effectiveCoverAspectRatio: Double?
+        get() = coverAspectRatio ?: multimedia?.coverAspectRatio
 }
 
 data class HistoricalPerformanceDto(
@@ -128,6 +134,9 @@ data class AttributionCoverDto(
 data class MultimediaDto(
     @SerializedName("cover_image_url")
     val coverImageUrl: String? = null,
+
+    @SerializedName("cover_aspect_ratio")
+    val coverAspectRatio: Double? = null,
 
     @SerializedName("europeana_search_term")
     val europeanaSearchTerm: String? = null,
