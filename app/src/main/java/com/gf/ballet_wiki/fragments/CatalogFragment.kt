@@ -107,10 +107,18 @@ class CatalogFragment : Fragment() {
             }
         )
 
-        binding.rvBallets.layoutManager = GridLayoutManager(requireContext(), 2)
+        val layoutManager = GridLayoutManager(requireContext(), 2)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (adapter.getItemViewType(position)) {
+                    BalletListAdapter.VIEW_TYPE_HERO,
+                    BalletListAdapter.VIEW_TYPE_LANDSCAPE -> 2 // Hero and Landscape span 2 columns
+                    else -> 1                                   // Standard spans 1 column
+                }
+            }
+        }
+        binding.rvBallets.layoutManager = layoutManager
         binding.rvBallets.adapter = adapter
-
-        //        binding.rvBallets.fixCardsInAdapter()
     }
 
     private fun setupSearchAndFilters() {
@@ -314,6 +322,7 @@ class CatalogFragment : Fragment() {
         }
 
         adapter.submitList(filteredList) {
+            binding.rvBallets.layoutManager?.requestLayout()
             binding.tvEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
         }
     }
